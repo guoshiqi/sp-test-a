@@ -1,0 +1,9 @@
+<resources>
+    <declare-styleable name="CircleProgress">
+        <attr name="foreground_color" format="color" />
+        <attr name="foreground_end_color" format="color" />
+        <attr name="background_color" format="color" />
+        <attr name="inner_color" format="integer" />
+        <attr name="width" format="dimension" />
+    </declare-styleable>
+</resources>
