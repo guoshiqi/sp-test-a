@@ -14,6 +14,10 @@ android {
             abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
         }
     }
+    lintOptions {
+        abortOnError false
+        disable 'MissingTranslation'
+    }
     buildTypes {
         release {
             minifyEnabled false
