@@ -22,7 +22,7 @@ android {
     }
 
     productFlavors {
-        samples{
+        mdm{
             applicationId "wendu.test.spider"
             buildConfigField "int" ,"channel","3"
         }
