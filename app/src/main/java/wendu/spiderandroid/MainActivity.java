@@ -35,7 +35,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         findViewById(R.id.email).setOnClickListener(this);
         result = getView(R.id.result);
         result.setOnClickListener(this);
-        setActivityTitle("Spider Demo");
+        setActivityTitle("Spider Demon");
         result = getView(R.id.result);
         hideBackImg();
     }
@@ -45,7 +45,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         intent.setClass(this, SpiderActivity.class);
         intent.putExtra("url", "http://172.19.22.235/h5Test/dist/emails/email.html?t=" + System.currentTimeMillis());
         intent.putExtra("inject", "http://172.19.22.235/h5Test/dist/");
-        intent.putExtra("title", "账单爬取");
+        intent.putExtra("title", "邮箱爬取");
+        intent.putExtra("debug",true);
         startActivityForResult(intent, 1);
     }
 

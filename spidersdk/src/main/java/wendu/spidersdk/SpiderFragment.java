@@ -18,6 +18,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
+import com.tencent.smtt.sdk.CookieManager;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -186,6 +188,10 @@ class SpiderFragment extends BaseFragment {
 
     @Override
     public void onDestroyView() {
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.removeSessionCookie();//移除
+        cookieManager.removeAllCookie();
+        cookieManager.flush();
         mWebView.destroy();
         super.onDestroyView();
     }

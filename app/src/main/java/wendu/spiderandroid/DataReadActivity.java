@@ -12,7 +12,7 @@ public class DataReadActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data_read);
-        setActivityTitle("Content");
+        setActivityTitle("内容");
         final int index=getIntent().getIntExtra("index",-1);
         final TextView textView=getView(R.id.text);
         if(index!=-1){

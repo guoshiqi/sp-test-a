@@ -21,7 +21,7 @@ public class ResultActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
-        setActivityTitle("Latest result");
+        setActivityTitle("爬取结果");
         listView = getView(R.id.list);
         List<String> list = new ArrayList<>();
         Pattern phtml = Pattern.compile("<[^>]+>", Pattern.CASE_INSENSITIVE);

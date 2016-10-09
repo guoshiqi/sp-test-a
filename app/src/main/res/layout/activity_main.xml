@@ -33,6 +33,7 @@
           android:padding="10dp"
           android:elevation="2dp"
           android:layout_marginLeft="10dp"
+          android:visibility="gone"
           android:enabled="false"
           android:background="@drawable/b1_press_selector"
           android:text="淘宝爬取" />

@@ -106,8 +106,6 @@ public class JavaScriptBridgeImp {
             intent.putExtra("result", resultData);
             mContxt.setResult(Activity.RESULT_OK, intent);
             mContxt.finish();
-            //mContxt.onBackPressed();
-            //mContxt.upload(datas.get(sessionKey),msg);
         }
         datas.remove(sessionKey);
     }
@@ -141,8 +139,6 @@ public class JavaScriptBridgeImp {
         if (webcore.startsWith(mContxt.getCurrentCore())){
             return;
         }
-
-        mContxt.showBottomToast("webcore switch to "+ webcore);
         mContxt.open(url,webcore);
     }
 

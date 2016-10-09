@@ -3,16 +3,8 @@
 
     <color name="colorPrimary">@color/blue</color>
     <color name="colorPrimaryDark">@color/blue</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="colorBtn1">@color/colorPrimary</color>
-    <color name="colorBtn1Dark">@color/colorPrimaryDark</color>
-    <color name="colorBtn2">@color/colorAccent</color>
-    <color name="colorBtn2Dark">@color/colorAccent</color>
-
-
     <color name="c1">#555</color>
     <color name="c2">#aaa</color>
-    <color name="green">#59bf87</color>
     <color name="grey">#ddd</color>
     <color name="blue">#64C0F0</color>
     <color name="blueDark">#2189bf</color>
@@ -39,18 +31,6 @@
     <color name="black_transparent_90">#E6000000</color>
     <color name="black_transparent_100">#FF000000</color>
 
-    <!-- 白色  透明度10->100  -->
-    <color name="white_transparent_5">#12FFFFFF</color>
-    <color name="white_transparent_10">#19FFFFFF</color>
-    <color name="white_transparent_20">#33FFFFFF</color>
-    <color name="white_transparent_30">#4DFFFFFF</color>
-    <color name="white_transparent_40">#66FFFFFF</color>
-    <color name="white_transparent_50">#80FFFFFF</color>
-    <color name="white_transparent_60">#99FFFFFF</color>
-    <color name="white_transparent_70">#B3FFFFFF</color>
-    <color name="white_transparent_80">#CCFFFFFF</color>
-    <color name="white_transparent_90">#E6FFFFFF</color>
-    <color name="white_transparent_100">#FFFFFFFF</color>
 
 
 

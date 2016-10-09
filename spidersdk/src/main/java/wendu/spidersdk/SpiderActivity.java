@@ -2,6 +2,7 @@ package wendu.spidersdk;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -21,7 +22,7 @@ import com.tencent.smtt.sdk.WebView;
 
 public class SpiderActivity extends AppCompatActivity {
 
-    FrameLayout container;
+    View container;
     FrameLayout webviewLayout;
     RelativeLayout spider;
     CircleProgress workProgress;
@@ -35,6 +36,7 @@ public class SpiderActivity extends AppCompatActivity {
     RelativeLayout errorLayout;
     RelativeLayout loading;
     TextView msg;
+    TextView webcore;
 
     public String getCurrentCore() {
         return currentCore;
@@ -67,12 +69,16 @@ public class SpiderActivity extends AppCompatActivity {
         errorLayout=getView(R.id.error_layout);
         loading=getView(R.id.loading);
         msg=getView(R.id.msg);
+        webcore=getView(R.id.webcore);
         fm = getSupportFragmentManager();
         crossWalkInitializer = CrossWalkInitializer.create(SpiderActivity.this);
         crossWalkInitializer.init(false);
         url = getIntent().getStringExtra("url");
         INJECT_URL=getIntent().getStringExtra("inject");
         String title=getIntent().getStringExtra("title");
+        if(getIntent().getBooleanExtra("debug",false)){
+            webcore.setVisibility(View.VISIBLE);
+        }
         titleTv.setText(TextUtils.isEmpty(title) ? "爬取" : title);
         //open(url, "x5|sys|cs");
         open(url, "sys|x5|cs");
@@ -109,10 +115,13 @@ public class SpiderActivity extends AppCompatActivity {
         getView(R.id.back).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SpiderActivity.super.onBackPressed();
+                if (isInit){
+                    onBackPressed();
+                }else {
+                    SpiderActivity.super.onBackPressed();
+                }
             }
         });
-
         errorLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -121,7 +130,6 @@ public class SpiderActivity extends AppCompatActivity {
                 fragment.errorReload();
             }
         });
-
 
     }
 
@@ -136,8 +144,6 @@ public class SpiderActivity extends AppCompatActivity {
         errorLayout.setVisibility(View.VISIBLE);
     }
 
-
-
     public void open(final String url, final String webCore) {
         this.url = url;
         webviewLayout.post(new Runnable() {
@@ -149,7 +155,6 @@ public class SpiderActivity extends AppCompatActivity {
                     switch (core) {
                         case "sys":
                             openInDefault();
-
                             return;
                         case "cs":
                             openInCrossWalk();
@@ -202,7 +207,7 @@ public class SpiderActivity extends AppCompatActivity {
         } else {
             Dialog alertDialog=new AlertDialog.Builder(this).
                     setTitle("提示").
-                    setMessage("首次加载需要下载数据，确定？").
+                    setMessage("首次加载需要下载数据，建议在wifi环境下下载,确定？").
                     setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -213,6 +218,7 @@ public class SpiderActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
+                            onBackPressed();
                         }
                     }).create();
             alertDialog.show();
@@ -253,7 +259,7 @@ public class SpiderActivity extends AppCompatActivity {
             @Override
             void onProgress(int progress) {
                 if (progress > 95) {
-                    initView.setText("正在验证...");
+                    initView.setText("正在验证.....");
                 } else {
                     initView.setText("首次加载初始化中：" + progress + "%");
                 }
@@ -267,6 +273,7 @@ public class SpiderActivity extends AppCompatActivity {
         fm.beginTransaction()
                 .replace(R.id.fragment, fragment, "")
                 .commit();
+        webcore.setText("webcore: "+currentCore);
     }
 
     boolean isX5() {
