@@ -25,7 +25,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     TextView result;
     String billId = "";
-    private SpiderServiceTest spiderService = DataController.getUploadSerivce();
+    private SpiderService spiderService = DataController.getUploadSerivce();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +70,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             ResultData resultData = (ResultData) data.getSerializableExtra("result");
             LatestResult.getInstance().getData().clear();
             LatestResult.getInstance().getData().addAll(resultData.datas);
+            upload(resultData.datas,resultData.errorMsg);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -105,6 +106,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
 
         final Gson gson = new Gson();
+        showLoadDialog("正在上传数据...");
         spiderService.sycTaskStatus(0, null, email, null, size, bank)
                 .subscribeOn(Schedulers.io())
                 .flatMap(new Func1<SpiderResponse, Observable<List<String>>>() {
@@ -144,22 +146,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                                 .subscribe(new Subscriber<SpiderResponse>() {
                                     @Override
                                     public void onCompleted() {
-                                        showDialog("提示", "爬取结束", new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                onBackPressed();
-                                            }
-                                        });
+                                        hideLoadDialog();
+                                        showDialog("提示", "爬取结束");
                                     }
 
                                     @Override
                                     public void onError(Throwable e) {
-                                        showDialog("爬取失败", e.getMessage(), new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                onBackPressed();
-                                            }
-                                        });
+                                        hideLoadDialog();
+                                        showDialog("爬取失败", e.getMessage());
                                     }
 
                                     @Override
@@ -171,12 +165,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
                     @Override
                     public void onError(Throwable e) {
-                        showDialog("失败", e.getMessage(), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                onBackPressed();
-                            }
-                        });
+                        hideLoadDialog();
+                        showDialog("失败", e.getMessage());
                         e.printStackTrace();
                     }
 
@@ -188,6 +178,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void errorReport(final String email, final String bank, final String errmsg) {
+        showLoadDialog("正在上报错误信息...");
         spiderService.sycTaskStatus(0, null, email, null, 0, bank)
                 .subscribeOn(Schedulers.io())
                 .flatMap(new Func1<SpiderResponse, Observable<SpiderResponse>>() {
@@ -201,22 +192,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 .subscribe(new Subscriber<SpiderResponse>() {
                     @Override
                     public void onCompleted() {
-                        showDialog("提示", "爬取失败［脚本错误］－错误上报成功", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                onBackPressed();
-                            }
-                        });
+                        hideLoadDialog();
+                        showDialog("提示", "爬取失败［脚本错误］－错误上报成功");
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        showDialog("提示", "爬取失败[脚本错误]－上报失败（网络错误）" + e.getMessage(), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                onBackPressed();
-                            }
-                        });
+                        hideLoadDialog();
+                        showDialog("提示", "爬取失败[脚本错误]－上报失败（网络错误）" + e.getMessage());
                     }
 
                     @Override

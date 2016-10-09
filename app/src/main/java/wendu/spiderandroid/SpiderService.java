@@ -10,8 +10,6 @@ import rx.Observable;
  * Created by du on 16/8/16.
  */
 public interface SpiderService {
-    @GET("/?platform=android")
-    Observable<String> getInjectJs(@Query("refer") String refer);
 
     @FormUrlEncoded
     @POST("status?channel=1")
