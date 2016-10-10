@@ -245,6 +245,7 @@ public class SpiderActivity extends AppCompatActivity {
                         setPositiveButton("返回",new DialogInterface.OnClickListener(){
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                isInit=false;
                                 onBackPressed();
                             }
                         }).create();

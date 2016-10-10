@@ -15,6 +15,11 @@
         <meta-data
             android:name="xwalk_verify"
             android:value="disable" />
+
+        <!--<meta-data-->
+            <!--android:name="xwalk_apk_url"-->
+            <!--android:value="http://119.29.112.230:9350/webcores" />-->
+
         <meta-data
         android:name="xwalk_apk_url"
         android:value="http://test.iguoxue.org/spider/crosswalk.php" />
@@ -22,6 +27,7 @@
         <!--<meta-data-->
             <!--android:name="xwalk_apk_url"-->
             <!--android:value="http://172.19.22.235/h5Test/dist/crosswalk.php" />-->
+
     </application>
 
 </manifest>

@@ -35,12 +35,12 @@ android {
             shrinkResources true //去除无用资源
         }
 
-        debug {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
-            shrinkResources true //去除无用资源
-        }
+//        debug {
+//            minifyEnabled true
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//            signingConfig signingConfigs.release
+//            shrinkResources true //去除无用资源
+//        }
     }
 
     productFlavors {
