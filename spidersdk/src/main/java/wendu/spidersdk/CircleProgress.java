@@ -12,7 +12,7 @@ import android.view.View;
 /**
  * Created by du on 16/4/19.
  */
-public class CircleProgress extends View {
+class CircleProgress extends View {
 
     double startDegree =-Math.PI/2 ;
     double endDegree = Math.PI*2+startDegree;

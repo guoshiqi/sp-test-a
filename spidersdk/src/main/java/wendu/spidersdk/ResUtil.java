@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 /**
  * Created by du on 16/4/15.
  */
-public class ResUtil {
+class ResUtil {
     public static int getColor(Context ctx,int resId) {
         return ContextCompat.getColor(ctx, resId);
     }

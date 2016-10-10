@@ -15,3 +15,27 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-keepattributes *JavascriptInterface*
+-keepattributes Signature
+-keepattributes *Annotation*
+-keepclassmembers class wendu.spidersdk.JavaScriptBridge {
+      public *;
+   }
+-keepclassmembers class wendu.spidersdk.JavaScriptBridgeForCrossWalk{
+      public *;
+   }
+-keep class wendu.spidersdk.ResultData
+-keep class wendu.spidersdk.CrossWalkInitializer
+-keep class wendu.spidersdk.SpiderActivity
+
+#xwalk
+-keep class org.xwalk.core.** { *;}
+-keep class org.chromium.** { *;}
+-keepattributes **
+-keep  class  junit.framework.**{*;}
+#x5
+-dontwarn class com.tencent.smtt.**
+-dontwarn class com.tencent.tbs.**
+-keep class com.tencent.smtt.**{*;}
+-keep class com.tencent.tbs.**{*;}

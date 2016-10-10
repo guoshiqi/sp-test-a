@@ -8,7 +8,7 @@ import org.xwalk.core.JavascriptInterface;
  * Created by du on 16/8/17.
  */
 
-public class JavaScriptBridgeForCrossWalk {
+ class JavaScriptBridgeForCrossWalk {
     private JavaScriptBridgeImp jsbImp;
 
     public JavaScriptBridgeForCrossWalk(Context mContext ) {

@@ -25,7 +25,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class SpiderCrossWalkFragment extends BaseFragment {
+ public class SpiderCrossWalkFragment extends BaseFragment {
 
     private XWalkView mWebView;
     private ProgressBar mProgressBar;

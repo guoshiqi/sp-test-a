@@ -15,7 +15,7 @@ import java.util.List;
  * Created by du on 16/8/17.
  */
 
-public class JavaScriptBridgeImp {
+ class JavaScriptBridgeImp {
     private SpiderActivity mContxt;
     private HashMap<String, String> session = new HashMap<>();
     private HashMap<String, List<String>> datas = new HashMap<>();

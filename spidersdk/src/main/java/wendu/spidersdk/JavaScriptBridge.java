@@ -6,7 +6,7 @@ import android.webkit.JavascriptInterface;
  * Created by du on 16/8/17.
  */
 
-public class JavaScriptBridge {
+ class JavaScriptBridge {
 
     private JavaScriptBridgeImp jsbImp;
     public JavaScriptBridge(Context mContext) {

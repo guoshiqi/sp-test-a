@@ -26,7 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-class SpiderFragment extends BaseFragment {
+public class SpiderFragment extends BaseFragment {
 
     private WebView mWebView;
     private ProgressBar mProgressBar;

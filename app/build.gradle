@@ -4,6 +4,15 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
+    signingConfigs {
+        release {
+            keyAlias 'cardloan'
+            keyPassword 'xiaoying@1234'
+            storeFile file('../sign/cardloan.jks')
+            storePassword 'xiaoying@1234'
+        }
+    }
+
     defaultConfig {
         applicationId "wendu.commonlib"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -20,8 +29,10 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+            shrinkResources true //去除无用资源
         }
     }
 
