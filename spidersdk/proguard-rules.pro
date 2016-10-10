@@ -35,7 +35,5 @@
 -keepattributes **
 -keep  class  junit.framework.**{*;}
 #x5
--dontwarn class com.tencent.smtt.**
--dontwarn class com.tencent.tbs.**
 -keep class com.tencent.smtt.**{*;}
 -keep class com.tencent.tbs.**{*;}

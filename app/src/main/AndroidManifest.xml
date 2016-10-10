@@ -26,6 +26,9 @@
 
         <activity android:name=".ResultActivity" />
         <activity android:name=".DataReadActivity"></activity>
+        <!--<meta-data-->
+        <!--android:name="xwalk_apk_url"-->
+        <!--android:value="http://172.19.22.235/h5Test/dist/crosswalk.php" />-->
     </application>
 
 </manifest>

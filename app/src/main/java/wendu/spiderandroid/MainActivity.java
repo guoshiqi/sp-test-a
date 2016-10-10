@@ -43,8 +43,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     void openActivity() {
         Intent intent = new Intent();
         intent.setClass(this, SpiderActivity.class);
-        //String baseUrl="http://172.19.22.235/spider-script/emails/"
-        String baseUrl="http://test.iguoxue.org/spider/emails/";
+        String baseUrl="http://172.19.22.235/spider-script/emails/";
+        //String baseUrl="http://test.iguoxue.org/spider/emails/";
         intent.putExtra("url",baseUrl+ "email.html?t=" + System.currentTimeMillis());
         intent.putExtra("inject", baseUrl);
         intent.putExtra("title", "邮箱爬取");
