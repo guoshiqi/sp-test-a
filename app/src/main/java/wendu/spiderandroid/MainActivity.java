@@ -8,6 +8,10 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,10 +71,20 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1 && resultCode == RESULT_OK) {
-            ResultData resultData = (ResultData) data.getSerializableExtra("result");
-            LatestResult.getInstance().getData().clear();
-            LatestResult.getInstance().getData().addAll(resultData.datas);
-            upload(resultData.datas,resultData.errorMsg);
+            String dataFile= data.getStringExtra("result");
+            ResultData resultData;
+            File file=new File(dataFile) ;
+            try {
+             FileInputStream fileInputStream = new FileInputStream(file.toString());
+             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+             resultData= (ResultData) objectInputStream.readObject();
+             LatestResult.getInstance().getData().clear();
+             LatestResult.getInstance().getData().addAll(resultData.datas);
+             upload(resultData.datas, resultData.errorMsg);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -104,6 +118,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             }
             return;
         }
+        showDialog("提示", "爬取结束");
+
+        //// TODO: 16/10/20 测试环境不上传数据
+        if(true) return;
 
         final Gson gson = new Gson();
         showLoadDialog("正在上传数据...");

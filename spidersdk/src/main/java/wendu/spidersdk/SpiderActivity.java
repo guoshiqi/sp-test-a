@@ -1,7 +1,9 @@
 package wendu.spidersdk;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,6 +21,10 @@ import android.widget.Toast;
 
 import com.tencent.smtt.sdk.QbSdk;
 import com.tencent.smtt.sdk.WebView;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 
 public class SpiderActivity extends AppCompatActivity {
 
@@ -42,15 +48,15 @@ public class SpiderActivity extends AppCompatActivity {
         return currentCore;
     }
 
-    String currentCore="";
-    public  static String INJECT_URL="";
+    String currentCore = "";
+    public static String INJECT_URL = "";
     private int max = 100;
     private static final String TAG = "SpiderActivity";
     private String url;
     boolean isInit = false;
 
     public <T extends View> T getView(int viewId) {
-        View  view = findViewById(viewId);
+        View view = findViewById(viewId);
         return (T) view;
     }
 
@@ -59,24 +65,24 @@ public class SpiderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spider);
         QbSdk.preInit(this);
-        container=getView(R.id.container);
-        webviewLayout=getView(R.id.fragment);
-        spider=getView(R.id.spider);
-        workProgress=getView(R.id.work_progress);
-        percentage=getView(R.id.percentage);
-        initView=getView(R.id.init);
-        titleTv=getView(R.id.title);
-        errorLayout=getView(R.id.error_layout);
-        loading=getView(R.id.loading);
-        msg=getView(R.id.msg);
-        webcore=getView(R.id.webcore);
+        container = getView(R.id.container);
+        webviewLayout = getView(R.id.fragment);
+        spider = getView(R.id.spider);
+        workProgress = getView(R.id.work_progress);
+        percentage = getView(R.id.percentage);
+        initView = getView(R.id.init);
+        titleTv = getView(R.id.title);
+        errorLayout = getView(R.id.error_layout);
+        loading = getView(R.id.loading);
+        msg = getView(R.id.msg);
+        webcore = getView(R.id.webcore);
         fm = getSupportFragmentManager();
         crossWalkInitializer = CrossWalkInitializer.create(SpiderActivity.this);
         crossWalkInitializer.init(false);
         url = getIntent().getStringExtra("url");
-        INJECT_URL=getIntent().getStringExtra("inject");
-        String title=getIntent().getStringExtra("title");
-        if(getIntent().getBooleanExtra("debug",false)){
+        INJECT_URL = getIntent().getStringExtra("inject");
+        String title = getIntent().getStringExtra("title");
+        if (getIntent().getBooleanExtra("debug", false)) {
             webcore.setVisibility(View.VISIBLE);
         }
         titleTv.setText(TextUtils.isEmpty(title) ? "爬取" : title);
@@ -107,17 +113,36 @@ public class SpiderActivity extends AppCompatActivity {
                     case 6:
                         showLoadErrorView();
                         break;
+                    case 7:
+                        Intent intent=new Intent();
+                        try {
+                            String path=getCacheDir()+"/spider.dat";
+                            File file = new File(path);
+                            file.delete();
+                            file.createNewFile();
+                            FileOutputStream fileOutputStream = new FileOutputStream(file.toString());
+                            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+                            objectOutputStream.writeObject(msg.obj);
+                            intent.putExtra("result", path);
+                            setResult(Activity.RESULT_OK, intent);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            setResult(Activity.RESULT_CANCELED, intent);
+
+                        }
+                        finish();
 
                 }
             }
         };
 
+
         getView(R.id.back).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isInit){
+                if (isInit) {
                     onBackPressed();
-                }else {
+                } else {
                     SpiderActivity.super.onBackPressed();
                 }
             }
@@ -133,14 +158,16 @@ public class SpiderActivity extends AppCompatActivity {
 
     }
 
-    void showLoadView(String message){
+    void showLoadView(String message) {
         loading.setVisibility(View.VISIBLE);
         msg.setText(message);
     }
-    void hideLoadView(){
+
+    void hideLoadView() {
         loading.setVisibility(View.GONE);
     }
-    void showLoadErrorView(){
+
+    void showLoadErrorView() {
         errorLayout.setVisibility(View.VISIBLE);
     }
 
@@ -151,7 +178,7 @@ public class SpiderActivity extends AppCompatActivity {
             public void run() {
                 String[] cores = webCore.split("\\|");
                 for (String core : cores) {
-                    currentCore=core;
+                    currentCore = core;
                     switch (core) {
                         case "sys":
                             openInDefault();
@@ -205,7 +232,7 @@ public class SpiderActivity extends AppCompatActivity {
             fragment = SpiderCrossWalkFragment.newInstance(url, true);
             startFragment();
         } else {
-            Dialog alertDialog=new AlertDialog.Builder(this).
+            Dialog alertDialog = new AlertDialog.Builder(this).
                     setTitle("提示").
                     setMessage("首次加载需要下载数据，建议在wifi环境下下载,确定？").
                     setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -239,13 +266,13 @@ public class SpiderActivity extends AppCompatActivity {
 
             @Override
             void onFailed() {
-                Dialog alertDialog=new AlertDialog.Builder(SpiderActivity.this).
+                Dialog alertDialog = new AlertDialog.Builder(SpiderActivity.this).
                         setTitle("提示").
                         setMessage("加载失败").
-                        setPositiveButton("返回",new DialogInterface.OnClickListener(){
+                        setPositiveButton("返回", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                isInit=false;
+                                isInit = false;
                                 onBackPressed();
                             }
                         }).create();
@@ -274,7 +301,7 @@ public class SpiderActivity extends AppCompatActivity {
         fm.beginTransaction()
                 .replace(R.id.fragment, fragment, "")
                 .commit();
-        webcore.setText("webcore: "+currentCore);
+        webcore.setText("webcore: " + currentCore);
     }
 
     boolean isX5() {
@@ -302,9 +329,9 @@ public class SpiderActivity extends AppCompatActivity {
         return handler;
     }
 
-    public void showBottomToast(String msg){
-        Toast toast= Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.BOTTOM,0,0);
+    public void showBottomToast(String msg) {
+        Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.BOTTOM, 0, 0);
         toast.show();
     }
 
@@ -317,10 +344,11 @@ public class SpiderActivity extends AppCompatActivity {
         }
         super.onDestroy();
     }
+
     @Override
     public void onBackPressed() {
         if (isInit) {
-            Dialog alertDialog=new AlertDialog.Builder(SpiderActivity.this).
+            Dialog alertDialog = new AlertDialog.Builder(SpiderActivity.this).
                     setTitle("提示").
                     setMessage("正在初始化，确定要退出吗？").
                     setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -336,10 +364,10 @@ public class SpiderActivity extends AppCompatActivity {
                             dialog.dismiss();
                         }
                     })
-                   .create();
+                    .create();
             alertDialog.show();
         } else {
-            if(!fragment.goBack()) {
+            if (!fragment.goBack()) {
                 super.onBackPressed();
             }
         }

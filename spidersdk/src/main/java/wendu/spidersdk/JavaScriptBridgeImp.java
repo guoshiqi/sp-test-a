@@ -101,11 +101,14 @@ import java.util.List;
         if (reslut==1){
             mContxt.getHandler().sendEmptyMessage(6);
         }else {
-            ResultData resultData=new ResultData(sessionKey,datas.get(sessionKey),msg);
-            Intent intent=new Intent();
-            intent.putExtra("result", resultData);
-            mContxt.setResult(Activity.RESULT_OK, intent);
-            mContxt.finish();
+            Message message = new Message();
+            message.what = 7;
+            message.obj=new ResultData(sessionKey,datas.get(sessionKey),msg);
+            mContxt.getHandler().sendMessage(message);
+//            Intent intent=new Intent();
+//            intent.putExtra("result", resultData);
+//            mContxt.setResult(Activity.RESULT_OK, intent);
+//            mContxt.finish();
         }
         datas.remove(sessionKey);
     }
