@@ -201,5 +201,4 @@ public class SpiderFragment extends BaseFragment {
         webView.loadUrl("javascript:" + js);
     }
 
-
 }
