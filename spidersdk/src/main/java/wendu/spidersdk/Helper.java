@@ -5,29 +5,46 @@ import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Created by du on 16/4/15.
  */
-class ResUtil {
+class Helper {
+    public static boolean isDebug=false;
     public static int getColor(Context ctx,int resId) {
         return ContextCompat.getColor(ctx, resId);
     }
-    public static String getFromAssets(Context ctx,String fileName) {
-        try {
-            InputStreamReader inputReader = new InputStreamReader(ctx.getResources().getAssets().open(fileName));
-            BufferedReader bufReader = new BufferedReader(inputReader);
-            String line = "";
-            String Result = "";
-            while ((line = bufReader.readLine()) != null)
-                Result += line;
-            return Result;
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static String getFromAssets(Context ctx,String ...fileName) {
+        String result = "";
+        for(String file : fileName) {
+            try {
+                InputStreamReader inputReader = new InputStreamReader(ctx.getResources().getAssets().open(file));
+                BufferedReader bufReader = new BufferedReader(inputReader);
+                String line = "";
+                while ((line = bufReader.readLine()) != null)
+                    result += line+"\r\n";
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        return "";
+        return result;
     }
+    public static InputStream getStreamFromAssets(Context ctx,String ...fileName) throws UnsupportedEncodingException {
+       return new ByteArrayInputStream(getFromAssets(ctx, fileName).getBytes("utf8"));
+
+    }
+    public static InputStream getDebugScript(Context ctx) throws UnsupportedEncodingException {
+        return getStreamFromAssets(ctx, "spider-android-debug.js","spider-index.js");
+    }
+    public static InputStream getDqueryScript(Context ctx) throws UnsupportedEncodingException {
+        return getStreamFromAssets(ctx, "jquery-3.1.0.min.js");
+    }
+
+
 
 
     public static  class ColorGradientHelper{

@@ -50,9 +50,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         //String baseUrl="http://172.19.22.235/spider-script/emails/";
         String baseUrl="http://test.iguoxue.org/spider/emails/";
         intent.putExtra("url",baseUrl+ "email.html?t=" + System.currentTimeMillis());
-        intent.putExtra("inject", baseUrl);
+        intent.putExtra("inject", baseUrl + "inject.php");
         intent.putExtra("title", "邮箱爬取");
-        intent.putExtra("debug", true);
+        //调试模式传true
+        intent.putExtra("debug", false);
         startActivityForResult(intent, 1);
     }
 
@@ -70,21 +71,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1 && resultCode == RESULT_OK) {
-            String dataFile= data.getStringExtra("result");
-            ResultData resultData;
-            File file=new File(dataFile) ;
-            try {
-             FileInputStream fileInputStream = new FileInputStream(file.toString());
-             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-             resultData= (ResultData) objectInputStream.readObject();
-             LatestResult.getInstance().getData().clear();
-             LatestResult.getInstance().getData().addAll(resultData.datas);
-             upload(resultData.datas, resultData.errorMsg);
-            } catch (Exception e) {
-                e.printStackTrace();
+        if (requestCode == 1 ) {
+            //获取爬取数据
+            if(resultCode == RESULT_OK) {
+                ResultData resultData = ResultData.getResult(this);
+                if (resultData != null) {
+                    LatestResult.getInstance().getData().clear();
+                    LatestResult.getInstance().getData().addAll(resultData.datas);
+                    upload(resultData.datas, resultData.errorMsg);
+                }
+            } else {
+                showDialog("中途取消");
             }
-
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

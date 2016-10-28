@@ -20,12 +20,12 @@ class CircleProgress extends View {
     int max=100;
     int percent;
     float WIDTH = 2f * getResources().getDisplayMetrics().density;
-    int foregroundColor = ResUtil.getColor(getContext(), R.color.colorPrimary);
+    int foregroundColor = Helper.getColor(getContext(), R.color.colorPrimary);
     int backgroundColor = Color.argb(30, Color.red(foregroundColor),
             Color.green(foregroundColor),Color.blue(foregroundColor));
     int innerColor =Color.TRANSPARENT;
 
-    ResUtil.ColorGradientHelper colorGradientHelper;
+    Helper.ColorGradientHelper colorGradientHelper;
 
     public CircleProgress(Context context)
     {
@@ -50,7 +50,7 @@ class CircleProgress extends View {
                 a.recycle();
             }
         }
-        colorGradientHelper=new ResUtil.ColorGradientHelper(foregroundColor,foregroundColorEnd);
+        colorGradientHelper=new Helper.ColorGradientHelper(foregroundColor,foregroundColorEnd);
     }
 
     @Override

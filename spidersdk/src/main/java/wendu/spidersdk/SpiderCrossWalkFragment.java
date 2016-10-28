@@ -152,29 +152,38 @@ import java.net.URL;
             if (url.indexOf("xiaoying/jquery.min.js") != -1) {
                 try {
                     //加载本地jquery
-                    InputStream data = new ByteArrayInputStream(ResUtil.getFromAssets(getContext(),"jquery-3.1.0.min.js").getBytes("utf8"));
+                    InputStream data =  Helper.getDqueryScript(getContext());
                     response = createXWalkWebResourceResponse(contentType, "UTF-8", data);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
 
             } else if (url.indexOf("xiaoying/inject.php") != -1) {
-                try {
-                    URL uri = new URL(SpiderActivity.INJECT_URL+"inject.php?platform=android&refer=" + url.substring(url.indexOf("refer=") + 6));
-                    HttpURLConnection urlCon = (HttpURLConnection) uri.openConnection();
-                    urlCon.setRequestMethod("GET");
-                    response=createXWalkWebResourceResponse(contentType,
-                            "UTF-8", urlCon.getInputStream());
-                }catch (Exception e){
-                    e.printStackTrace();
-                    view.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            context.showLoadErrorView();
-                        }
-                    });
-                }
+                if (Helper.isDebug) {
+                    try {
+                        response = createXWalkWebResourceResponse(contentType, "UTF-8", Helper.getDebugScript(getContext()));
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                } else {
 
+                    try {
+                        URL uri = new URL(SpiderActivity.INJECT_URL + "?platform=android&refer=" + url.substring(url.indexOf("refer=") + 6));
+                        HttpURLConnection urlCon = (HttpURLConnection) uri.openConnection();
+                        urlCon.setRequestMethod("GET");
+                        response = createXWalkWebResourceResponse(contentType,
+                                "UTF-8", urlCon.getInputStream());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        view.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                context.showLoadErrorView();
+                            }
+                        });
+                    }
+
+                }
             }
             return response==null?super.shouldInterceptLoadRequest(view,request):response;
         }
@@ -198,7 +207,7 @@ import java.net.URL;
     }
 
     void injectJs(XWalkView webView) {
-        String js = ResUtil.getFromAssets(getContext(),"injector.js");
+        String js = Helper.getFromAssets(getContext(), "injector.js");
         webView.load("javascript:" + js,null);
     }
 

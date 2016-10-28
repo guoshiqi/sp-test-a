@@ -82,7 +82,8 @@ public class SpiderActivity extends AppCompatActivity {
         url = getIntent().getStringExtra("url");
         INJECT_URL = getIntent().getStringExtra("inject");
         String title = getIntent().getStringExtra("title");
-        if (getIntent().getBooleanExtra("debug", false)) {
+        Helper.isDebug=getIntent().getBooleanExtra("debug", false);
+        if ( Helper.isDebug) {
             webcore.setVisibility(View.VISIBLE);
         }
         titleTv.setText(TextUtils.isEmpty(title) ? "爬取" : title);
