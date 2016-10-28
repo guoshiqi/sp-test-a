@@ -19,12 +19,12 @@ String.prototype.empty = function () {
 };
 
 function log(){
-    for(var i=0;i<arguments.length;++i)  {
-     var str=arguments[i];
-      str=typeof str=="object"?JSON.stringify(str):str;
-      console.log("xy log: "+ str);
-    }
-}
+     for(var i=0;i<arguments.length;++i)  {
+      var str=arguments[i];
+       str=typeof str=="object"?JSON.stringify(str):str;
+       console.log("xy log: "+ str);
+     }
+ }
 
 String.prototype.endWith = function (str) {
     if (!str) return false;
