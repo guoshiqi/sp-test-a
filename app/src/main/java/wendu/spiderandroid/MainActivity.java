@@ -2,8 +2,10 @@ package wendu.spiderandroid;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.SwitchCompat;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -29,7 +31,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     TextView result;
     String billId = "";
+    SwitchCompat debugSwitch;
     private SpiderService spiderService = DataController.getUploadSerivce();
+    boolean isDebug=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,11 +41,21 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         //   x.Ext.init(getApplication());
         setContentView(R.layout.activity_main);
         findViewById(R.id.email).setOnClickListener(this);
+        debugSwitch=getView(R.id.debug);
+        isDebug=KvStorage.getInstance().getBoolean("debug",false);
+        debugSwitch.setChecked(isDebug);
         result = getView(R.id.result);
         result.setOnClickListener(this);
         setActivityTitle("Spider Demon");
         result = getView(R.id.result);
         hideBackImg();
+        debugSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+              isDebug=isChecked;
+              KvStorage.getInstance().edit().putBoolean("debug", isDebug).commit();
+            }
+        });
     }
 
     void openActivity() {
@@ -49,11 +63,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         intent.setClass(this, SpiderActivity.class);
         //String baseUrl="http://172.19.22.235/spider-script/emails/";
         String baseUrl="http://test.iguoxue.org/spider/emails/";
+        //将要打开页面url
         intent.putExtra("url",baseUrl+ "email.html?t=" + System.currentTimeMillis());
+        //注入url
         intent.putExtra("inject", baseUrl + "inject.php");
         intent.putExtra("title", "邮箱爬取");
-        //调试模式传true
-        intent.putExtra("debug", false);
+        //调试模式
+        intent.putExtra("debug", isDebug);
         startActivityForResult(intent, 1);
     }
 
@@ -81,7 +97,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     upload(resultData.datas, resultData.errorMsg);
                 }
             } else {
-                showDialog("中途取消");
+                showToast("爬取任务取消");
             }
         }
         super.onActivityResult(requestCode, resultCode, data);

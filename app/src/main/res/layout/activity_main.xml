@@ -1,55 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-      android:orientation="vertical"
+    android:background="#fff"
+    android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="#fff"
     tools:context="wendu.androidcommonlibs.MainActivity">
+
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:gravity="center">
-    <TextView
-      android:id="@+id/email"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:elevation="2dp"
-      android:padding="10dp"
-      android:textColor="@color/white"
-      android:background="@drawable/b1_press_selector"
-      android:text="邮箱爬取" />
+        android:gravity="center"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
+                android:text="调试模式"
+                />
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/debug"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
-      <TextView
-          android:id="@+id/url"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:padding="10dp"
-          android:elevation="2dp"
-          android:layout_marginLeft="10dp"
-          android:visibility="gone"
-          android:enabled="false"
-          android:background="@drawable/b1_press_selector"
-          android:text="淘宝爬取" />
-     </LinearLayout>
+        </LinearLayout>
+
+
+
+        <TextView
+            android:id="@+id/email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/b1_press_selector"
+            android:elevation="2dp"
+            android:padding="10dp"
+            android:text="邮箱爬取"
+            android:textColor="@color/white" />
+
+
+        <TextView
+            android:id="@+id/url"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/b1_press_selector"
+            android:elevation="2dp"
+            android:enabled="false"
+            android:padding="10dp"
+            android:text="淘宝爬取"
+            android:visibility="gone" />
+    </LinearLayout>
+
     <TextView
         android:id="@+id/result"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
+        android:background="@drawable/b1_press_selector"
         android:elevation="2dp"
-        android:textAlignment="center"
         android:padding="10dp"
+        android:textAlignment="center"
         android:textColor="@color/white"
-        android:visibility="gone"
-        android:background="@drawable/b1_press_selector" />
+        android:visibility="gone" />
 
 
-  </LinearLayout>
+</LinearLayout>
 
