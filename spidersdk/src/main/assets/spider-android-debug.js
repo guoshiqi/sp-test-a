@@ -182,7 +182,9 @@ DataSession.prototype = {
         f && f(JSON.parse(t || "{}"))
     },
     "get": function (key, f) {
-        f && f(this.data()[key]);
+        f && this.data(function(data){
+           f(data[key])
+        });
     },
     "set": function (key, value) {
         var t = _xy.get(this.key);
