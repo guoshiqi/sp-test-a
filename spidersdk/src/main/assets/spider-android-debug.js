@@ -25,6 +25,11 @@ function log(){
        console.log("xy log: "+ str);
      }
  }
+ //异常捕获
+ function errorReport(e){
+     console.error("xy log: 语法错误: "+e.message+e.stack);
+     window.curSession&&curSession.finish(e.toString(),"")
+ }
 
 String.prototype.endWith = function (str) {
     if (!str) return false;
@@ -43,11 +48,7 @@ MutationObserver = window.MutationObserver ||
     window.WebKitMutationObserver ||
     window.MozMutationObserver;
 
-//异常捕获
-function errorReport(e){
-    console.error(" 语法错误: "+e.toString());
-    window.curSession&&curSession.finish(e.toString(),"")
-}
+
 
 function  safeCallback(f){
     if (!(f instanceof Function)) return f;
@@ -151,7 +152,7 @@ function dSpider(sessionKey, callback) {
     },20);
 }
 
-window.local = {
+var dSpiderLocal = {
     set: function (k, v) {
         return _xy.save(k, v)
     },
@@ -182,7 +183,9 @@ DataSession.prototype = {
         f && f(JSON.parse(t || "{}"))
     },
     "get": function (key, f) {
-        f && f(this.data()[key]);
+        this.data(function (d) {
+            f && f(d[key])
+           })
     },
     "set": function (key, value) {
         var t = _xy.get(this.key);
