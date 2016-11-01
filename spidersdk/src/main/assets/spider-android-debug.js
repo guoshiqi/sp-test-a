@@ -208,18 +208,20 @@ DataSession.prototype = {
         f && f(_xy.getProgress());
     },
     "showLoading": function (s) {
-        _xy.showLoading(s || "正在爬取,请耐心等待...")
+        _xy.showLoading(s || "正在处理,请耐心等待...")
     },
     "hideLoading": function () {
         _xy.hideLoading()
     },
     "finish": function (errmsg, content, code) {
         this.finished=true;
+        this.hideLoading();
+        this.showProgress(false);
         if (errmsg) {
             var ob = {
                 url: location.href,
                 msg: errmsg,
-                content: content == undefined ? document.documentElement.outerHTML : content,
+                content: content||document.documentElement.outerHTML ,
                 extra: _xy.getExtraData()
             }
             return _xy.finish(this.key || "", code || 2, JSON.stringify(ob));
@@ -233,11 +235,15 @@ DataSession.prototype = {
         return _xy.push(this.key, value)
     },
 
+    "openWithSpecifiedCore":function(url, core){
+        _xy.openWithSpecifiedCore(url, core)
+    },
+
     "string": function (f) {
-        f=safeCallback(f);
-        var d = JSON.stringify(_xy.get(this.key));
-        f && f(d);
-        f || log(d);
+        this.data(function (d) {
+             f || log(d)
+             f && f(d)
+         })
     }
 };
 apiInit();
