@@ -64,7 +64,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         //String baseUrl="http://172.19.22.235/spider-script/emails/";
         String baseUrl="http://test.iguoxue.org/spider/emails/";
         //将要打开页面url
-        intent.putExtra("url",baseUrl+ "email.html?t=" + System.currentTimeMillis());
+
+        intent.putExtra("url","https://plogin.m.jd.com/user/login.action?appid=100");
+        //intent.putExtra("url",baseUrl+ "email.html?t=" + System.currentTimeMillis());
         //注入url
         intent.putExtra("inject", baseUrl + "inject.php");
         intent.putExtra("title", "邮箱爬取");
