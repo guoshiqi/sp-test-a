@@ -119,7 +119,7 @@ public class SpiderX5Fragment extends BaseFragment {
         public void onPageFinished(final WebView view, String url) {
             super.onPageFinished(view, url);
             injectJs(view);
-            context.hideLoadView();
+            //context.hideLoadView();
         }
 
         @Override
