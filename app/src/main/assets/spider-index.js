@@ -20,6 +20,7 @@ dSpider("sessionkey", function(session,env,$){
    //place your code here!
 if (window.location.pathname.indexOf("mlapp/mytaobao") != -1) {
     //taobaoState    0:爬账单  1:爬地址   2:爬个人信息   3:结束
+    session.set("taobaoState",1);//调试爬取地址---------------调试
     session.get("taobaoState",function(count){
         if(count!=1&&count!=2&&count!=3){
             if(count == 0){
@@ -29,11 +30,15 @@ if (window.location.pathname.indexOf("mlapp/mytaobao") != -1) {
                 session.set("orderArray",[]);
             }
             document.getElementsByClassName("label-act")[0].children[0].children[0].click();//点击订单
-        }else{
-            log("----------************----------************----------")
+        }else if(count==1){
+            //跳转到网页版   www.taobao.com
+            session.set("AddressData",[]);
+            location.href="//www.taobao.com/index.php?from=wap"
         }
     });
 }
+
+
 
 //获取订单列表
 if (window.location.pathname.indexOf("mlapp/olist") != -1) {
@@ -259,7 +264,66 @@ if (window.location.pathname.indexOf("mlapp/odetail") != -1) {
         $("div.back").click();//订单详情页的返回
     }
 }
+//------------------------------------------------------------------------------------爬取收货地址----------------------------------------------------------------------------
+/**
+ * 爬取收货地址
+ */
+if((window.location.hostname.indexOf("www.taobao.com") != -1)){
+    location.href = "//i.taobao.com/my_taobao.htm";
+}
 
+if((window.location.href.indexOf("i.taobao.com/my_taobao") != -1)){
+    log("----------------------------进入到账号管理界面----------------------------");
+    dQuery("li.J_MtNavSubTrigger").children()[0].click();//进入到账号管理界面
+    log("----------------------------click事件已经执行----------------------------");
+}
 
+if((window.location.hostname.indexOf("member1.taobao.com") != -1)){
+    if((window.location.href.indexOf("deliver_address") != -1)){
+        if((window.location.href.indexOf("addrId") != -1)){
+            session.get("AddressData",function(addressData){
+                session.get("addressUrlArray",function(urlArray){//取出href和位置并发起请求
+                    session.get("addressUrlPosition",function(urlPosition){
+                        //取出爬到的数据并保存
+                        var tempAddaress =  {};
+                        tempAddaress.location = dQuery("div.city-title").text();//所在区域
+                        tempAddaress.address = dQuery("textarea#J_Street").text();//详细地址
+                        tempAddaress.zipcode = dQuery("input#J_PostCode").attr("value");//邮编
+                        tempAddaress.name = dQuery("input#J_Name").attr("value");//姓名
+                        tempAddaress.phone = dQuery("input#J_Mobile").attr("value");//电话号
+                        addressData.push(tempAddaress);
+                        session.set("AddressData",addressData);
+                        if(urlPosition<urlArray.length){
+                            session.set("addressUrlPosition",urlPosition+1);
+                            lcoation.href = urlArray[urlPosition+1];
+                        }else{
+                            log("----------------------------地址爬取完成----------------------------");
+                            session.set("taobaoState",2);
+                            //爬取个人信息
+                        }
+                    })
+                })
+            })
+        }else {
+            //dQuery("tbody>tr>td").map(function(){return dQuery(this).find("a")[0] }) 找出当前元素中的第一个子元素a
+            //开始爬取地址
+            var trList = dQuery("tbody>tr>td>a");
+            var modifyUrlArray = [];
+            for (var tl = 0; tl < trList.length; tl++) {
+                if ("修改" == dQuery(trList[tl]).text()) {
+                    modifyUrlArray.push(dQuery(trList[tl]).attr("href"));
+                }
+            }
+            //保存数据
+            session.set("addressUrlArray",modifyUrlArray);
+            //记录位置
+            session.set("addressUrlPosition",0);
+            lcoation.href = modifyUrlArray[0];
+        }
+    }else{
+        location.href="https://member1.taobao.com/member/fresh/deliver_address.htm"
+    }
+}
+//------------------------------------------------------------------------------------爬取个人资料----------------------------------------------------------------------------
 
 })
