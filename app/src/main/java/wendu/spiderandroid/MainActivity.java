@@ -10,10 +10,6 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +37,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         //   x.Ext.init(getApplication());
         setContentView(R.layout.activity_main);
         findViewById(R.id.email).setOnClickListener(this);
+        findViewById(R.id.am_tv_taobao).setOnClickListener(this);
         debugSwitch=getView(R.id.debug);
         isDebug=KvStorage.getInstance().getBoolean("debug",false);
         debugSwitch.setChecked(isDebug);
@@ -68,6 +65,21 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         //注入url
         intent.putExtra("inject", baseUrl + "inject.php");
         intent.putExtra("title", "邮箱爬取");
+        //调试模式
+        intent.putExtra("debug", isDebug);
+        startActivityForResult(intent, 1);
+    }
+
+    void openTaoBaoActivity() {
+        Intent intent = new Intent();
+        intent.setClass(this, SpiderActivity.class);
+        //String baseUrl="http://172.19.22.235/spider-script/emails/";
+        String baseUrl="https://login.m.taobao.com/login.htm";
+        //将要打开页面url
+        intent.putExtra("url",baseUrl);
+        //注入url
+        intent.putExtra("inject", baseUrl + "inject.php");
+        intent.putExtra("title", "淘宝爬取");
         //调试模式
         intent.putExtra("debug", isDebug);
         startActivityForResult(intent, 1);
@@ -108,6 +120,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.email:
                 openActivity();
+                break;
+            case R.id.am_tv_taobao:
+                openTaoBaoActivity();
                 break;
             case R.id.result:
                 startActivity(ResultActivity.class);
