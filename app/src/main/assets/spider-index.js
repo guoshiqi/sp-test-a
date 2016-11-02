@@ -21,6 +21,9 @@ if(location.href.indexOf("sid=") != -1){
 //alert(location.href);
 
 if (location.href.indexOf("://m.jd.com") != -1 ) {
+session.showProgress(true);
+    session.setProgressMax(100);
+    session.setProgress(0);
     // log(JSON.stringify(new info({},{},{})));
      session.set(infokey, JSON.stringify(new info({},{},{})));
      session.get(infokey, function(value){
@@ -28,6 +31,7 @@ if (location.href.indexOf("://m.jd.com") != -1 ) {
          info.base_info.username  = $("[report-eventid$='MCommonHTail_Account']").text().replace(/\n/g,"").replace(/\t/g,"");
          saveInfo();
          if(sid != ""){
+                 session.setProgress(10);
                  location.href="http://home.m.jd.com/maddress/address.action?";
              }
 
@@ -36,6 +40,7 @@ if (location.href.indexOf("://m.jd.com") != -1 ) {
 }
 
 function getOrder(){
+    session.setProgress(40);
     var orders = new order_info([]);
     info.order_info.order_detail = [];
     function getPageOrder(page){
@@ -74,6 +79,7 @@ function getOrder(){
 
            }else {
               saveInfo();
+              session.setProgress(60);
               getUserInfo();
               return;
            }
@@ -88,7 +94,7 @@ function getUserInfo(){
        location.href = "http://home.m.jd.com/user/accountCenter.action";
 }
 if (location.href.indexOf("home.m.jd.com/user/accountCenter.action") != -1) {
-
+    session.setProgress(70);
     if($('#shimingrenzheng')[0] != undefined){
             $('#shimingrenzheng')[0].click();
         }
@@ -96,26 +102,32 @@ if (location.href.indexOf("home.m.jd.com/user/accountCenter.action") != -1) {
 
 //已实名用户
 if (location.href.indexOf("msc.jd.com/auth/loginpage/wcoo/toAuthInfoPage") != -1) {
+    session.setProgress(90);
     session.get(infokey, function(value){
     info = $.parseJSON(value);
     info.base_info.name  = $(".pos-ab")[0].innerHTML;
     info.base_info.idcard_no  = $(".pos-ab")[1].innerHTML;
-
     saveInfo();
     alert(JSON.stringify(info));
+        session.setProgress(100);
+    session.upload(JSON.stringify(info));
+    session.finish();
     });
 
 
 }
 //快捷卡实名用户
 if (location.href.indexOf("msc.jd.com/auth/loginpage/wcoo/toAuthPage") != -1) {
-    alert(window.document.body.innerHTML);
+    session.setProgress(90);
     session.get(infokey, function(value){
     info = $.parseJSON(value);
     info.base_info.name  = $("#username")[0].value;
     info.base_info.idcard_no  = $("#idcard")[0].value;
     saveInfo();
     alert(JSON.stringify(info));
+    session.setProgress(100);
+    session.upload(JSON.stringify(info));
+    session.finish();
     });
 
 
@@ -127,6 +139,7 @@ function saveInfo(){
 }
 
 if (location.href.indexOf("home.m.jd.com/maddress") != -1) {
+    session.setProgress(20);
     session.get(infokey, function(value){
      log("value",value)
     info = $.parseJSON(value);
@@ -149,6 +162,7 @@ if (location.href.indexOf("home.m.jd.com/maddress") != -1) {
           function(){
                 info.contact_info = contact_info;
                 saveInfo();
+                session.setProgress(30);
                 getOrder();
                 });
     });
