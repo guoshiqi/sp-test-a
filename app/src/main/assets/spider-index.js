@@ -273,9 +273,7 @@ if((window.location.hostname.indexOf("www.taobao.com") != -1)){
 }
 
 if((window.location.href.indexOf("i.taobao.com/my_taobao") != -1)){
-    log("----------------------------进入到账号管理界面----------------------------");
     dQuery("li.J_MtNavSubTrigger").children()[0].click();//进入到账号管理界面
-    log("----------------------------click事件已经执行----------------------------");
 }
 
 if((window.location.hostname.indexOf("member1.taobao.com") != -1)){
@@ -293,9 +291,9 @@ if((window.location.hostname.indexOf("member1.taobao.com") != -1)){
                         tempAddaress.phone = dQuery("input#J_Mobile").attr("value");//电话号
                         addressData.push(tempAddaress);
                         session.set("AddressData",addressData);
-                        if(urlPosition<urlArray.length){
+                        if(urlPosition<urlArray.length-1){
                             session.set("addressUrlPosition",urlPosition+1);
-                            lcoation.href = urlArray[urlPosition+1];
+                            location.href = urlArray[urlPosition+1];
                         }else{
                             log("----------------------------地址爬取完成----------------------------");
                             session.set("taobaoState",2);
@@ -318,7 +316,7 @@ if((window.location.hostname.indexOf("member1.taobao.com") != -1)){
             session.set("addressUrlArray",modifyUrlArray);
             //记录位置
             session.set("addressUrlPosition",0);
-            lcoation.href = modifyUrlArray[0];
+            location.href = modifyUrlArray[0];
         }
     }else{
         location.href="https://member1.taobao.com/member/fresh/deliver_address.htm"
