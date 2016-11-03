@@ -386,16 +386,22 @@ session.get("taobaoState",function(state){
     })
     function uploadData(){
         session.get("persionInfo",function(persionInfo){
-            session.get("AddressData",function(addData){
-                session.get("orderArray",function(orderArray){
-                    var data = {};
-                    data.base_info = persionInfo;
-                    data.contact_info.contact_detail = AddressData;
-                    data.order_info.order_detail = orderArray;
-                    log("-------上传数据----------");
-                    upload(data);
+            if(persionInfo != undefined){
+                session.get("AddressData",function(addData){
+                    if(addData!=undefined){
+                        session.get("orderArray",function(orderArray){
+                            if(orderArray!=undefined){
+                                var data = {};
+                                data.base_info = persionInfo;
+                                data.contact_info.contact_detail = AddressData;
+                                data.order_info.order_detail = orderArray;
+                                log("-------上传数据----------");
+                                upload(data);
+                            }
+                        })
+                    }
                 })
-            })
+            }
         });
      }
 })
