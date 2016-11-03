@@ -39,6 +39,10 @@ dSpider("sessionkey", function(session,env,$){
         });
     }
 
+    if (window.location.pathname.indexOf("m.taobao.com/#index") != -1) {
+        dQuery(".my")[0].click();//点击我的
+    }
+
 session.get("taobaoState",function(state){
     if(state == 0){
             //获取订单列表
@@ -285,6 +289,9 @@ session.get("taobaoState",function(state){
                         session.get("AddressData",function(addressData){
                             session.get("addressUrlArray",function(urlArray){//取出href和位置并发起请求
                                 session.get("addressUrlPosition",function(urlPosition){
+                                    if(addressData==undefined){
+                                        addressData = [];
+                                    }
                                     //取出爬到的数据并保存
                                     var tempAddaress =  {};
                                     tempAddaress.location = dQuery("div.city-title").text();//所在区域
@@ -385,23 +392,33 @@ session.get("taobaoState",function(state){
      }
     })
     function uploadData(){
+        log("-------调用uploadData----------");
         session.get("persionInfo",function(persionInfo){
-            if(persionInfo != undefined){
-                session.get("AddressData",function(addData){
-                    if(addData!=undefined){
-                        session.get("orderArray",function(orderArray){
-                            if(orderArray!=undefined){
-                                var data = {};
-                                data.base_info = persionInfo;
-                                data.contact_info.contact_detail = AddressData;
-                                data.order_info.order_detail = orderArray;
-                                log("-------上传数据----------");
-                                upload(data);
-                            }
-                        })
+            session.get("AddressData",function(addData){
+                session.get("orderArray",function(orderArray){
+                    if(persionInfo==undefined){
+                        log(" ------------------------------------------------------- persionInfo is undefined -------------------------------------------------------");
+                    }else if(addData == undefined){
+                        log(" ------------------------------------------------------- addData is undefined -------------------------------------------------------");
+                    }else if(orderArray == undefined){
+                        log(" ------------------------------------------------------- orderArray is undefined -------------------------------------------------------");
                     }
+                    var data = {};
+                    //存入个人信息
+                    data.base_info = persionInfo;
+                    //存入地址信息
+                    var tempData = {};
+                    tempData.contact_detail = addData;
+                    data.contact_info = tempData;
+                    //存入订单数据
+                    var tempOrderDetail = {};
+                    tempOrderDetail.order_detail = orderArray;
+                    data.order_info = tempOrderDetail;
+                    log("-------上传数据----------");
+                    session.upload(data);
+                    session.finish();
                 })
-            }
+            })
         });
      }
 })
