@@ -61,16 +61,15 @@
 
 
         <TextView
-            android:id="@+id/url"
+            android:id="@+id/am_tv_taobao"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
+            android:layout_marginTop="20dp"
             android:background="@drawable/b1_press_selector"
             android:elevation="2dp"
-            android:enabled="false"
             android:padding="10dp"
             android:text="淘宝爬取"
-            android:visibility="gone" />
+            android:textColor="@color/white" />
     </LinearLayout>
 
     <TextView
