@@ -60,7 +60,7 @@ public class SpiderFragment extends BaseFragment {
         WebSettings settings = mWebView.getSettings();
         mWebView.getSettings().setDomStorageEnabled(true);
         mWebView.getSettings().setAllowFileAccess(true);
-        mWebView.getSettings().setAppCacheEnabled(true);
+        mWebView.getSettings().setAppCacheEnabled(false);
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         settings.setJavaScriptEnabled(true);
         settings.setLoadWithOverviewMode(true);
