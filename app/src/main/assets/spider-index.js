@@ -17,8 +17,9 @@ var max_order_num = 200;
 var max_order_date = 10;
 if(location.href.indexOf("sid=") != -1){
     sid = re.exec(location.href)[1];
+    session.set("sid",  sid);
+
 };
-alert(location.href);
 
 session.onNavigate=function(url){
    if(url.indexOf("://plogin.m.jd.com/user")!=-1){
@@ -34,6 +35,7 @@ if (location.href.indexOf("://m.jd.com") != -1 ) {
     session.setProgressMax(100);
     session.setProgress(0);
     session.hideLoading();
+
     // log(JSON.stringify(new info({},{},{})));
      session.set(infokey, JSON.stringify(new info({},{},{})));
      session.get(infokey, function(value){
@@ -114,17 +116,24 @@ if (location.href.indexOf("home.m.jd.com/user/accountCenter.action") != -1) {
 if (location.href.indexOf("msc.jd.com/auth/loginpage/wcoo/toAuthInfoPage") != -1) {
     session.setProgress(90);
     session.get(infokey, function(value){
-    info = $.parseJSON(value);
-    info.base_info.name  = $(".pos-ab")[0].innerHTML;
-    info.base_info.idcard_no  = $(".pos-ab")[1].innerHTML;
-    saveInfo();
-    alert(JSON.stringify(info));
-        session.setProgress(100);
-    session.upload(JSON.stringify(info));
-    session.finish();
+        info = $.parseJSON(value);
+        info.base_info.name  = $(".pos-ab")[0].innerHTML;
+        info.base_info.idcard_no  = $(".pos-ab")[1].innerHTML;
+        saveInfo();
+        logout();
+
     });
 
 
+}
+
+function logout(){
+    session.get("sid", function(sidvalue){
+                location.href = "https://passport.m.jd.com/user/logout.action?sid="+sidvalue;
+                session.setProgress(100);
+                session.upload(JSON.stringify(info));
+                session.finish();
+    });
 }
 //快捷卡实名用户
 if (location.href.indexOf("msc.jd.com/auth/loginpage/wcoo/toAuthPage") != -1) {
@@ -134,10 +143,7 @@ if (location.href.indexOf("msc.jd.com/auth/loginpage/wcoo/toAuthPage") != -1) {
     info.base_info.name  = $("#username")[0].value;
     info.base_info.idcard_no  = $("#idcard")[0].value;
     saveInfo();
-    alert(JSON.stringify(info));
-    session.setProgress(100);
-    session.upload(JSON.stringify(info));
-    session.finish();
+    logout();
     });
 
 
