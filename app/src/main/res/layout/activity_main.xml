@@ -60,6 +60,17 @@
             android:padding="10dp"
             android:text="淘宝爬取"
             android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/mobile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/b1_press_selector"
+            android:elevation="2dp"
+            android:padding="10dp"
+            android:onClick="openMobileCall"
+            android:layout_marginTop="15dp"
+            android:text="通话详单爬取"/>
     </LinearLayout>
 
     <TextView
