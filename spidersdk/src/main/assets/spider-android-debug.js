@@ -25,6 +25,11 @@ function log(){
        console.log("xy log: "+ str);
      }
  }
+ //异常捕获
+ function errorReport(e){
+     console.error("xy log: 语法错误: "+e.message+e.stack);
+     window.curSession&&curSession.finish(e.toString(),"")
+ }
 
 String.prototype.endWith = function (str) {
     if (!str) return false;
@@ -43,11 +48,7 @@ MutationObserver = window.MutationObserver ||
     window.WebKitMutationObserver ||
     window.MozMutationObserver;
 
-//异常捕获
-function errorReport(e){
-    console.error(" 语法错误: "+e.toString());
-    window.curSession&&curSession.finish(e.toString(),"")
-}
+
 
 function  safeCallback(f){
     if (!(f instanceof Function)) return f;
@@ -142,6 +143,11 @@ function dSpider(sessionKey, callback) {
             return;
         }
         var session= new DataSession(sessionKey);
+        window.onbeforeunload = function () {
+            if(session.onNavigate){
+                session.onNavigate(location.href);
+            }
+        }
         window.curSession=session;
         DataSession.getExtraData(function (extras) {
            callback(session, extras, dQuery);
@@ -151,7 +157,7 @@ function dSpider(sessionKey, callback) {
     },20);
 }
 
-window.local = {
+var dSpiderLocal = {
     set: function (k, v) {
         return _xy.save(k, v)
     },
@@ -182,7 +188,9 @@ DataSession.prototype = {
         f && f(JSON.parse(t || "{}"))
     },
     "get": function (key, f) {
-        f && f(this.data()[key]);
+        this.data(function (d) {
+            f && f(d[key])
+           })
     },
     "set": function (key, value) {
         var t = _xy.get(this.key);
@@ -205,18 +213,20 @@ DataSession.prototype = {
         f && f(_xy.getProgress());
     },
     "showLoading": function (s) {
-        _xy.showLoading(s || "正在爬取,请耐心等待...")
+        _xy.showLoading(s || "正在处理,请耐心等待...")
     },
     "hideLoading": function () {
         _xy.hideLoading()
     },
     "finish": function (errmsg, content, code) {
         this.finished=true;
+        this.hideLoading();
+        this.showProgress(false);
         if (errmsg) {
             var ob = {
                 url: location.href,
                 msg: errmsg,
-                content: content == undefined ? document.documentElement.outerHTML : content,
+                content: content||document.documentElement.outerHTML ,
                 extra: _xy.getExtraData()
             }
             return _xy.finish(this.key || "", code || 2, JSON.stringify(ob));
@@ -230,11 +240,15 @@ DataSession.prototype = {
         return _xy.push(this.key, value)
     },
 
+    "openWithSpecifiedCore":function(url, core){
+        _xy.openWithSpecifiedCore(url, core)
+    },
+
     "string": function (f) {
-        f=safeCallback(f);
-        var d = JSON.stringify(_xy.get(this.key));
-        f && f(d);
-        f || log(d);
+        this.data(function (d) {
+             f || log(d)
+             f && f(d)
+         })
     }
 };
 apiInit();
