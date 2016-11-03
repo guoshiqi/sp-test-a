@@ -60,7 +60,7 @@ public class SpiderFragment extends BaseFragment {
         WebSettings settings = mWebView.getSettings();
         mWebView.getSettings().setDomStorageEnabled(true);
         mWebView.getSettings().setAllowFileAccess(true);
-        mWebView.getSettings().setAppCacheEnabled(true);
+        mWebView.getSettings().setAppCacheEnabled(false);
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         settings.setJavaScriptEnabled(true);
         settings.setLoadWithOverviewMode(true);
@@ -196,11 +196,11 @@ public class SpiderFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
 
-        CookieManager cookieManager = CookieManager.getInstance();
-        cookieManager.removeSessionCookie();//移除
-        cookieManager.removeAllCookie();
-        cookieManager.flush();
-        mWebView.destroy();
+//        CookieManager cookieManager = CookieManager.getInstance();
+//        cookieManager.removeSessionCookie();//移除
+//        cookieManager.removeAllCookie();
+//        cookieManager.flush();
+//        mWebView.destroy();
         super.onDestroyView();
     }
 

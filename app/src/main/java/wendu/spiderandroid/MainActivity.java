@@ -38,6 +38,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         setContentView(R.layout.activity_main);
         findViewById(R.id.email).setOnClickListener(this);
         findViewById(R.id.am_tv_taobao).setOnClickListener(this);
+        findViewById(R.id.jd).setOnClickListener(this);
         debugSwitch=getView(R.id.debug);
         isDebug=KvStorage.getInstance().getBoolean("debug",false);
         debugSwitch.setChecked(isDebug);
@@ -61,7 +62,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         //String baseUrl="http://172.19.22.235/spider-script/emails/";
         String baseUrl="http://test.iguoxue.org/spider/emails/";
         //将要打开页面url
-        intent.putExtra("url",baseUrl+ "email.html?t=" + System.currentTimeMillis());
+
+        intent.putExtra("url","https://plogin.m.jd.com/user/login.action?appid=100");
+        //intent.putExtra("url",baseUrl+ "email.html?t=" + System.currentTimeMillis());
         //注入url
         intent.putExtra("inject", baseUrl + "inject.php");
         intent.putExtra("title", "邮箱爬取");
@@ -80,6 +83,23 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         //注入url
         intent.putExtra("inject", baseUrl + "inject.php");
         intent.putExtra("title", "淘宝爬取");
+        //调试模式
+        intent.putExtra("debug", isDebug);
+        startActivityForResult(intent, 1);
+    }
+
+    void openJd() {
+        Intent intent = new Intent();
+        intent.setClass(this, SpiderActivity.class);
+        //String baseUrl="http://172.19.22.235/spider-script/emails/";
+        String baseUrl="http://test.iguoxue.org/spider/emails/";
+        //将要打开页面url
+
+        intent.putExtra("url","https://plogin.m.jd.com/user/login.action?appid=100");
+        //intent.putExtra("url",baseUrl+ "email.html?t=" + System.currentTimeMillis());
+        //注入url
+        intent.putExtra("inject", baseUrl + "inject.php");
+        intent.putExtra("title", "京东信息爬取");
         //调试模式
         intent.putExtra("debug", isDebug);
         startActivityForResult(intent, 1);
@@ -123,6 +143,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.am_tv_taobao:
                 openTaoBaoActivity();
+                break;
+            case R.id.jd:
+                openJd();
                 break;
             case R.id.result:
                 startActivity(ResultActivity.class);
