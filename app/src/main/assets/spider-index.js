@@ -27,6 +27,10 @@ dSpider("sessionkey", function(session,env,$){
                 }else{
                     session.set("taobaoState",0);
                     session.set("orderArray",[]);
+                    //显示进度为0
+                    session.showProgress(false);
+                    session.setProgressMax(100);
+                    session.setProgress(2);
                 }
                 document.getElementsByClassName("label-act")[0].children[0].children[0].click();//点击订单
             }else if(count==1){
@@ -80,8 +84,10 @@ session.get("taobaoState",function(state){
                 if(position >= $(".order-list>li").length){
                     //更新状态并退回到个人页
                     session.set("taobaoState",1);
+                    session.setProgress(35);
                     setTimeout(location.url = history.go(-1),1000);
                 }else{
+                    session.setProgress(5+(position/($(".order-list>li").length))*30);
                     //进入订单详情页
                     ($($(".order-list>li")[position]).children()[3].children[0].children[0]).click();
                 }
@@ -301,11 +307,13 @@ session.get("taobaoState",function(state){
                                     tempAddaress.phone = dQuery("input#J_Mobile").attr("value");//电话号
                                     addressData.push(tempAddaress);
                                     session.set("AddressData",addressData);
+                                    session.setProgress(35+(((urlPosition+1)/7)*30));
                                     if(urlPosition<urlArray.length-1){
                                         session.set("addressUrlPosition",urlPosition+1);
                                         location.href = urlArray[urlPosition+1];
                                     }else{
                                         session.set("taobaoState",2);
+                                        session.setProgress(75);
                                         //爬取个人信息
                                         location.href = "https://i.taobao.com/user/baseInfoSet.htm"
                                     }
@@ -344,6 +352,7 @@ session.get("taobaoState",function(state){
                 tempPersonInfo.name = dQuery("input#J_realname").attr("value");//姓名
                 //保存tempPersonInfo
                 session.set("persionInfo",tempPersonInfo);
+                session.setProgress(85);
                 location.href = "https://member1.taobao.com/member/fresh/account_security.htm";//跳转到安全设置拿电话
             }
             if(window.location.pathname.indexOf("account_security") != -1){//个人资料设置
@@ -361,6 +370,7 @@ session.get("taobaoState",function(state){
                     //保存手机号
                     perInfo.phone = phone;
                     session.set("persionInfo",perInfo);
+                    session.setProgress(98);
                     //点击查看获取省份证号
                     dQuery("div.operate>a")[0].click();
                 });
@@ -383,6 +393,7 @@ session.get("taobaoState",function(state){
                     session.set("persionInfo",perInfo);
                     //修改状态
                     session.set("taobaoState",3);
+                    session.setProgress(100);
                     uploadData();
                 });
             }
@@ -392,16 +403,15 @@ session.get("taobaoState",function(state){
      }
     })
     function uploadData(){
-        log("-------调用uploadData----------");
         session.get("persionInfo",function(persionInfo){
             session.get("AddressData",function(addData){
                 session.get("orderArray",function(orderArray){
                     if(persionInfo==undefined){
-                        log(" ------------------------------------------------------- persionInfo is undefined -------------------------------------------------------");
+                        session.finish("upLoadData方法中的数据为空","persionInfo is undefined",2);
                     }else if(addData == undefined){
-                        log(" ------------------------------------------------------- addData is undefined -------------------------------------------------------");
+                        session.finish("upLoadData方法中的数据为空","addData is undefined",2);
                     }else if(orderArray == undefined){
-                        log(" ------------------------------------------------------- orderArray is undefined -------------------------------------------------------");
+                        session.finish("upLoadData方法中的数据为空","orderArray is undefined",2);
                     }
                     var data = {};
                     //存入个人信息
@@ -416,6 +426,7 @@ session.get("taobaoState",function(state){
                     data.order_info = tempOrderDetail;
                     log("-------上传数据----------");
                     session.upload(data);
+                    session.showProgress(false);
                     session.finish();
                 })
             })
