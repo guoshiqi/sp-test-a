@@ -38,7 +38,8 @@ class Helper {
 
     }
     public static InputStream getDebugScript(Context ctx) throws UnsupportedEncodingException {
-        return getStreamFromAssets(ctx, "spider-android-debug.js","spider-index.js");
+        InputStream inputStream;
+        return getStreamFromAssets(ctx, "_spider_start.js","spider-android-debug.js",SpiderActivity.debugSrc,"_spider_end.js");
     }
     public static InputStream getDqueryScript(Context ctx) throws UnsupportedEncodingException {
         return getStreamFromAssets(ctx, "jquery-3.1.0.min.js");

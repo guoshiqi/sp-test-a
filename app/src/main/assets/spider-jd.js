@@ -1,20 +1,10 @@
 log("****************Debug model *******************")
 dSpider("sessionkey", function(session,env,$){
-
- // session为会话对象
- // env为平台环境参数
- // $ 为dQuery
- //session.upload([string|object])
- //session.finish() 结束爬取
-
- log(session,env,$)
-
- //place your code here!
 var re = /sid=(.+)$/ig;
 var infokey = "infokey";
 var sid = "";
-var max_order_num = 200;
-var max_order_date = 10;
+var max_order_num = 30;
+var max_order_date = 30;
 if(location.href.indexOf("sid=") != -1){
     sid = re.exec(location.href)[1];
     session.set("sid",  sid);
