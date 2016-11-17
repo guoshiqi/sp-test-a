@@ -274,6 +274,7 @@ dSpider("sessionkey", function(session,env,$){
 
             if (window.location.hostname.indexOf("m.taobao.com") != -1) {
                 $(".my").click();//点击我的
+                location.href="//www.taobao.com/index.php?from=wap";
             }
             /**
              * 爬取收货地址
