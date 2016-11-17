@@ -23,6 +23,16 @@ class CircleProgress extends View {
     int foregroundColor = Helper.getColor(getContext(), R.color.colorPrimary);
     int backgroundColor = Color.argb(30, Color.red(foregroundColor),
             Color.green(foregroundColor),Color.blue(foregroundColor));
+
+    public int getInnerColor() {
+        return innerColor;
+    }
+
+    public void setInnerColor(int innerColor) {
+        this.innerColor = innerColor;
+        invalidate();
+    }
+
     int innerColor =Color.TRANSPARENT;
 
     Helper.ColorGradientHelper colorGradientHelper;
@@ -52,6 +62,8 @@ class CircleProgress extends View {
         }
         colorGradientHelper=new Helper.ColorGradientHelper(foregroundColor,foregroundColorEnd);
     }
+
+
 
     @Override
     protected void onDraw(Canvas canvas) {

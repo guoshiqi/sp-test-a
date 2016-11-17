@@ -7,9 +7,13 @@ import android.content.SharedPreferences;
 import android.os.Message;
 import android.text.TextUtils;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by du on 16/8/17.
@@ -145,6 +149,14 @@ import java.util.List;
         mContxt.open(url,webcore);
     }
 
+    public void load(String url, String headers){
+        if (!TextUtils.isEmpty(headers)){
+            mContxt.loadUrl(url,Helper.getMapForJson(headers));
+        }
+    }
 
+    public void setUserAgent(String userAgent) {
+        mContxt.setUserAgent(userAgent);
+    }
 
 }
