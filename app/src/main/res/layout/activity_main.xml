@@ -70,6 +70,17 @@
             android:padding="10dp"
             android:text="淘宝爬取"
             android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/mobile_unicom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/b1_press_selector"
+            android:elevation="2dp"
+            android:padding="10dp"
+            android:onClick="openUnicomMobileCall"
+            android:layout_marginTop="15dp"
+            android:text="联通通话详单"/>
     </LinearLayout>
 
     <TextView
