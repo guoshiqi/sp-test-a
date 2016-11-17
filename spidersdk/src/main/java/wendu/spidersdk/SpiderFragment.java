@@ -4,10 +4,12 @@ import android.annotation.TargetApi;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.CookieManager;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
@@ -18,13 +20,11 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
-import com.tencent.smtt.sdk.CookieManager;
-
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Map;
 
 public class SpiderFragment extends BaseFragment {
 
@@ -32,6 +32,7 @@ public class SpiderFragment extends BaseFragment {
     private ProgressBar mProgressBar;
     private SpiderActivity context;
     private String url;
+    private String userAgent;
     private final String contentType = "application/javascript";
 
     public static SpiderFragment newInstance(String url, boolean showBack) {
@@ -59,8 +60,9 @@ public class SpiderFragment extends BaseFragment {
         mWebView.addJavascriptInterface(new JavaScriptBridge(getActivity()), "_xy");
         WebSettings settings = mWebView.getSettings();
         mWebView.getSettings().setDomStorageEnabled(true);
-        mWebView.getSettings().setAllowFileAccess(true);
-        mWebView.getSettings().setAppCacheEnabled(true);
+        mWebView.getSettings().setAllowFileAccess(false);
+        mWebView.getSettings().setAppCacheEnabled(false);
+        settings.setSavePassword(false);
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         settings.setJavaScriptEnabled(true);
         settings.setLoadWithOverviewMode(true);
@@ -81,10 +83,30 @@ public class SpiderFragment extends BaseFragment {
         mProgressBar.setProgress(0);
     }
 
-    private void loadUrl(String url) {
+    public void loadUrl(String url) {
         mWebView.loadUrl(url);
     }
 
+    @Override
+    public void loadUrl(final String url, final Map<String, String> additionalHttpHeaders){
+        mWebView.post(new Runnable() {
+            @Override
+            public void run() {
+                String str=additionalHttpHeaders.get("User-Agent");
+                if(!TextUtils.isEmpty(str)){
+                    userAgent=mWebView.getSettings().getUserAgentString();
+                   mWebView.getSettings().setUserAgentString(str);
+                }
+                mWebView.loadUrl(url,additionalHttpHeaders);
+            }
+        });
+
+    }
+
+    @Override
+    void setUserAgent(String userAgent) {
+        mWebView.getSettings().setUserAgentString(userAgent);
+    }
 
     private WebViewClient mWebViewClient = new WebViewClient() {
         @Override
@@ -97,8 +119,12 @@ public class SpiderFragment extends BaseFragment {
         @Override
         public void onPageFinished(final WebView view, String url) {
             super.onPageFinished(view, url);
+            if(!TextUtils.isEmpty(userAgent)){
+                setUserAgent(userAgent);
+                userAgent=null;
+            }
             injectJs(view);
-            context.hideLoadView();
+            //context.hideLoadView();
         }
 
         @SuppressWarnings("deprecation")
@@ -199,8 +225,8 @@ public class SpiderFragment extends BaseFragment {
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.removeSessionCookie();//移除
         cookieManager.removeAllCookie();
-        cookieManager.flush();
-        mWebView.destroy();
+        mWebView.clearCache(true);
+        //mWebView.destroy();
         super.onDestroyView();
     }
 

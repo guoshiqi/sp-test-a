@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Map;
 
 public class SpiderX5Fragment extends BaseFragment {
 
@@ -32,6 +33,7 @@ public class SpiderX5Fragment extends BaseFragment {
     private String mTitle;
     private String url;
     private boolean showBack;
+    private String userAgent;
     private final String contentType = "application/javascript";
 
     public static SpiderX5Fragment newInstance(String url, boolean showBack) {
@@ -67,16 +69,17 @@ public class SpiderX5Fragment extends BaseFragment {
         WebSettings webSetting = mWebView.getSettings();
         webSetting.setJavaScriptEnabled(true);
         webSetting.setJavaScriptCanOpenWindowsAutomatically(true);
-        webSetting.setAllowFileAccess(true);
+        webSetting.setAllowFileAccess(false);
         webSetting.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
         webSetting.setSupportZoom(true);
         webSetting.setUseWideViewPort(true);
         webSetting.setSupportMultipleWindows(true);
         webSetting.setLoadWithOverviewMode(true);
-        webSetting.setAppCacheEnabled(true);
+        webSetting.setAppCacheEnabled(false);
         webSetting.setDatabaseEnabled(true);
         webSetting.setDomStorageEnabled(true);
         webSetting.setGeolocationEnabled(true);
+        webSetting.setSavePassword(false);
         // webSetting.setPageCacheCapacity(IX5WebSettings.DEFAULT_CACHE_CAPACITY);
         webSetting.setPluginState(WebSettings.PluginState.ON_DEMAND);
         webSetting.setRenderPriority(WebSettings.RenderPriority.HIGH);
@@ -102,10 +105,30 @@ public class SpiderX5Fragment extends BaseFragment {
         mProgressBar.setProgress(0);
     }
 
-    private void loadUrl(String url) {
+    public void loadUrl(String url) {
         mWebView.loadUrl(url);
     }
 
+    @Override
+    public void loadUrl(final String url, final Map<String, String> additionalHttpHeaders){
+        mWebView.post(new Runnable() {
+            @Override
+            public void run() {
+                String str=additionalHttpHeaders.get("User-Agent");
+                if(!TextUtils.isEmpty(str)){
+                    userAgent=mWebView.getSettings().getUserAgentString();
+                    mWebView.getSettings().setUserAgentString(str);
+                }
+                mWebView.loadUrl(url,additionalHttpHeaders);
+            }
+        });
+
+    }
+
+    @Override
+    void setUserAgent(String userAgent) {
+        mWebView.getSettings().setUserAgentString(userAgent);
+    }
 
     private WebViewClient mWebViewClient = new WebViewClient() {
         @Override
@@ -118,8 +141,12 @@ public class SpiderX5Fragment extends BaseFragment {
         @Override
         public void onPageFinished(final WebView view, String url) {
             super.onPageFinished(view, url);
+            if(!TextUtils.isEmpty(userAgent)){
+                setUserAgent(userAgent);
+                userAgent=null;
+            }
             injectJs(view);
-            context.hideLoadView();
+            //context.hideLoadView();
         }
 
         @Override
