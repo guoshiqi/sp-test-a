@@ -196,11 +196,13 @@ public class SpiderFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
 
-//        CookieManager cookieManager = CookieManager.getInstance();
-//        cookieManager.removeSessionCookie();//移除
-//        cookieManager.removeAllCookie();
-//        cookieManager.flush();
-//        mWebView.destroy();
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.removeSessionCookie();//移除
+        cookieManager.removeAllCookie();
+        cookieManager.flush();
+        mWebView.destroy();
+        context.deleteDatabase("webview.db");
+        context.deleteDatabase("webviewCache.db");
         super.onDestroyView();
     }
 

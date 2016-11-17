@@ -43,6 +43,7 @@ public class SpiderActivity extends AppCompatActivity {
     RelativeLayout loading;
     TextView msg;
     TextView webcore;
+    public static String debugSrc="";
 
     public String getCurrentCore() {
         return currentCore;
@@ -82,9 +83,10 @@ public class SpiderActivity extends AppCompatActivity {
         url = getIntent().getStringExtra("url");
         INJECT_URL = getIntent().getStringExtra("inject");
         String title = getIntent().getStringExtra("title");
-        Helper.isDebug=getIntent().getBooleanExtra("debug", false);
-        if ( Helper.isDebug) {
+        Helper.isDebug = getIntent().getBooleanExtra("debug", false);
+        if (Helper.isDebug) {
             webcore.setVisibility(View.VISIBLE);
+            debugSrc=getIntent().getStringExtra("debugSrc");
         }
         titleTv.setText(TextUtils.isEmpty(title) ? "爬取" : title);
         //open(url, "x5|sys|cs");
@@ -115,9 +117,9 @@ public class SpiderActivity extends AppCompatActivity {
                         showLoadErrorView();
                         break;
                     case 7:
-                        Intent intent=new Intent();
+                        Intent intent = new Intent();
                         try {
-                            String path=getCacheDir()+"/spider.dat";
+                            String path = getCacheDir() + "/spider.dat";
                             File file = new File(path);
                             file.delete();
                             file.createNewFile();
@@ -368,9 +370,7 @@ public class SpiderActivity extends AppCompatActivity {
                     .create();
             alertDialog.show();
         } else {
-            if (!fragment.goBack()) {
-                super.onBackPressed();
-            }
+            super.onBackPressed();
         }
 
     }

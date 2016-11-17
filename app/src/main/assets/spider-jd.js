@@ -1,24 +1,14 @@
 log("****************Debug model *******************")
 dSpider("sessionkey", function(session,env,$){
-
- // session为会话对象
- // env为平台环境参数
- // $ 为dQuery
- //session.upload([string|object])
- //session.finish() 结束爬取
-
- log(session,env,$)
-
- //place your code here!
 var re = /sid=(.+)$/ig;
 var infokey = "infokey";
 var sid = "";
-var max_order_num = 200;
-var max_order_date = 10;
+var max_order_num = 30;
+var max_order_date = 30;
 if(location.href.indexOf("sid=") != -1){
     sid = re.exec(location.href)[1];
+    session.set("sid",  sid);
 };
-alert(location.href);
 
 session.onNavigate=function(url){
    if(url.indexOf("://plogin.m.jd.com/user")!=-1){
@@ -34,6 +24,7 @@ if (location.href.indexOf("://m.jd.com") != -1 ) {
     session.setProgressMax(100);
     session.setProgress(0);
     session.hideLoading();
+
     // log(JSON.stringify(new info({},{},{})));
      session.set(infokey, JSON.stringify(new info({},{},{})));
      session.get(infokey, function(value){
@@ -73,9 +64,6 @@ function getOrder(){
                                                                                 var num = $("<div>").append(products[k]).find(".s3-num").text();
                                                                                 orderitem.products.push(new product(name,  num ,price));
                                                                             });
-//                                                                            $.each(d.orderList[i].orderMsg.wareInfoList,function(j,e){
-//                                                                                   orderitem.products.push(new product(d.orderList[i].orderMsg.wareInfoList[j].wname,d.orderList[i].orderMsg.wareInfoList[j].buyCount ));
-//                                                                            })
                                                                             if(info.order_info.order_detail.length < max_order_num &&
                                                                             Date.parse(new Date()) < (new Date(orderitem.time)).getTime() + max_order_date * 24 * 60 * 60 * 1000){
                                                                                     info.order_info.order_detail.push(orderitem);
@@ -114,17 +102,24 @@ if (location.href.indexOf("home.m.jd.com/user/accountCenter.action") != -1) {
 if (location.href.indexOf("msc.jd.com/auth/loginpage/wcoo/toAuthInfoPage") != -1) {
     session.setProgress(90);
     session.get(infokey, function(value){
-    info = $.parseJSON(value);
-    info.base_info.name  = $(".pos-ab")[0].innerHTML;
-    info.base_info.idcard_no  = $(".pos-ab")[1].innerHTML;
-    saveInfo();
-    alert(JSON.stringify(info));
-        session.setProgress(100);
-    session.upload(JSON.stringify(info));
-    session.finish();
+        info = $.parseJSON(value);
+        info.base_info.name  = $(".pos-ab")[0].innerHTML;
+        info.base_info.idcard_no  = $(".pos-ab")[1].innerHTML;
+        saveInfo();
+        logout();
+
     });
 
 
+}
+
+function logout(){
+    session.get("sid", function(sidvalue){
+                location.href = "https://passport.m.jd.com/user/logout.action?sid="+sidvalue;
+                session.setProgress(100);
+                session.upload(JSON.stringify(info));
+                session.finish();
+    });
 }
 //快捷卡实名用户
 if (location.href.indexOf("msc.jd.com/auth/loginpage/wcoo/toAuthPage") != -1) {
@@ -134,10 +129,7 @@ if (location.href.indexOf("msc.jd.com/auth/loginpage/wcoo/toAuthPage") != -1) {
     info.base_info.name  = $("#username")[0].value;
     info.base_info.idcard_no  = $("#idcard")[0].value;
     saveInfo();
-    alert(JSON.stringify(info));
-    session.setProgress(100);
-    session.upload(JSON.stringify(info));
-    session.finish();
+    logout();
     });
 
 
