@@ -4,15 +4,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.spider.SpiderActivity_">
+    android:background="@color/white"
+    tools:context=".SpiderActivity">
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:background="@color/colorPrimary"
-        android:orientation="horizontal">
-
+        android:paddingTop="@dimen/status_bar_height"
+        >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        >
         <ImageView
             android:id="@+id/back"
             android:layout_width="wrap_content"
@@ -30,6 +36,7 @@
             android:textColor="@color/white"
             android:textSize="18dp" />
     </RelativeLayout>
+    </LinearLayout>
 
 
     <RelativeLayout
@@ -44,21 +51,43 @@
             android:id="@+id/spider"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone">
-
+            android:background="@color/white"
+            android:clickable="true"
+            android:visibility="gone"
+            android:paddingTop="@dimen/status_bar_height"
+            >
+            <ImageView
+                android:id="@+id/back_gray"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:paddingTop="14dp"
+                android:paddingLeft="19dp"
+                android:paddingRight="19dp"
+                android:paddingBottom="14dp"
+                android:src="@drawable/back_dark" />
             <wendu.spidersdk.CircleProgress
                 android:id="@+id/work_progress"
                 android:layout_width="200dp"
                 android:layout_height="200dp"
-                android:layout_centerInParent="true" />
-
+                android:layout_marginTop="28dp"
+                android:layout_centerHorizontal="true"
+                 />
             <TextView
                 android:id="@+id/percentage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
+                android:layout_marginTop="100dp"
                 android:text="0%"
+                android:layout_centerHorizontal="true"
                 android:textSize="30dp" />
+
+            <wendu.spidersdk.WaveProgress
+                android:id="@+id/wave"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_alignParentBottom="true"
+                />
         </RelativeLayout>
 
         <RelativeLayout
@@ -92,6 +121,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/windowBackground"
+            android:clickable="true"
             android:visibility="gone">
 
             <LinearLayout

@@ -2,6 +2,7 @@ package wendu.spidersdk;
 
 import android.net.http.SslError;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,13 +25,15 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Map;
 
- public class SpiderCrossWalkFragment extends BaseFragment {
+public class SpiderCrossWalkFragment extends BaseFragment {
 
     private XWalkView mWebView;
     private ProgressBar mProgressBar;
     private SpiderActivity context;
     private String url;
+    private String userAgent;
     private final String contentType = "application/javascript";
 
     public static SpiderCrossWalkFragment newInstance(String url, boolean showBack) {
@@ -55,6 +58,31 @@ import java.net.URL;
         return rootView;
     }
 
+    public void loadUrl(String url){
+        mWebView.load(url,null);
+    }
+
+    @Override
+    public void loadUrl(final String url, final Map<String, String> additionalHttpHeaders){
+        mWebView.post(new Runnable() {
+            @Override
+            public void run() {
+                String str=additionalHttpHeaders.get("User-Agent");
+                if(!TextUtils.isEmpty(str)){
+                    userAgent=mWebView.getSettings().getUserAgentString();
+                    mWebView.getSettings().setUserAgentString(str);
+                }
+                mWebView.load(url,null,additionalHttpHeaders);
+            }
+        });
+
+    }
+
+    @Override
+    void setUserAgent(String userAgent) {
+        mWebView.getSettings().setUserAgentString(userAgent);
+    }
+
     void initXWalks(){
         //置是否允许通过file url加载的Javascript可以访问其他的源,包括其他的文件和http,https等其他的源
         XWalkPreferences.setValue(XWalkPreferences.ALLOW_UNIVERSAL_ACCESS_FROM_FILE, true);
@@ -69,8 +97,11 @@ import java.net.URL;
         XWalkSettings settings = mWebView.getSettings();
         settings.setLoadWithOverviewMode(true);
         settings.setUseWideViewPort(true);
+        userAgent=settings.getUserAgentString();
         mWebView.load(url, null);
     }
+
+
 
     private void showLoadProgress() {
         mProgressBar.setVisibility(View.VISIBLE);
@@ -96,6 +127,10 @@ import java.net.URL;
         @Override
         public void onPageLoadStopped(XWalkView view, String url, LoadStatus status) {
             super.onPageLoadStopped(view, url, status);
+            if(!TextUtils.isEmpty(userAgent)){
+                setUserAgent(userAgent);
+                userAgent=null;
+            }
             injectJs(view);
         }
     }
@@ -137,11 +172,6 @@ import java.net.URL;
         public boolean shouldOverrideUrlLoading(XWalkView view, String url) {
             showLoadProgress();
             return super.shouldOverrideUrlLoading(view, url);
-        }
-
-        @Override
-        public void onLoadFinished(XWalkView view, String url) {
-            super.onLoadFinished(view, url);
         }
 
         @Override

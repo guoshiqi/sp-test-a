@@ -89,4 +89,14 @@ import android.webkit.JavascriptInterface;
     @JavascriptInterface
     public void   openWithSpecifiedCore(String url, String webcore){jsbImp.openWithSpecifiedCore(url, webcore);}
 
+    @JavascriptInterface
+    public void load(String url, String headers){
+       jsbImp.load(url,headers);
+    }
+
+    @JavascriptInterface
+    public void setUserAgent(String userAgent) {
+        jsbImp.setUserAgent(userAgent);
+    }
+
 }

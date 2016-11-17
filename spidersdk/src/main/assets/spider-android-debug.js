@@ -136,25 +136,26 @@ function apiInit(){
 
 //爬取入口
 function dSpider(sessionKey, callback) {
-    var t= setInterval(function(){
-        if(window.xyApiLoaded) {
+    var t = setInterval(function () {
+        if (window.xyApiLoaded) {
             clearInterval(t);
-        }else{
+        } else {
             return;
         }
-        var session= new DataSession(sessionKey);
+        var session = new DataSession(sessionKey);
         window.onbeforeunload = function () {
+            session._save()
             if(session.onNavigate){
                 session.onNavigate(location.href);
             }
         }
-        window.curSession=session;
-        DataSession.getExtraData(function (extras) {
-           callback(session, extras, dQuery);
-
+        window.curSession = session;
+        session._init(function(){
+            DataSession.getExtraData(function (extras) {
+                callback(session, extras, dQuery);
+            })
         })
-
-    },20);
+    }, 20);
 }
 
 var dSpiderLocal = {
@@ -179,24 +180,18 @@ DataSession.getExtraData = function (f) {
 
 //js bridge api
 DataSession.prototype = {
-    "save": function (obj) {
-        return _xy.set(this.key, JSON.stringify(obj));
+   _save: function () {
+        return _xy.set(this.key, JSON.stringify(this.data));
     },
-    "data": function (f) {
-        var t = _xy.get(this.key);
-        f=safeCallback(f);
-        f && f(JSON.parse(t || "{}"))
+    _init: function () {
+        this.data = JSON.parse(_xy.get(this.key) || "{}");
     },
-    "get": function (key, f) {
-        this.data(function (d) {
-            f && f(d[key])
-           })
+
+    get: function (key) {
+        return this.data[key];
     },
-    "set": function (key, value) {
-        var t = _xy.get(this.key);
-        t = JSON.parse(t || "{}");
-        t[key] = value;
-        this.save(t)
+    set: function (key, value) {
+        this.data[key]=value;
     },
 
     "showProgress": function (isShow) {
@@ -244,11 +239,8 @@ DataSession.prototype = {
         _xy.openWithSpecifiedCore(url, core)
     },
 
-    "string": function (f) {
-        this.data(function (d) {
-             f || log(d)
-             f && f(d)
-         })
+    "string": function () {
+       log(this.data)
     }
 };
 apiInit();
