@@ -6,7 +6,7 @@ var sid = "";
 var max_order_num = 30;
 var max_order_date = 30;
 if(location.href.indexOf("sid=") != -1){
-    sid = re.exec(location.href)[1];
+    sid = qs["sid"];
     session.set("sid",  sid);
 };
 
