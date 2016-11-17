@@ -66,7 +66,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     void openTaoBaoActivity() {
         String baseUrl="https://login.m.taobao.com/login.htm";
-        startDspider(baseUrl,baseUrl,"淘宝爬取","taobo_sipder.js");
+        startDspider(baseUrl,baseUrl,"淘宝爬取","spider_taobao.js");
     }
 
 
