@@ -183,8 +183,9 @@ DataSession.prototype = {
    _save: function () {
         return _xy.set(this.key, JSON.stringify(this.data));
     },
-    _init: function () {
+    _init: function (f) {
         this.data = JSON.parse(_xy.get(this.key) || "{}");
+        f()
     },
 
     get: function (key) {
