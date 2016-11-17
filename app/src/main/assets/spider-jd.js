@@ -1,5 +1,9 @@
 log("****************Debug model *******************")
+log("jdjdjdjxxx");
+
 dSpider("sessionkey", function(session,env,$){
+
+log("jdjdjdjd");
 var re = /sid=(.+)$/ig;
 var infokey = "infokey";
 var sid = "";
@@ -27,18 +31,16 @@ if (location.href.indexOf("://m.jd.com") != -1 ) {
 
     // log(JSON.stringify(new info({},{},{})));
      session.set(infokey, JSON.stringify(new info({},{},{})));
-     session.get(infokey, function(value){
-         info = $.parseJSON(value);
+     info = $.parseJSON(session.get(infokey));
          info.base_info.username  = $("[report-eventid$='MCommonHTail_Account']").text().replace(/\n/g,"").replace(/\t/g,"");
          saveInfo();
          if(sid != ""){
-                 session.setProgress(10);
-                 location.href="http://home.m.jd.com/maddress/address.action?";
-             }
-
-         });
-
+             session.setProgress(10);
+             location.href="http://home.m.jd.com/maddress/address.action?";
+         }
 }
+
+
 
 function getOrder(){
     session.setProgress(40);
@@ -101,36 +103,29 @@ if (location.href.indexOf("home.m.jd.com/user/accountCenter.action") != -1) {
 //已实名用户
 if (location.href.indexOf("msc.jd.com/auth/loginpage/wcoo/toAuthInfoPage") != -1) {
     session.setProgress(90);
-    session.get(infokey, function(value){
-        info = $.parseJSON(value);
-        info.base_info.name  = $(".pos-ab")[0].innerHTML;
-        info.base_info.idcard_no  = $(".pos-ab")[1].innerHTML;
-        saveInfo();
-        logout();
-
-    });
+    info = $.parseJSON(session.get(infokey));
+            info.base_info.name  = $(".pos-ab")[0].innerHTML;
+            info.base_info.idcard_no  = $(".pos-ab")[1].innerHTML;
+            saveInfo();
+            logout();
 
 
 }
 
 function logout(){
-    session.get("sid", function(sidvalue){
-                location.href = "https://passport.m.jd.com/user/logout.action?sid="+sidvalue;
-                session.setProgress(100);
-                session.upload(JSON.stringify(info));
-                session.finish();
-    });
+    location.href = "https://passport.m.jd.com/user/logout.action?sid="+session.get("sid");
+                    session.setProgress(100);
+                    session.upload(JSON.stringify(info));
+                    session.finish();
 }
 //快捷卡实名用户
 if (location.href.indexOf("msc.jd.com/auth/loginpage/wcoo/toAuthPage") != -1) {
     session.setProgress(90);
-    session.get(infokey, function(value){
-    info = $.parseJSON(value);
+    info = $.parseJSON(session.get(infokey));
     info.base_info.name  = $("#username")[0].value;
     info.base_info.idcard_no  = $("#idcard")[0].value;
     saveInfo();
     logout();
-    });
 
 
 }
@@ -142,32 +137,30 @@ function saveInfo(){
 
 if (location.href.indexOf("home.m.jd.com/maddress") != -1) {
     session.setProgress(20);
-    session.get(infokey, function(value){
-     log("value",value)
-    info = $.parseJSON(value);
-    contact_info = new contact_info([]);
-    var taskAddr = [];
-    var urlarray = $(".ia-r");
-    for(var i=0;i<urlarray.length;i++){
-                            taskAddr.push($.get(urlarray[i],function(response,status){
-                            var node = $("<div>").append($(response))
-                            var name = node.find("#uersNameId")[0].value;
-                            var phone = node.find("#mobilePhoneId")[0].value;
-                            var addr = node.find("#addressLabelId")[0].innerHTML;
-                            var detail = node.find("#address_where")[0].innerHTML;
-                            contact_info.contact_detail.push(new contact(name,addr,detail,phone, ""));
-                            }) );
 
-    }
+    info = $.parseJSON(session.get(infokey));
+        contact_info = new contact_info([]);
+        var taskAddr = [];
+        var urlarray = $(".ia-r");
+        for(var i=0;i<urlarray.length;i++){
+                                taskAddr.push($.get(urlarray[i],function(response,status){
+                                var node = $("<div>").append($(response))
+                                var name = node.find("#uersNameId")[0].value;
+                                var phone = node.find("#mobilePhoneId")[0].value;
+                                var addr = node.find("#addressLabelId")[0].innerHTML;
+                                var detail = node.find("#address_where")[0].innerHTML;
+                                contact_info.contact_detail.push(new contact(name,addr,detail,phone, ""));
+                                }) );
 
-     $.when(taskAddr).done(
-          function(){
-                info.contact_info = contact_info;
-                saveInfo();
-                session.setProgress(30);
-                getOrder();
-                });
-    });
+        }
+
+         $.when(taskAddr).done(
+              function(){
+                    info.contact_info = contact_info;
+                    saveInfo();
+                    session.setProgress(30);
+                    getOrder();
+                    });
 
 
 }
