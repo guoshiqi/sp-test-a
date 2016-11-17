@@ -39,6 +39,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         findViewById(R.id.email).setOnClickListener(this);
         findViewById(R.id.am_tv_taobao).setOnClickListener(this);
         findViewById(R.id.jd).setOnClickListener(this);
+        findViewById(R.id.mobile_unicom).setOnClickListener(this);
         debugSwitch=getView(R.id.debug);
         isDebug=KvStorage.getInstance().getBoolean("debug",false);
         debugSwitch.setChecked(isDebug);
@@ -66,13 +67,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     void openTaoBaoActivity() {
         String baseUrl="https://login.m.taobao.com/login.htm";
-        startDspider(baseUrl,baseUrl,"淘宝爬取","taobo_sipder.js");
+        startDspider(baseUrl,baseUrl,"淘宝爬取","spider_taobao.js");
     }
 
 
     void openEmail() {
         String baseUrl="http://172.19.22.235/spider-script/emails/";
         startDspider(baseUrl+ "email.html?t=" + System.currentTimeMillis(),baseUrl+"inject.php","邮箱爬取","");
+    }
+
+    void openUnicomCall() {
+        String baseUrl="http://wap.10010.com/t/query/getPhoneByDetailTip.htm";
+        startDspider(baseUrl, baseUrl,"联通通话详单爬去","spider_unicom_call.js");
     }
 
     void startDspider(String startUrl,String scriptUrl,String title,String debugSrcFileName) {
@@ -91,22 +97,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         //调试模式
         intent.putExtra("debug", isDebug);
         intent.putExtra("debugSrc",debugSrcFileName);
-        startActivityForResult(intent, 1);
-    }
-
-    //打开获取通话记录activity
-    public void openUnicomMobileCall(View v) {
-        Intent intent = new Intent();
-        intent.setClass(this, SpiderActivity.class);
-        //联通
-        String baseUrl="http://wap.10010.com/t/query/getPhoneByDetailTip.htm";
-        //将要打开页面url
-        intent.putExtra("url",baseUrl);
-        //注入url
-        intent.putExtra("inject", baseUrl + "inject.php");
-        intent.putExtra("title", "通话记录爬取");
-        //调试模式
-        intent.putExtra("debug", isDebug);
         startActivityForResult(intent, 1);
     }
 
@@ -151,6 +141,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.jd:
                 openJd();
+                break;
+            case R.id.mobile_unicom:
+                openUnicomCall();
                 break;
             case R.id.result:
                 startActivity(ResultActivity.class);

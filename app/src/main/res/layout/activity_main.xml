@@ -80,6 +80,7 @@
             android:padding="10dp"
             android:onClick="openUnicomMobileCall"
             android:layout_marginTop="15dp"
+            android:textColor="@color/white"
             android:text="联通通话详单"/>
     </LinearLayout>
 
