@@ -28,7 +28,7 @@ dSpider("sessionkey", function(session,env,$){
                 session.set("taobaoState",0);
                 session.set("orderArray",[]);
                 //显示进度为0
-                session.showProgress(true);
+                session.showProgress(false);
                 session.setProgressMax(100);
                 session.setProgress(2);
             }
@@ -272,8 +272,8 @@ dSpider("sessionkey", function(session,env,$){
     //------------------------------------------------------------------------------------爬取收货地址----------------------------------------------------------------------------
     else if(state == 1){
 
-            if (window.location.pathname.indexOf("m.taobao.com") != -1) {
-                dQuery(".my")[0].click();//点击我的
+            if (window.location.hostname.indexOf("m.taobao.com") != -1) {
+                $(".my").click();//点击我的
             }
             /**
              * 爬取收货地址
