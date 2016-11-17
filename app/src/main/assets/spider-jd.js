@@ -16,7 +16,7 @@ var sid = "";
 var max_order_num = 200;
 var max_order_date = 10;
 if(location.href.indexOf("sid=") != -1){
-    sid = re.exec(location.href)[1];
+    sid = qs["sid"];
     session.set("sid",  sid);
 };
 
