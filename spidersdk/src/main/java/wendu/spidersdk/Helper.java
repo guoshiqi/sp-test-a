@@ -4,11 +4,16 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by du on 16/4/15.
@@ -16,7 +21,13 @@ import java.io.UnsupportedEncodingException;
 class Helper {
     public static boolean isDebug=false;
     public static int getColor(Context ctx,int resId) {
-        return ContextCompat.getColor(ctx, resId);
+        int color=-1;
+        try {
+           color= ContextCompat.getColor(ctx, resId);
+        }catch (Exception e){
+
+        }
+        return color;
     }
     public static String getFromAssets(Context ctx,String ...fileName) {
         String result = "";
@@ -43,6 +54,27 @@ class Helper {
     }
     public static InputStream getDqueryScript(Context ctx) throws UnsupportedEncodingException {
         return getStreamFromAssets(ctx, "jquery-3.1.0.min.js");
+    }
+
+    public static Map<String, String> getMapForJson(String jsonStr){
+        JSONObject jsonObject ;
+        try {
+            jsonObject = new JSONObject(jsonStr);
+
+            Iterator<String> keyIter= jsonObject.keys();
+            String key;
+            String value ;
+            Map<String, String> valueMap = new HashMap<>();
+            while (keyIter.hasNext()) {
+                key = keyIter.next();
+                value = jsonObject.getString(key);
+                valueMap.put(key, value);
+            }
+            return valueMap;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 

@@ -1,4 +1,6 @@
 <resources>
+    <style name="ColorTranslucentTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    </style>
     <declare-styleable name="CircleProgress">
         <attr name="foreground_color" format="color" />
         <attr name="foreground_end_color" format="color" />
