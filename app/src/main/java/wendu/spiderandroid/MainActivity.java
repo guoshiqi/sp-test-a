@@ -105,6 +105,22 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         startActivityForResult(intent, 1);
     }
 
+    //打开获取通话记录activity
+    public void openUnicomMobileCall(View v) {
+        Intent intent = new Intent();
+        intent.setClass(this, SpiderActivity.class);
+        //联通
+        String baseUrl="http://wap.10010.com/t/query/getPhoneByDetailTip.htm";
+        //将要打开页面url
+        intent.putExtra("url",baseUrl);
+        //注入url
+        intent.putExtra("inject", baseUrl + "inject.php");
+        intent.putExtra("title", "通话记录爬取");
+        //调试模式
+        intent.putExtra("debug", isDebug);
+        startActivityForResult(intent, 1);
+    }
+
     @Override
     protected void onResume() {
         List<String> list = LatestResult.getInstance().getData();
