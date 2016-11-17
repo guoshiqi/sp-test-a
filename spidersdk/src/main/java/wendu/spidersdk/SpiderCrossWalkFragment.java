@@ -198,7 +198,7 @@ public class SpiderCrossWalkFragment extends BaseFragment {
                 } else {
 
                     try {
-                        URL uri = new URL(SpiderActivity.INJECT_URL + "?platform=android&refer=" + url.substring(url.indexOf("refer=") + 6));
+                        URL uri = new URL(SpiderActivity.INJECT_URL + "&platform=android&refer=" + url.substring(url.indexOf("refer=") + 6));
                         HttpURLConnection urlCon = (HttpURLConnection) uri.openConnection();
                         urlCon.setRequestMethod("GET");
                         response = createXWalkWebResourceResponse(contentType,

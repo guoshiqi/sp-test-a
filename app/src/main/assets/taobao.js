@@ -1,23 +1,5 @@
-log("****************Debug model *******************")
-//function dSpiderTaobao(,callback){
-//   dSpider(sessionkey, function(session,env,$){
-//       session.get("",function(data){
-//          callback(session,env,$,data)
-//       })
-//   });
-//}
 
-//dSpiderTaobao("sessionkey", function(session,env,$,data){
-dSpider("sessionkey", function(session,env,$){
-   // session为会话对象
-   // env为平台环境参数
-   // $ 为dQuery
-   //session.upload([string|object])
-   //session.finish() 结束爬取
-
-   log(session,env,$)
-
-   //place your code here!
+dSpider("taobao", function(session,env,$){
     if (window.location.pathname.indexOf("mlapp/mytaobao") != -1) {
         //taobaoState    0:爬账单  1:爬地址   2:爬个人信息   3:结束
         var count = session.get("taobaoState");
