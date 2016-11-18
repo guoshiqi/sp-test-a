@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SpiderAndroid.iml" filepath="$PROJECT_DIR$/SpiderAndroid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android-spider.iml" filepath="$PROJECT_DIR$/android-spider.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/spidersdk/spidersdk.iml" filepath="$PROJECT_DIR$/spidersdk/spidersdk.iml" />
     </modules>
