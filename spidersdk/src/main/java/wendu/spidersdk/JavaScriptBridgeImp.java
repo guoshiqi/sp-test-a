@@ -144,6 +144,7 @@ import java.util.Map;
             webcore="x5|sys|cs";
         }
         if (webcore.startsWith(mContxt.getCurrentCore())){
+            mContxt.loadUrl(url);
             return;
         }
         mContxt.open(url,webcore);

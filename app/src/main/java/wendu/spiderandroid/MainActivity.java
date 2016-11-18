@@ -30,6 +30,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     SwitchCompat debugSwitch;
     private SpiderService spiderService = DataController.getUploadSerivce();
     boolean isDebug=false;
+    private String scriptUrl="http://119.29.112.230:4832/?sid=";
+    //private String scriptUrl="http://172.19.22.235/spider-script/?sid=";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         findViewById(R.id.email).setOnClickListener(this);
         findViewById(R.id.am_tv_taobao).setOnClickListener(this);
         findViewById(R.id.jd).setOnClickListener(this);
+        findViewById(R.id.mobile_unicom).setOnClickListener(this);
         debugSwitch=getView(R.id.debug);
         isDebug=KvStorage.getInstance().getBoolean("debug",false);
         debugSwitch.setChecked(isDebug);
@@ -59,20 +62,24 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
 
     void openJd() {
-        String scriptUrl="http://test.iguoxue.org/spider/ecom/jd.php";
         String startUrl="https://plogin.m.jd.com/user/login.action?appid=100";
-        startDspider(startUrl,scriptUrl,"京东信息爬取","spider-jd.js");
+        startDspider(startUrl,scriptUrl+"jd","京东信息爬取", "jd.js");
     }
 
     void openTaoBaoActivity() {
         String baseUrl="https://login.m.taobao.com/login.htm";
-        startDspider(baseUrl,baseUrl,"淘宝爬取","taobo_sipder.js");
+        startDspider(baseUrl,scriptUrl+"taobao","淘宝爬取", "taobao.js");
     }
 
+    void openUnicomCall() {
+        String baseUrl="http://wap.10010.com/t/query/getPhoneByDetailTip.htm";
+        startDspider(baseUrl, scriptUrl+"unicom","联通通话详单爬去", "unicom.js");
+    }
 
     void openEmail() {
-        String baseUrl="http://172.19.22.235/spider-script/emails/";
-        startDspider(baseUrl+ "email.html?t=" + System.currentTimeMillis(),baseUrl+"inject.php","邮箱爬取","");
+        //String baseUrl="http://119.29.112.230:4832/emails/";
+        String baseUrl="http://119.29.112.230:4832/emails/";
+        startDspider(baseUrl+ "email.html?t=" + System.currentTimeMillis(),baseUrl+"inject.php?sid=email","邮箱爬取","");
     }
 
     void startDspider(String startUrl,String scriptUrl,String title,String debugSrcFileName) {
@@ -91,22 +98,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         //调试模式
         intent.putExtra("debug", isDebug);
         intent.putExtra("debugSrc",debugSrcFileName);
-        startActivityForResult(intent, 1);
-    }
-
-    //打开获取通话记录activity
-    public void openUnicomMobileCall(View v) {
-        Intent intent = new Intent();
-        intent.setClass(this, SpiderActivity.class);
-        //联通
-        String baseUrl="http://wap.10010.com/t/query/getPhoneByDetailTip.htm";
-        //将要打开页面url
-        intent.putExtra("url",baseUrl);
-        //注入url
-        intent.putExtra("inject", baseUrl + "inject.php");
-        intent.putExtra("title", "通话记录爬取");
-        //调试模式
-        intent.putExtra("debug", isDebug);
         startActivityForResult(intent, 1);
     }
 
@@ -151,6 +142,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.jd:
                 openJd();
+                break;
+            case R.id.mobile_unicom:
+                openUnicomCall();
                 break;
             case R.id.result:
                 startActivity(ResultActivity.class);

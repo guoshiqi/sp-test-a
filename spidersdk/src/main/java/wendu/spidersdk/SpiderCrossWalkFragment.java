@@ -58,8 +58,14 @@ public class SpiderCrossWalkFragment extends BaseFragment {
         return rootView;
     }
 
-    public void loadUrl(String url){
-        mWebView.load(url,null);
+    public void loadUrl(final String url){
+        mWebView.post(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.load(url,null);
+            }
+        });
+
     }
 
     @Override
@@ -198,7 +204,7 @@ public class SpiderCrossWalkFragment extends BaseFragment {
                 } else {
 
                     try {
-                        URL uri = new URL(SpiderActivity.INJECT_URL + "?platform=android&refer=" + url.substring(url.indexOf("refer=") + 6));
+                        URL uri = new URL(SpiderActivity.INJECT_URL + "&platform=android&refer=" + url.substring(url.indexOf("refer=") + 6));
                         HttpURLConnection urlCon = (HttpURLConnection) uri.openConnection();
                         urlCon.setRequestMethod("GET");
                         response = createXWalkWebResourceResponse(contentType,

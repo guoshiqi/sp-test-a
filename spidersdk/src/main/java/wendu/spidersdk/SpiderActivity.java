@@ -102,6 +102,7 @@ public class SpiderActivity extends AppCompatActivity {
         msg = getView(R.id.msg);
         webcore = getView(R.id.webcore);
         fm = getSupportFragmentManager();
+        workProgress.setForegroundColor(Color.argb(70,19,94,148),Color.argb(170,19,94,148));
         crossWalkInitializer = CrossWalkInitializer.create(SpiderActivity.this);
         crossWalkInitializer.init(false);
         url = getIntent().getStringExtra("url");

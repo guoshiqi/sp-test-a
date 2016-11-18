@@ -63,7 +63,13 @@ class CircleProgress extends View {
         colorGradientHelper=new Helper.ColorGradientHelper(foregroundColor,foregroundColorEnd);
     }
 
-
+    void setForegroundColor(int color,int end){
+        foregroundColor=color;
+        colorGradientHelper=new Helper.ColorGradientHelper(foregroundColor,end);
+        backgroundColor = Color.argb(30, Color.red(foregroundColor),
+                Color.green(foregroundColor),Color.blue(foregroundColor));
+        invalidate();
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {

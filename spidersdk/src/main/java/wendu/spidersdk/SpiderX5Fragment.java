@@ -105,8 +105,13 @@ public class SpiderX5Fragment extends BaseFragment {
         mProgressBar.setProgress(0);
     }
 
-    public void loadUrl(String url) {
-        mWebView.loadUrl(url);
+    public void loadUrl(final String url) {
+        mWebView.post(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.loadUrl(url);
+            }
+        });
     }
 
     @Override
@@ -191,7 +196,7 @@ public class SpiderX5Fragment extends BaseFragment {
                 } else {
 
                     try {
-                        URL uri = new URL(SpiderActivity.INJECT_URL + "?platform=android&refer=" + url.substring(url.indexOf("refer=") + 6));
+                        URL uri = new URL(SpiderActivity.INJECT_URL + "&platform=android&refer=" + url.substring(url.indexOf("refer=") + 6));
                         HttpURLConnection urlCon = (HttpURLConnection) uri.openConnection();
                         urlCon.setRequestMethod("GET");
                         response = new WebResourceResponse(contentType,
