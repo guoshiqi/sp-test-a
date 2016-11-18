@@ -105,8 +105,13 @@ public class SpiderX5Fragment extends BaseFragment {
         mProgressBar.setProgress(0);
     }
 
-    public void loadUrl(String url) {
-        mWebView.loadUrl(url);
+    public void loadUrl(final String url) {
+        mWebView.post(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.loadUrl(url);
+            }
+        });
     }
 
     @Override

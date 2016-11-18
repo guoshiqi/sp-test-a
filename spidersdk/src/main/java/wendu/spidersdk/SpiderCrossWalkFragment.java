@@ -58,8 +58,14 @@ public class SpiderCrossWalkFragment extends BaseFragment {
         return rootView;
     }
 
-    public void loadUrl(String url){
-        mWebView.load(url,null);
+    public void loadUrl(final String url){
+        mWebView.post(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.load(url,null);
+            }
+        });
+
     }
 
     @Override

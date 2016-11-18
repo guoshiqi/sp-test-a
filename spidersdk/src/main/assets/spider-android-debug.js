@@ -19,17 +19,17 @@ String.prototype.empty = function () {
 };
 
 function log(){
-     for(var i=0;i<arguments.length;++i)  {
-      var str=arguments[i];
-      str = typeof str !== "string" ? JSON.stringify(str) : str;
-       console.log("xy log: "+ str);
-     }
- }
- //异常捕获
- function errorReport(e){
-     console.error("xy log: 语法错误: "+e.message+e.stack);
-     window.curSession&&curSession.finish(e.toString(),"")
- }
+    for(var i=0;i<arguments.length;++i)  {
+        var str=arguments[i];
+        str = typeof str !== "string" ? JSON.stringify(str) : str;
+        console.log("xy log: "+ str);
+    }
+}
+//异常捕获
+function errorReport(e){
+    console.error("xy log: 语法错误: "+e.message+e.stack);
+    window.curSession&&curSession.finish(e.toString(),"")
+}
 
 String.prototype.endWith = function (str) {
     if (!str) return false;
@@ -152,7 +152,6 @@ function dSpider(sessionKey, callback) {
         window.curSession = session;
         session._init(function(){
             DataSession.getExtraData(function (extras) {
-            log("****************Debug model *******************")
                 callback(session, extras, dQuery);
             })
         })
@@ -181,7 +180,7 @@ DataSession.getExtraData = function (f) {
 
 //js bridge api
 DataSession.prototype = {
-   _save: function () {
+    _save: function () {
         return _xy.set(this.key, JSON.stringify(this.data));
     },
     _init: function (f) {
@@ -242,7 +241,7 @@ DataSession.prototype = {
     },
 
     "string": function () {
-       log(this.data)
+        log(this.data)
     }
 };
 apiInit();

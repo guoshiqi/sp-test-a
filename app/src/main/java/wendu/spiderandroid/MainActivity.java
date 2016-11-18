@@ -31,6 +31,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private SpiderService spiderService = DataController.getUploadSerivce();
     boolean isDebug=false;
     private String scriptUrl="http://119.29.112.230:4832/?sid=";
+    //private String scriptUrl="http://172.19.22.235/spider-script/?sid=";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,8 +77,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     void openEmail() {
-        String baseUrl="http://172.19.22.235/spider-script/emails/";
-        startDspider(baseUrl+ "email.html?t=" + System.currentTimeMillis(),baseUrl+"inject.php","邮箱爬取","");
+        //String baseUrl="http://119.29.112.230:4832/emails/";
+        String baseUrl="http://119.29.112.230:4832/emails/";
+        startDspider(baseUrl+ "email.html?t=" + System.currentTimeMillis(),baseUrl+"inject.php?sid=email","邮箱爬取","");
     }
 
     void startDspider(String startUrl,String scriptUrl,String title,String debugSrcFileName) {
