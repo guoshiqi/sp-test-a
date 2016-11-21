@@ -2,7 +2,6 @@
 dSpider("taobao", function(session,env,$){
     //禁止加载图片
     session.autoLoadImg(false)
-    session.
     log(location.href)
     if (window.location.pathname.indexOf("mlapp/mytaobao") != -1) {
         //taobaoState    0:爬账单  1:爬地址   2:爬个人信息   3:结束
