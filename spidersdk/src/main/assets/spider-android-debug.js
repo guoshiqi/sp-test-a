@@ -67,19 +67,22 @@ dQuery.errorReport=errorReport;
 
 function hook(fun){
     return function() {
-        if (!(arguments[0] instanceof Function)) {
-            t=arguments[0];
-            log("warning: "+fun.name+" first argument should be function not string ")
-            arguments[0]=function(){eval(t)};
-        }
-        arguments[0]=safeCallback(arguments[0]);
-        return fun.apply(this,arguments)
+
+            if (!(arguments[0] instanceof Function)) {
+                t=arguments[0];
+                log("warning: "+fun.name+" first argument should be function not string ")
+                arguments[0]=function(){eval(t)};
+            }
+            arguments[0]=safeCallback(arguments[0]);
+
+           return fun.apply(this,arguments)
+
     }
 }
 
 //hook setTimeout,setInterval异步回调
-setTimeout=hook(setTimeout);
-setInterval=hook(setInterval);
+var setTimeout=hook(window.setTimeout);
+var setInterval=hook(window.setInterval);
 
 //dom 监控
 function DomNotFindReport(selector) {
