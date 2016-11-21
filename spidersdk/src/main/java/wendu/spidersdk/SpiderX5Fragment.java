@@ -18,7 +18,6 @@ import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
 import com.tencent.smtt.sdk.WebViewClient;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -31,15 +30,16 @@ public class SpiderX5Fragment extends BaseFragment {
     private ProgressBar mProgressBar;
     private SpiderActivity  context;
     private String mTitle;
-    private String url;
+    private String mUrl;
     private boolean showBack;
     private String userAgent;
+    private boolean mLoading=true;
     private final String contentType = "application/javascript";
 
     public static SpiderX5Fragment newInstance(String url, boolean showBack) {
         SpiderX5Fragment fragment = new SpiderX5Fragment();
         Bundle args = new Bundle();
-        args.putString("url", url);
+        args.putString("mUrl", url);
         args.putBoolean("showBack", showBack);
         fragment.setArguments(args);
         return fragment;
@@ -50,7 +50,7 @@ public class SpiderX5Fragment extends BaseFragment {
                                     Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_x5, container, false);
         Log.e("spider", "x5 loaded!");
-        url = getArguments().getString("url");
+        mUrl = getArguments().getString("mUrl");
         mProgressBar = (ProgressBar) rootView.findViewById(R.id.progress);
         showLoadProgress();
         context= (SpiderActivity) getActivity();
@@ -60,7 +60,7 @@ public class SpiderX5Fragment extends BaseFragment {
         mWebView.addJavascriptInterface(new JavaScriptBridge(getActivity()), "_xy");
         mWebView.clearCache(true);
         initWebViewSettings();
-        loadUrl(url);
+        loadUrl(mUrl);
         return rootView;
     }
 
@@ -85,6 +85,15 @@ public class SpiderX5Fragment extends BaseFragment {
         webSetting.setRenderPriority(WebSettings.RenderPriority.HIGH);
         webSetting.setCacheMode(WebSettings.LOAD_NO_CACHE);
         webSetting.setMixedContentMode(0);
+
+    }
+    public void  autoLoadImg(final boolean load){
+        mWebView.post(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.getSettings().setLoadsImagesAutomatically(load) ;
+            }
+        });
 
     }
 
@@ -139,6 +148,7 @@ public class SpiderX5Fragment extends BaseFragment {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             showLoadProgress();
+            mLoading=true;
             return super.shouldOverrideUrlLoading(view, url);
         }
 
@@ -150,8 +160,7 @@ public class SpiderX5Fragment extends BaseFragment {
                 setUserAgent(userAgent);
                 userAgent=null;
             }
-            injectJs(view);
-            //context.hideLoadView();
+            injectJs();
         }
 
         @Override
@@ -239,6 +248,7 @@ public class SpiderX5Fragment extends BaseFragment {
             if (!TextUtils.isEmpty(title)) {
                 mTitle = title;
             }
+            injectJs();
         }
 
         @Override
@@ -252,10 +262,17 @@ public class SpiderX5Fragment extends BaseFragment {
 
     };
 
-    void injectJs(WebView webView) {
-        String js = Helper.getFromAssets(this.getContext(), "injector.js");
-        webView.loadUrl("javascript:" + js);
+    void injectJs() {
+        mLoading=false;
+        mWebView.post(new Runnable() {
+            @Override
+            public void run() {
+                String js = Helper.getFromAssets(getContext(), "injector.js");
+                mWebView.loadUrl("javascript:" + js);
+            }
+        });
     }
+
 
     @Override
     public void onDestroyView() {

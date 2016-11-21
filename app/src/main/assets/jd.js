@@ -12,7 +12,8 @@ dSpider("jd", function(session,env,$){
 
     session.onNavigate=function(url){
        if(url.indexOf("://plogin.m.jd.com/user")!=-1){
-         session.showLoading();
+         //session.showLoading();
+         session.autoLoadImg(false);
        }
      }
 

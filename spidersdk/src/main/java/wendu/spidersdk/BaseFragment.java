@@ -15,5 +15,6 @@ public abstract class BaseFragment extends Fragment {
     abstract void loadUrl(String url, Map<String, String> additionalHttpHeaders);
     abstract void loadUrl(String url);
     abstract void setUserAgent(String userAgent);
+    public void  autoLoadImg(boolean load){};
 
 }

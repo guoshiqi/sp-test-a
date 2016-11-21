@@ -152,8 +152,10 @@ function dSpider(sessionKey, callback) {
         window.curSession = session;
         session._init(function(){
             DataSession.getExtraData(function (extras) {
-            log("dSpider start!")
-                callback(session, extras, dQuery);
+            dQuery(function(){
+               log("dSpider start!")
+               callback(session, extras, dQuery);
+            })
             })
         })
     }, 20);
@@ -239,6 +241,10 @@ DataSession.prototype = {
 
     "openWithSpecifiedCore":function(url, core){
         _xy.openWithSpecifiedCore(url, core)
+    },
+
+    autoLoadImg:function(load){
+           _xy.autoLoadImg(load)
     },
 
     "string": function () {

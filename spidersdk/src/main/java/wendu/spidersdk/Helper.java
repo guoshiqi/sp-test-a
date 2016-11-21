@@ -32,6 +32,7 @@ class Helper {
     public static String getFromAssets(Context ctx,String ...fileName) {
         String result = "";
         for(String file : fileName) {
+            result+="\r\n";
             try {
                 InputStreamReader inputReader = new InputStreamReader(ctx.getResources().getAssets().open(file));
                 BufferedReader bufReader = new BufferedReader(inputReader);
@@ -44,6 +45,15 @@ class Helper {
         }
         return result;
     }
+
+    public static String getDebugScripts(Context ctx){
+        //String script="!function(){\r\n";
+        String script="";
+        script+=getFromAssets(ctx, "jquery-3.1.0.min.js","spider-android-debug.js",SpiderActivity.debugSrc);
+        //script+="\r\n}()";
+        return  script;
+    }
+
     public static InputStream getStreamFromAssets(Context ctx,String ...fileName) throws UnsupportedEncodingException {
        return new ByteArrayInputStream(getFromAssets(ctx, fileName).getBytes("utf8"));
 

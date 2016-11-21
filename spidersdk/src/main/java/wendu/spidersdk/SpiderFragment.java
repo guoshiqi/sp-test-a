@@ -1,6 +1,7 @@
 package wendu.spidersdk;
 
 import android.annotation.TargetApi;
+import android.graphics.Bitmap;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,14 +32,15 @@ public class SpiderFragment extends BaseFragment {
     private WebView mWebView;
     private ProgressBar mProgressBar;
     private SpiderActivity context;
-    private String url;
+    private String mUrl;
     private String userAgent;
+    private boolean mLoading=true;
     private final String contentType = "application/javascript";
 
     public static SpiderFragment newInstance(String url, boolean showBack) {
         SpiderFragment fragment = new SpiderFragment();
         Bundle args = new Bundle();
-        args.putString("url", url);
+        args.putString("mUrl", url);
         args.putBoolean("showBack", showBack);
         fragment.setArguments(args);
         return fragment;
@@ -49,11 +51,10 @@ public class SpiderFragment extends BaseFragment {
                                     Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_spider, container, false);
         Log.e("spider", "system webview loaded!");
-        url = getArguments().getString("url");
+        mUrl = getArguments().getString("mUrl");
         mProgressBar = (ProgressBar) rootView.findViewById(R.id.progress);
         showLoadProgress();
         context= (SpiderActivity) getActivity();
-
         mWebView = (WebView) rootView.findViewById(R.id.webview);
         mWebView.setWebChromeClient(mWebChromeClient);
         mWebView.setWebViewClient(mWebViewClient);
@@ -71,8 +72,7 @@ public class SpiderFragment extends BaseFragment {
             settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }
         settings.setUseWideViewPort(true);
-        loadUrl(url);
-
+        loadUrl(mUrl);
         return rootView;
     }
 
@@ -108,6 +108,16 @@ public class SpiderFragment extends BaseFragment {
 
     }
 
+    public void  autoLoadImg(final boolean load){
+        mWebView.post(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.getSettings().setLoadsImagesAutomatically(load) ;
+            }
+        });
+
+    }
+
     @Override
     void setUserAgent(String userAgent) {
         mWebView.getSettings().setUserAgentString(userAgent);
@@ -117,6 +127,7 @@ public class SpiderFragment extends BaseFragment {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             showLoadProgress();
+            mLoading=true;
             return super.shouldOverrideUrlLoading(view, url);
         }
 
@@ -128,9 +139,10 @@ public class SpiderFragment extends BaseFragment {
                 setUserAgent(userAgent);
                 userAgent=null;
             }
-            injectJs(view);
-            //context.hideLoadView();
+            injectJs();
         }
+
+
 
         @SuppressWarnings("deprecation")
         @Override
@@ -152,6 +164,11 @@ public class SpiderFragment extends BaseFragment {
         @Override
         public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
             handler.proceed();
+        }
+
+        @Override
+        public void onPageCommitVisible(WebView view, String url) {
+            super.onPageCommitVisible(view, url);
         }
 
         @Override
@@ -220,8 +237,14 @@ public class SpiderFragment extends BaseFragment {
             } else {
                 mProgressBar.setProgress(newProgress);
             }
+
         }
 
+        @Override
+        public void onReceivedTitle(WebView view, String title) {
+            super.onReceivedTitle(view, title);
+            injectJs();
+        }
     };
 
     @Override
@@ -235,9 +258,15 @@ public class SpiderFragment extends BaseFragment {
         super.onDestroyView();
     }
 
-    void injectJs(WebView webView) {
-        String js = Helper.getFromAssets(getContext(), "injector.js");
-        webView.loadUrl("javascript:" + js);
+    void injectJs() {
+        mLoading=false;
+        mWebView.post(new Runnable() {
+            @Override
+            public void run() {
+              String js = Helper.getFromAssets(getContext(), "injector.js");
+                mWebView.loadUrl("javascript:" + js);
+            }
+        });
     }
 
 }

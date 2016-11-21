@@ -442,6 +442,15 @@ public class SpiderActivity extends AppCompatActivity {
         }
     }
 
+    public void  autoLoadImg(final boolean load){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                fragment.autoLoadImg(load);
+            }
+        });
+
+    }
 
     @Override
     public void onBackPressed() {

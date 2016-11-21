@@ -103,4 +103,9 @@ import org.xwalk.core.JavascriptInterface;
         jsbImp.setUserAgent(userAgent);
     }
 
+    @JavascriptInterface
+    public void autoLoadImg(boolean load) {
+        jsbImp.autoLoadImg(load);
+    }
+
 }

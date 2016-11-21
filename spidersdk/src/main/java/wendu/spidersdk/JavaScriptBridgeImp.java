@@ -160,4 +160,8 @@ import java.util.Map;
         mContxt.setUserAgent(userAgent);
     }
 
+    public void autoLoadImg(boolean load){
+        mContxt.autoLoadImg(load);
+    }
+
 }

@@ -34,6 +34,7 @@ public class SpiderCrossWalkFragment extends BaseFragment {
     private SpiderActivity context;
     private String url;
     private String userAgent;
+    private boolean mLoading=true;
     private final String contentType = "application/javascript";
 
     public static SpiderCrossWalkFragment newInstance(String url, boolean showBack) {
@@ -107,7 +108,9 @@ public class SpiderCrossWalkFragment extends BaseFragment {
         mWebView.load(url, null);
     }
 
-
+    public void  autoLoadImg(boolean load){
+       //
+    }
 
     private void showLoadProgress() {
         mProgressBar.setVisibility(View.VISIBLE);
@@ -128,6 +131,7 @@ public class SpiderCrossWalkFragment extends BaseFragment {
         @Override
         public void onReceivedTitle(XWalkView view, String title) {
             super.onReceivedTitle(view, title);
+            injectJs();
         }
 
         @Override
@@ -137,7 +141,7 @@ public class SpiderCrossWalkFragment extends BaseFragment {
                 setUserAgent(userAgent);
                 userAgent=null;
             }
-            injectJs(view);
+            injectJs();
         }
     }
 
@@ -177,6 +181,7 @@ public class SpiderCrossWalkFragment extends BaseFragment {
         @Override
         public boolean shouldOverrideUrlLoading(XWalkView view, String url) {
             showLoadProgress();
+            mLoading=true;
             return super.shouldOverrideUrlLoading(view, url);
         }
 
@@ -242,10 +247,17 @@ public class SpiderCrossWalkFragment extends BaseFragment {
         }
     }
 
-    void injectJs(XWalkView webView) {
-        String js = Helper.getFromAssets(getContext(), "injector.js");
-        webView.load("javascript:" + js,null);
+    void injectJs() {
+        mLoading=false;
+        mWebView.post(new Runnable() {
+            @Override
+            public void run() {
+                String js = Helper.getFromAssets(getContext(), "injector.js");
+                mWebView.load("javascript:" + js,null);
+            }
+        });
     }
+
 
     @Override
     public void onDestroyView() {
