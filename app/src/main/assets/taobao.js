@@ -2,7 +2,6 @@
 dSpider("taobao", function(session,env,$){
     //禁止加载图片
     session.autoLoadImg(false)
-    session.string();
     log(location.href)
     if(location.pathname.indexOf("mtb/mtb.htm")!=-1){
         location="http://h5.m.taobao.com/mlapp/mytaobao.html#mlapp-mytaobao";
@@ -21,7 +20,8 @@ dSpider("taobao", function(session,env,$){
                 session.setProgressMax(100);
                 session.setProgress(2);
             }
-            document.getElementsByClassName("label-act")[0].children[0].children[0].click();//点击订单
+//            document.getElementsByClassName("label-act")[0].children[0].children[0].click();//点击订单
+            location = "http://h5.m.taobao.com/mlapp/olist.html";//进入订单
         }else if(count==1){
             //跳转到网页版   www.taobao.com
             session.set("AddressData",[]);
@@ -77,7 +77,21 @@ dSpider("taobao", function(session,env,$){
                 }else{
                     session.setProgress(5+(position/($(".order-list>li").length))*60);
                     //进入订单详情页
-                    ($($(".order-list>li")[position]).children()[3].children[0].children[0]).click();
+//                    ($($(".order-list>li")[position]).children()[3].children[0].children[0]).click();
+                    if(session.get("detailUrl")==undefined){
+                        ($($(".order-list>li")[position]).children().eq(3).children().eq(0).children().eq(0)).trigger("click");
+                    }else{
+                        var tempUrl = session.get("detailUrl");
+                        //从控件中获取订单id
+                        var tempOid = ($($(".order-list>li")[position]).children().eq(0)).attr("class").toString().split(" ")[1];
+                        var myUrl = tempUrl.split("bizOrderId=")[0]+"bizOrderId="+tempOid.substring(0,16);
+                        var paramsArray = tempUrl.split("bizOrderId=")[1].split("&");
+                        for(var myPa = 1 ; myPa < paramsArray.length ; myPa ++){
+                            myUrl = myUrl + "&" + paramsArray[myPa];
+                        }
+                        log("mytesturl = "+myUrl);
+                        location = myUrl;
+                    }
                 }
             }
             /**
@@ -98,6 +112,7 @@ dSpider("taobao", function(session,env,$){
                 }
             }
             if (window.location.pathname.indexOf("mlapp/odetail") != -1) {
+                session.set("detailUrl",window.location.href);
                 var currentPosition;
                 var currentOrderData = [];
                 function getOrderDetail() {
