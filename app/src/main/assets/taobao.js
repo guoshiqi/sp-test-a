@@ -47,7 +47,7 @@ dSpider("taobao", function(session,env,$){
                 var myInterval;
                 //循环调用获取订单的方法
                 function getOrder() {
-                    if(!window.getComputedStyle($("div.order-more")[0], '::after')){
+                    if(window.getComputedStyle($("div.order-more")[0], '::after') != null){
                         if (window.getComputedStyle($("div.order-more")[0], '::after').getPropertyValue('content')||$(".order-list>li").length>=5) {//限制订单爬取的数量
                             log("加载完成");
                             clearInterval(myInterval);
@@ -60,7 +60,7 @@ dSpider("taobao", function(session,env,$){
                             log("正在获取订单");
                         }
                     }else{
-                        log("  ::after  is  null ! ");
+                        log("  ::after  is  null ! "+ window.getComputedStyle($("div.order-more")[0], '::after'));
                     }
                 }
                 myInterval = setInterval(getOrder, 3000);
