@@ -1,5 +1,8 @@
 
 dSpider("taobao", function(session,env,$){
+    //禁止加载图片
+    session.autoLoadImg(false)
+    log(location.href)
     if (window.location.pathname.indexOf("mlapp/mytaobao") != -1) {
         //taobaoState    0:爬账单  1:爬地址   2:爬个人信息   3:结束
         var count = session.get("taobaoState");
@@ -10,7 +13,7 @@ dSpider("taobao", function(session,env,$){
                 session.set("taobaoState",0);
                 session.set("orderArray",[]);
                 //显示进度为0
-                session.showProgress(false);
+                session.showProgress(true);
                 session.setProgressMax(100);
                 session.setProgress(2);
             }
@@ -39,7 +42,20 @@ dSpider("taobao", function(session,env,$){
             function getOrderList(){
                 var myInterval;
                 //循环调用获取订单的方法
-                function getOrder() {
+//                function getOrder() {
+//                    if (window.getComputedStyle($("div.order-more")[0], '::after').getPropertyValue('content')||$(".order-list>li").length>=5) {//限制订单爬取的数量
+//                        log("加载完成");
+//                        clearInterval(myInterval);
+//                        //进入订单
+//                        session.set("OrderItemPosition",0);
+//                        intoOrderDetail(0);
+//                    } else {
+//                        //需要继续请求订单
+//                        document.getElementsByClassName("order-more")[0].click();//点击加载更多
+//                        log("正在获取订单");
+//                    }
+//                }
+                myInterval = setInterval(function(){
                     if (window.getComputedStyle($("div.order-more")[0], '::after').getPropertyValue('content')||$(".order-list>li").length>=5) {//限制订单爬取的数量
                         log("加载完成");
                         clearInterval(myInterval);
@@ -51,8 +67,7 @@ dSpider("taobao", function(session,env,$){
                         document.getElementsByClassName("order-more")[0].click();//点击加载更多
                         log("正在获取订单");
                     }
-                }
-                myInterval = setInterval(getOrder, 3000);
+                }, 3000);
             }
             /**
              * 进入订单的爬取操作
@@ -62,7 +77,7 @@ dSpider("taobao", function(session,env,$){
                     //更新状态并退回到个人页
                     session.set("taobaoState",1);
                     session.setProgress(65);
-                    setTimeout(location.url = history.go(-1),1000);
+                    setTimeout(function(){location.url = history.go(-1)},1000);
                 }else{
                     session.setProgress(5+(position/($(".order-list>li").length))*60);
                     //进入订单详情页
@@ -83,7 +98,7 @@ dSpider("taobao", function(session,env,$){
                     //拿到position后开始爬取
                     var oip = session.get("OrderItemPosition");
                     session.set("OrderItemPosition",oip+1);
-                    setTimeout(location.url = history.go(-1),1000);
+                    setTimeout( function(){location.url = history.go(-1)},1000);
                 }
             }
             if (window.location.pathname.indexOf("mlapp/odetail") != -1) {
@@ -98,6 +113,10 @@ dSpider("taobao", function(session,env,$){
                     var orderInfoList = [];
                     //拿到页面列表中所有的div
                     var ol = $(".order-list>li>div");
+                    if(ol.length == 0){
+                        setTimeout(getOrderDetail,100);
+                        return;
+                    }
                     for (var i = 0; i < ol.length; i++) {
                         if (ol[i].className.indexOf("orderinfo") != -1) {
                             //订单编号

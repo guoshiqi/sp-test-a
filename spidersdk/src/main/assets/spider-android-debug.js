@@ -67,13 +67,16 @@ dQuery.errorReport=errorReport;
 
 function hook(fun){
     return function() {
-        if (!(arguments[0] instanceof Function)) {
-            t=arguments[0];
-            log("warning: "+fun.name+" first argument should be function not string ")
-            arguments[0]=function(){eval(t)};
-        }
-        arguments[0]=safeCallback(arguments[0]);
-        return fun.apply(this,arguments)
+
+            if (!(arguments[0] instanceof Function)) {
+                t=arguments[0];
+                log("warning: "+fun.name+" first argument should be function not string ")
+                arguments[0]=function(){eval(t)};
+            }
+            arguments[0]=safeCallback(arguments[0]);
+
+           return fun.apply(this,arguments)
+
     }
 }
 
