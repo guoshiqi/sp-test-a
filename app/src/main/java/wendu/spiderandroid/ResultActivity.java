@@ -28,15 +28,16 @@ public class ResultActivity extends BaseActivity {
         String cap;
 
         for (String s : LatestResult.getInstance().getData()) {
-            Matcher mhtml = phtml.matcher(s);
-            cap = mhtml.replaceAll("");
-            cap = cap.replaceAll("[(\\s+)｜(&nbsp;)]", "");
-
-            cap = cap.substring(0, cap.length() < 40 ? cap.length() : 40) + "...";
-            if (cap.equals("...")) {
-                cap = "[无文本内容]";
-            }
-            list.add(cap);
+//            Matcher mhtml = phtml.matcher(s);
+//            cap = mhtml.replaceAll("");
+//            cap = cap.replaceAll("[(\\s+)｜(&nbsp;)]", "");
+//
+//            cap = cap.substring(0, cap.length() < 40 ? cap.length() : 40) + "...";
+//            if (cap.equals("...")) {
+//                cap = "[无文本内容]";
+//            }
+//            list.add(cap);
+            list.add(s);
         }
 
 

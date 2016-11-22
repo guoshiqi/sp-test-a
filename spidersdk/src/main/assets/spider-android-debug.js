@@ -78,8 +78,8 @@ function hook(fun){
 }
 
 //hook setTimeout,setInterval异步回调
-setTimeout=hook(setTimeout);
-setInterval=hook(setInterval);
+var setTimeout=hook(window.setTimeout);
+var setInterval=hook(window.setInterval);
 
 //dom 监控
 function DomNotFindReport(selector) {
@@ -152,10 +152,10 @@ function dSpider(sessionKey, callback) {
         window.curSession = session;
         session._init(function(){
             DataSession.getExtraData(function (extras) {
-            dQuery(function(){
+             dQuery(function(){
                log("dSpider start!")
                callback(session, extras, dQuery);
-            })
+             })
             })
         })
     }, 20);
@@ -232,6 +232,17 @@ DataSession.prototype = {
         }
         return _xy.finish(this.key || "", 0, "")
     },
+    load:function(url,headers){
+        headers=headers||{}
+        if(typeof headers!=="object"){
+            alert("the second argument of function load  must be Object!")
+            return
+        }
+        _xy.load(url,JSON.stringify(headers));
+    },
+     setUserAgent:function(str){
+            _xy.setUserAgent(str)
+     },
     "upload": function (value) {
         if (value instanceof Object) {
             value = JSON.stringify(value);
