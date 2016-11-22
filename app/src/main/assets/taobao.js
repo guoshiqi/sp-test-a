@@ -4,7 +4,7 @@ dSpider("taobao", function(session,env,$){
     session.autoLoadImg(false)
     log(location.href)
     if(location.pathname.indexOf("mtb/mtb.htm")!=-1){
-     location="http://h5.m.taobao.com/mlapp/mytaobao.html#mlapp-mytaobao";
+        location="http://h5.m.taobao.com/mlapp/mytaobao.html#mlapp-mytaobao";
     }
     if (window.location.pathname.indexOf("mlapp/mytaobao") != -1) {
         //taobaoState    0:爬账单  1:爬地址   2:爬个人信息   3:结束
