@@ -60,6 +60,7 @@ public class SpiderCrossWalkFragment extends BaseFragment {
     }
 
     public void loadUrl(final String url){
+        mLoading=true;
         mWebView.post(new Runnable() {
             @Override
             public void run() {
@@ -71,6 +72,7 @@ public class SpiderCrossWalkFragment extends BaseFragment {
 
     @Override
     public void loadUrl(final String url, final Map<String, String> additionalHttpHeaders){
+        mLoading=true;
         mWebView.post(new Runnable() {
             @Override
             public void run() {
