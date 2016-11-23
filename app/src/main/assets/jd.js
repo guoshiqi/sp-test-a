@@ -4,12 +4,12 @@ dSpider("jd", function(session,env,$){
     var infokey = "infokey";
     var sid = "";
     var max_order_num = 30;
-    var max_order_date = 30;
+    var max_order_date = 100;
     if(location.href.indexOf("sid=") != -1){
         sid = qs["sid"];
         session.set("sid",  sid);
     };
-
+    sid = session.get("sid");
     session.onNavigate=function(url){
        if(url.indexOf("://plogin.m.jd.com/user")!=-1){
           session.showLoading();
@@ -25,14 +25,12 @@ dSpider("jd", function(session,env,$){
         session.hideLoading();
 
         // log(JSON.stringify(new info({},{},{})));
-         session.set(infokey, JSON.stringify(new info({},{},{})));
-         info = $.parseJSON(session.get(infokey));
-             info.base_info.username  = $("[report-eventid$='MCommonHTail_Account']").text().replace(/\n/g,"").replace(/\t/g,"");
-             saveInfo();
-             if(sid != ""){
-                 session.setProgress(10);
-                 location.href="http://home.m.jd.com/maddress/address.action?";
-             }
+        session.set(infokey, JSON.stringify(new info({},{},{})));
+        info = $.parseJSON(session.get(infokey));
+        info.base_info.username  = $("[report-eventid$='MCommonHTail_Account']").text().replace(/\n/g,"").replace(/\t/g,"");
+        saveInfo();
+        session.setProgress(10);
+        location.href="http://home.m.jd.com/maddress/address.action?";
     }
 
 
