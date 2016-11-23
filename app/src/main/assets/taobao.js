@@ -3,7 +3,8 @@ dSpider("taobao", function(session,env,$){
     //禁止加载图片
     session.autoLoadImg(false)
     log(location.href)
-    if(location.pathname.indexOf("mtb/mtb.htm")!=-1){
+    //遇到错误页面继续爬取未完成的模块
+    if(location.pathname.indexOf("mtb/mtb.htm")!=-1 || location.hostname.indexOf("member1.taobao.com") != -1){
         location="http://h5.m.taobao.com/mlapp/mytaobao.html#mlapp-mytaobao";
     }
     if (window.location.pathname.indexOf("mlapp/mytaobao") != -1) {
@@ -49,6 +50,12 @@ dSpider("taobao", function(session,env,$){
                 function getOrder() {
                     if(window.getComputedStyle($("div.order-more")[0], '::after') != null){
                         if (window.getComputedStyle($("div.order-more")[0], '::after').getPropertyValue('content')||$(".order-list>li").length>=5) {//限制订单爬取的数量
+                            var tempOllLength = $(".order-list>li").length;
+                            var orderListArray = [];
+                            for(var tol = 0 ; tol < tempOllLength ; tol ++){
+                                orderListArray[tol] = ($($(".order-list>li")[tol]).children().eq(0)).attr("class").toString().split(" ")[1].substring(0,16);
+                            }
+                            session.set("orderIdList",orderListArray)
                             log("加载完成");
                             clearInterval(myInterval);
                             //进入订单
@@ -69,6 +76,30 @@ dSpider("taobao", function(session,env,$){
              * 进入订单的爬取操作
              */
             function intoOrderDetail(position) {
+                log("------mytest-------"+$(".order-list>li").length);
+                if($(".order-list>li").length == 0){//当lengt为0的时候的处理
+                    var myBizOrderIdList = session.get("orderIdList");
+                    if(position>=myBizOrderIdList.length){
+                        //更新状态并退回到个人页
+                        session.set("taobaoState",1);
+                        session.setProgress(65);
+                        setTimeout(function(){location.url = history.go(-1)},1000);
+                        return;
+                    }else{
+                        log("------mytest---position----"+position);
+                        var myBizOrderId = myBizOrderIdList[position];
+                        var tempUrl = session.get("detailUrl");
+                        //从控件中获取订单id
+                        var myUrl = tempUrl.split("bizOrderId=")[0]+"bizOrderId="+myBizOrderId;
+                        var paramsArray = tempUrl.split("bizOrderId=")[1].split("&");
+                        for(var myPa = 1 ; myPa < paramsArray.length ; myPa ++){
+                            myUrl = myUrl + "&" + paramsArray[myPa];
+                        }
+                        log("mytesturl = "+myUrl);
+                        location = myUrl;
+                        return;
+                    }
+                }
                 if(position >= $(".order-list>li").length){
                     //更新状态并退回到个人页
                     session.set("taobaoState",1);
