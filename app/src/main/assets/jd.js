@@ -5,10 +5,7 @@ dSpider("jd", function(session,env,$){
     var sid = "";
     var max_order_num = 30;
     var max_order_date = 100;
-    if(location.href.indexOf("sid=") != -1){
-        sid = qs["sid"];
-        session.set("sid",  sid);
-    };
+    
     sid = session.get("sid");
     session.onNavigate=function(url){
        if(url.indexOf("://plogin.m.jd.com/user")!=-1){
@@ -23,6 +20,11 @@ dSpider("jd", function(session,env,$){
         session.setProgressMax(100);
         session.setProgress(0);
         session.hideLoading();
+
+        if($(".jd-search-form-input")[0] != undefined){
+            sid  = $(".jd-search-form-input")[0].children[0].value;
+            session.set("sid",  sid);
+         }
 
         // log(JSON.stringify(new info({},{},{})));
         session.set(infokey, JSON.stringify(new info({},{},{})));
