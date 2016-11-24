@@ -43,9 +43,6 @@ dSpider("jd", function(session,env,$){
         contact_info = new contact_info([]);
         var taskAddr = [];
         var urlarray = $(".ia-r");
-        log("xxxxxx start");
-        log(urlarray.length);
-
         for(var i=0;i<urlarray.length;i++){
                                     taskAddr.push($.get(urlarray[i],function(response,status){
                                     var node = $("<div>").append($(response))
@@ -53,22 +50,16 @@ dSpider("jd", function(session,env,$){
                                     var phone = node.find("#mobilePhoneId")[0].value;
                                     var addr = node.find("#addressLabelId")[0].innerHTML;
                                     var detail = node.find("#address_where")[0].innerHTML;
-                                            log("xxxxxzzz" + name);
 
                                     contact_info.contact_detail.push(new contact(name,addr,detail,phone, ""));
                                     }) );
 
             }
 
-       
+
           $.when.apply($,taskAddr).done(
-
-
        // $.when(taskAddr).done(
                   function(){
-                        log("xxxxxzzzkkkk");
-
-                        log(contact_info);
                         globalInfo.contact_info = contact_info;
                         saveInfo();
                         session.setProgress(30);
