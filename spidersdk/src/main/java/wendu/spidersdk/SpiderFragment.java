@@ -61,6 +61,9 @@ public class SpiderFragment extends BaseFragment {
         mWebView.addJavascriptInterface(new JavaScriptBridge(getActivity()), "_xy");
         WebSettings settings = mWebView.getSettings();
         mWebView.getSettings().setDomStorageEnabled(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            CookieManager.getInstance().setAcceptThirdPartyCookies(mWebView,true);
+        }
         mWebView.getSettings().setAllowFileAccess(false);
         mWebView.getSettings().setAppCacheEnabled(false);
         settings.setSavePassword(false);
@@ -84,6 +87,7 @@ public class SpiderFragment extends BaseFragment {
     }
 
     public void loadUrl(final String url) {
+        mLoading=true;
         mWebView.post(new Runnable() {
             @Override
             public void run() {
@@ -94,6 +98,7 @@ public class SpiderFragment extends BaseFragment {
 
     @Override
     public void loadUrl(final String url, final Map<String, String> additionalHttpHeaders){
+        mLoading=true;
         mWebView.post(new Runnable() {
             @Override
             public void run() {
