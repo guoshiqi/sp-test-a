@@ -3,9 +3,10 @@ dSpider("taobao", function(session,env,$){
     //禁止加载图片
     session.autoLoadImg(false)
     log(location.href)
+    alert = function(){};
     //遇到错误页面继续爬取未完成的模块
-    if(location.pathname.indexOf("mtb/mtb.htm")!=-1 || location.hostname.indexOf("member1.taobao.com") != -1){
-        location="http://h5.m.taobao.com/mlapp/mytaobao.html#mlapp-mytaobao";
+    if(location.pathname.indexOf("mtb/mtb.htm")!=-1){
+        location="http://h5.m.taobao.com/mlapp/mytaobao.html";
     }
     if (window.location.pathname.indexOf("mlapp/mytaobao") != -1) {
         //taobaoState    0:爬账单  1:爬地址   2:爬个人信息   3:结束
