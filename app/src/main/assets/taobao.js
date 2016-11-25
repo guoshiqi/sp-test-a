@@ -17,7 +17,7 @@ dSpider("taobao", function(session,env,$){
                 session.set("taobaoState",0);
                 session.set("orderArray",[]);
                 //显示进度为0
-                session.showProgress(true);
+                session.showProgress(false);
                 session.setProgressMax(100);
                 session.setProgress(2);
             }
