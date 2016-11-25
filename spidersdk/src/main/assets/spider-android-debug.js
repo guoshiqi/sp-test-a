@@ -146,12 +146,14 @@ function dSpider(sessionKey, callback) {
             return;
         }
         var session = new DataSession(sessionKey);
-        window.onbeforeunload = function () {
-            session._save()
-            if(session.onNavigate){
-                session.onNavigate(location.href);
-            }
-        }
+        var onclose=function(){
+               log("onNavigate:"+location.href)
+               session._save()
+               if(session.onNavigate){
+                   session.onNavigate(location.href);
+               }
+           }
+        dQuery(window).on("unbeforeload",onclose)
         window.curSession = session;
         session._init(function(){
             DataSession.getExtraData(function (extras) {
