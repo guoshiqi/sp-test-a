@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
+import android.webkit.JsResult;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
@@ -249,6 +250,13 @@ public class SpiderFragment extends BaseFragment {
         public void onReceivedTitle(WebView view, String title) {
             super.onReceivedTitle(view, title);
             injectJs();
+        }
+
+        @Override
+        public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
+            Log.e("dspider sdk:","alert called");
+            result.confirm();
+            return true;
         }
     };
 
