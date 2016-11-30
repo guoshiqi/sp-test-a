@@ -60,8 +60,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         });
     }
 
-
-
     void openJd() {
         String startUrl="https://plogin.m.jd.com/user/login.action?appid=100";
         startDspider(startUrl,scriptUrl+"jd","京东信息爬取", "jd.js");
