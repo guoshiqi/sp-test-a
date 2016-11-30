@@ -1,10 +1,14 @@
 package wendu.spidersdk;
 
 import android.annotation.TargetApi;
-import android.graphics.Bitmap;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +26,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -35,8 +40,9 @@ public class SpiderFragment extends BaseFragment {
     private SpiderActivity context;
     private String mUrl;
     private String userAgent;
-    private boolean mLoading=true;
+    private boolean mNeedInjected =true;
     private final String contentType = "application/javascript";
+    SharedPreferences sharedPreferences;
 
     public static SpiderFragment newInstance(String url, boolean showBack) {
         SpiderFragment fragment = new SpiderFragment();
@@ -50,12 +56,15 @@ public class SpiderFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                     Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_spider, container, false);
+        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_spider, container, false);
         Log.e("spider", "system webview loaded!");
         mUrl = getArguments().getString("mUrl");
+
         mProgressBar = (ProgressBar) rootView.findViewById(R.id.progress);
         showLoadProgress();
         context= (SpiderActivity) getActivity();
+        sharedPreferences=context.getSharedPreferences("spider", Context.MODE_PRIVATE);
+        sharedPreferences.edit().remove("jscache").commit();
         mWebView = (WebView) rootView.findViewById(R.id.webview);
         mWebView.setWebChromeClient(mWebChromeClient);
         mWebView.setWebViewClient(mWebViewClient);
@@ -88,7 +97,7 @@ public class SpiderFragment extends BaseFragment {
     }
 
     public void loadUrl(final String url) {
-        mLoading=true;
+        mNeedInjected =true;
         mWebView.post(new Runnable() {
             @Override
             public void run() {
@@ -99,7 +108,7 @@ public class SpiderFragment extends BaseFragment {
 
     @Override
     public void loadUrl(final String url, final Map<String, String> additionalHttpHeaders){
-        mLoading=true;
+        mNeedInjected =true;
         mWebView.post(new Runnable() {
             @Override
             public void run() {
@@ -132,8 +141,9 @@ public class SpiderFragment extends BaseFragment {
     private WebViewClient mWebViewClient = new WebViewClient() {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            Log.e("xy log","shouldOverrideUrlLoading: "+url);
             showLoadProgress();
-            mLoading=true;
+            mNeedInjected =true;
             return super.shouldOverrideUrlLoading(view, url);
         }
 
@@ -146,6 +156,7 @@ public class SpiderFragment extends BaseFragment {
                 userAgent=null;
             }
             injectJs();
+            mNeedInjected =true;
         }
 
 
@@ -199,19 +210,39 @@ public class SpiderFragment extends BaseFragment {
                     }
                 } else {
                     try {
-                        URL uri = new URL(SpiderActivity.INJECT_URL + "&platform=android&refer=" + url.substring(url.indexOf("refer=") + 6));
-                        HttpURLConnection urlCon = (HttpURLConnection) uri.openConnection();
-                        urlCon.setRequestMethod("GET");
+                        String js="";
+                        if(SpiderActivity.SCRIPT_CACHED) {
+                            js = sharedPreferences.getString("jscache","");
+                        }
+                        if (TextUtils.isEmpty(js)){
+                            URL uri = new URL(SpiderActivity.INJECT_URL + "&platform=android&refer=" + url.substring(url.indexOf("refer=") + 6));
+                            HttpURLConnection urlCon = (HttpURLConnection) uri.openConnection();
+                            urlCon.setRequestMethod("GET");
+                            urlCon.setConnectTimeout(10000);
+                            js=Helper.inputStream2String(urlCon.getInputStream());
+                            if(SpiderActivity.SCRIPT_CACHED) {
+                                sharedPreferences.edit().putString("jscache",js);
+                            }
+                        }
                         response = new WebResourceResponse(contentType,
-                                "UTF-8", urlCon.getInputStream());
-                    } catch (Exception e) {
+                                "UTF-8", new ByteArrayInputStream(js.getBytes()));
+                    } catch (final Exception e) {
                         e.printStackTrace();
                         view.post(new Runnable() {
                             @Override
                             public void run() {
-                                context.showLoadErrorView();
+                                Dialog alertDialog = new AlertDialog.Builder(context).
+                                        setTitle("提示").
+                                        setMessage("服务器罢工了！"+e.getMessage()).
+                                        setPositiveButton("返回", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                context.onBackPressed();
+                                            }
+                                        }).create();
+                              alertDialog.show();
                             }
-                        });
+                       });
                     }
                 }
             }
@@ -252,12 +283,12 @@ public class SpiderFragment extends BaseFragment {
             injectJs();
         }
 
-//        @Override
-//        public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
-//            Log.e("dspider sdk:","alert called");
-//            result.confirm();
-//            return true;
-//        }
+        @Override
+        public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
+            Log.e("dspider sdk:","alert called");
+            result.confirm();
+            return true;
+        }
     };
 
     @Override
@@ -272,7 +303,8 @@ public class SpiderFragment extends BaseFragment {
     }
 
     void injectJs() {
-        mLoading=false;
+        if(mNeedInjected ==false) return;
+        mNeedInjected =false;
         mWebView.post(new Runnable() {
             @Override
             public void run() {

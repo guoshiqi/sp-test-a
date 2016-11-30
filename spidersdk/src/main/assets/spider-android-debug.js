@@ -159,6 +159,11 @@ function dSpider(sessionKey, callback) {
         session._init(function(){
             DataSession.getExtraData(function (extras) {
              dQuery(function(){
+               dQuery("body").on("click","a",function(){
+                 dQuery(this).attr("target",function(_,v){
+                     if(v=="_blank") return "_self"
+                 })
+               })
                log("dSpider start!")
                callback(session, extras, dQuery);
              })

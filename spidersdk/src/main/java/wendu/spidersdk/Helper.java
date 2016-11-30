@@ -3,11 +3,13 @@ package wendu.spidersdk;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
@@ -32,16 +34,30 @@ class Helper {
     public static String getFromAssets(Context ctx,String ...fileName) {
         String result = "";
         for(String file : fileName) {
-            result+="\r\n";
             try {
-                InputStreamReader inputReader = new InputStreamReader(ctx.getResources().getAssets().open(file));
-                BufferedReader bufReader = new BufferedReader(inputReader);
-                String line = "";
-                while ((line = bufReader.readLine()) != null)
-                    result += line+"\r\n";
-            } catch (Exception e) {
+                if(ctx==null){
+                    Log.e("xy log:", "getFromAssets context null");
+                    break;
+                }
+               result+= inputStream2String(ctx.getResources().getAssets().open(file));
+            } catch (IOException e) {
                 e.printStackTrace();
             }
+            result+="\r\n";
+        }
+        return result;
+    }
+
+    public   static   String   inputStream2String(InputStream   is) {
+        String result = "";
+        String line ;
+        try {
+            InputStreamReader inputReader = new InputStreamReader(is);
+            BufferedReader bufReader = new BufferedReader(inputReader);
+            while ((line = bufReader.readLine()) != null)
+                result += line+"\r\n";
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return result;
     }

@@ -44,14 +44,16 @@ import java.util.Map;
         return session.get(sessionKey);
     }
     public void save(String key, String value) {
-        sharedPreferences.edit().putString(key, value).commit();
-        //KvStorage.getInstance().commit();
+        if(TextUtils.isEmpty(value)) {
+           sharedPreferences.edit().remove(key).commit();
+        }else {
+            sharedPreferences.edit().putString(key, value).commit();
+        }
     }
 
     public String read(String key){
        return sharedPreferences.getString(key, "");
     }
-
 
     public String clear(String sessionKey) {
         return session.remove(sessionKey);
@@ -109,12 +111,9 @@ import java.util.Map;
             message.what = 7;
             message.obj=new ResultData(sessionKey,datas.get(sessionKey),msg);
             mContxt.getHandler().sendMessage(message);
-//            Intent intent=new Intent();
-//            intent.putExtra("result", resultData);
-//            mContxt.setResult(Activity.RESULT_OK, intent);
-//            mContxt.finish();
         }
         datas.remove(sessionKey);
+
     }
 
 
