@@ -222,8 +222,8 @@ dSpider("jd", function(session,env,$){
         this.address  = address;
     }
 
-    function product(product, number, price){
-        this.product  = product;
+    function product(name, number, price){
+        this.name  = name;
         this.number  = number;
         this.price  = price;
     }
