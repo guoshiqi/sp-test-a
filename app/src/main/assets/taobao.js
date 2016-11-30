@@ -18,7 +18,7 @@ dSpider("taobao", function(session,env,$){
                 session.set("taobaoState",0);
                 session.set("orderArray",[]);
                 //显示进度为0
-                session.showProgress(false);
+                session.showProgress(true);
                 session.setProgressMax(100);
                 session.setProgress(2);
             }
@@ -77,7 +77,6 @@ dSpider("taobao", function(session,env,$){
              * 进入订单的爬取操作
              */
             function intoOrderDetail(position) {
-                log("------mytest-------"+$(".order-list>li").length);
                 if($(".order-list>li").length == 0){//当lengt为0的时候的处理
                     var myBizOrderIdList = session.get("orderIdList");
                     if(position>=myBizOrderIdList.length){
@@ -87,7 +86,6 @@ dSpider("taobao", function(session,env,$){
                         setTimeout(function(){location.url = history.go(-1)},1000);
                         return;
                     }else{
-                        log("------mytest---position----"+position);
                         var myBizOrderId = myBizOrderIdList[position];
                         var tempUrl = session.get("detailUrl");
                         //从控件中获取订单id
@@ -246,22 +244,22 @@ dSpider("taobao", function(session,env,$){
                                             totalPrice = totalPrice.substring(totalPrice.indexOf("￥") + 1, totalPrice.length)
                                         }
                                         tbOrderDetailInfo.total = totalPrice;
+                                        tbOrderDetailInfo.products = [];
                                         if (orderInfoList.length > 1) {//说明此订单中有多个商品
                                             for (var oil = 0; oil < orderInfoList.length; oil++) {
-                                                var tempTbOrderDetailInfo = {};
-                                                tempTbOrderDetailInfo.id = tbOrderDetailInfo.id;
-                                                tempTbOrderDetailInfo.time = tbOrderDetailInfo.time;
-                                                tempTbOrderDetailInfo.name = orderInfoList[oil].name;
-                                                tempTbOrderDetailInfo.price = orderInfoList[oil].price;
-                                                tempTbOrderDetailInfo.number = orderInfoList[oil].number;
-                                                tempTbOrderDetailInfo.total = tbOrderDetailInfo.total;
-                                                tempTbOrderDetailInfo.address = tbOrderDetailInfo.address;
-                                                totalProductArray.push(tempTbOrderDetailInfo);
+                                                var myproducts = {};
+                                                myproducts.name = orderInfoList[oil].name;
+                                                myproducts.price = orderInfoList[oil].price;
+                                                myproducts.number = orderInfoList[oil].number;
+                                                tbOrderDetailInfo.products.push(myproducts);
+                                                totalProductArray.push(tbOrderDetailInfo);
                                             }
                                         } else if (orderInfoList.length == 1) {//此订单中只有一个商品
-                                            tbOrderDetailInfo.name = orderInfoList[0].name;
-                                            tbOrderDetailInfo.price = orderInfoList[0].price;
-                                            tbOrderDetailInfo.number = orderInfoList[0].number;
+                                            var myproducts = {};
+                                            myproducts.name = orderInfoList[0].name;
+                                            myproducts.price = orderInfoList[0].price;
+                                            myproducts.number = orderInfoList[0].number;
+                                            tbOrderDetailInfo.products.push(myproducts);
                                             totalProductArray.push(tbOrderDetailInfo);
                                         }
                                         //存放数据
