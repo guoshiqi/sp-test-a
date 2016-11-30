@@ -450,6 +450,10 @@ dSpider("taobao", function(session,env,$){
             session.finish("upLoadData方法中的数据为空","orderArray is undefined",2);
         }
         var data = {};
+        //存入ec_no TODO: ROY 这里是测试的ec_no
+        data.ec_no = "234578535";
+        //存入site_id
+        data.site_id = "1";
         //存入个人信息
         data.base_info = persionInfo;
         //存入地址信息
