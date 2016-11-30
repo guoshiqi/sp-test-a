@@ -18,7 +18,7 @@ dSpider("taobao", function(session,env,$){
                 session.set("taobaoState",0);
                 session.set("orderArray",[]);
                 //显示进度为0
-                session.showProgress(false);
+                session.showProgress(true);
                 session.setProgressMax(100);
                 session.setProgress(2);
             }
@@ -77,7 +77,6 @@ dSpider("taobao", function(session,env,$){
              * 进入订单的爬取操作
              */
             function intoOrderDetail(position) {
-                log("------mytest-------"+$(".order-list>li").length);
                 if($(".order-list>li").length == 0){//当lengt为0的时候的处理
                     var myBizOrderIdList = session.get("orderIdList");
                     if(position>=myBizOrderIdList.length){
@@ -87,7 +86,6 @@ dSpider("taobao", function(session,env,$){
                         setTimeout(function(){location.url = history.go(-1)},1000);
                         return;
                     }else{
-                        log("------mytest---position----"+position);
                         var myBizOrderId = myBizOrderIdList[position];
                         var tempUrl = session.get("detailUrl");
                         //从控件中获取订单id
