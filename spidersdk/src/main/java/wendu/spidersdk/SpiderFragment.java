@@ -252,12 +252,12 @@ public class SpiderFragment extends BaseFragment {
             injectJs();
         }
 
-        @Override
-        public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
-            Log.e("dspider sdk:","alert called");
-            result.confirm();
-            return true;
-        }
+//        @Override
+//        public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
+//            Log.e("dspider sdk:","alert called");
+//            result.confirm();
+//            return true;
+//        }
     };
 
     @Override
