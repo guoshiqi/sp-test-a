@@ -4,10 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -53,6 +50,7 @@ public class SpiderActivity extends AppCompatActivity {
     TextView webcore;
     ViewGroup toobar;
     public static String debugSrc="";
+    public static boolean SCRIPT_CACHED=true;
 
     public String getCurrentCore() {
         return currentCore;
@@ -109,6 +107,7 @@ public class SpiderActivity extends AppCompatActivity {
         INJECT_URL = getIntent().getStringExtra("inject");
         String title = getIntent().getStringExtra("title");
         Helper.isDebug = getIntent().getBooleanExtra("debug", false);
+        SCRIPT_CACHED=getIntent().getBooleanExtra("cache",true );
         if (Helper.isDebug) {
             webcore.setVisibility(View.VISIBLE);
             debugSrc=getIntent().getStringExtra("debugSrc");
@@ -133,9 +132,11 @@ public class SpiderActivity extends AppCompatActivity {
                         showProgress((boolean) msg.obj);
                         break;
                     case 4:
+                        fragment.showInput(false);
                         showLoadView((String) msg.obj);
                         break;
                     case 5:
+                        fragment.showInput(true);
                         hideLoadView();
                         break;
                     case 6:
@@ -189,7 +190,7 @@ public class SpiderActivity extends AppCompatActivity {
         errorLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showLoadView("正在加载...");
+              // showLoadView("正在加载...");
                 errorLayout.setVisibility(View.GONE);
                 fragment.errorReload();
             }
@@ -366,7 +367,7 @@ public class SpiderActivity extends AppCompatActivity {
     }
 
     public void showProgress(boolean show) {
-
+        fragment.showInput(!show);
         webviewLayout.setVisibility(show ? View.GONE : View.VISIBLE);
         spider.setVisibility(show ? View.VISIBLE : View.GONE);
         toobar.setVisibility(show ? View.GONE : View.VISIBLE);

@@ -60,14 +60,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         });
     }
 
-
-
     void openJd() {
         String startUrl="https://plogin.m.jd.com/user/login.action?appid=100";
         startDspider(startUrl,scriptUrl+"jd","京东信息爬取", "jd.js");
     }
 
     void openTaoBaoActivity() {
+        //String baseUrl="https://www.taobao.com/index.php?from=wap";
         String baseUrl="https://login.m.taobao.com/login.htm";
         startDspider(baseUrl,scriptUrl+"taobao","淘宝爬取", "taobao.js");
     }
@@ -80,10 +79,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     void openEmail() {
         //String baseUrl="http://172.19.23.62/spider-script/emails/";
         String baseUrl="http://119.29.112.230:4832/emails/";
-        startDspider(baseUrl+ "email.html?t=" + System.currentTimeMillis(),baseUrl+"inject.php?sid=email","邮箱爬取","");
+        startDspider(baseUrl+ "email.html?t=" + System.currentTimeMillis(),baseUrl+"inject.php?sid=email","邮箱爬取","",false);
+    }
+    void startDspider(String startUrl,String scriptUrl,String title,String debugSrcFileName) {
+        startDspider(startUrl,scriptUrl,title,debugSrcFileName,true);
     }
 
-    void startDspider(String startUrl,String scriptUrl,String title,String debugSrcFileName) {
+    void startDspider(String startUrl,String scriptUrl,String title,String debugSrcFileName,boolean scriptCached) {
         if (isDebug&&TextUtils.isEmpty(debugSrcFileName)){
            showDialog("该业务暂不支持调试！");
            return;
@@ -98,6 +100,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         intent.putExtra("title", title);
         //调试模式
         intent.putExtra("debug", isDebug);
+        intent.putExtra("cache",scriptCached );
         intent.putExtra("debugSrc",debugSrcFileName);
         startActivityForResult(intent, 1);
     }
