@@ -119,10 +119,11 @@ dSpider("taobao", function(session,env,$){
                     }else{
                         var tempUrl = session.get("detailUrl");
                         //从控件中获取订单id
-//                        var tempOid = ($($(".order-list>li")[position]).children().eq(0)).attr("class").toString().split(" ")[1];
+                        //var tempOid = ($($(".order-list>li")[position]).children().eq(0)).attr("class").toString().split(" ")[1];
+                        //从保存的url中取地址
+                        //var myUrl = tempUrl.split("bizOrderId=")[0]+"bizOrderId="+tempOid.substring(0,16);
                         var tempOid = myBizOrderIdList[position];
                         session.set("currentBizOrderId","bizOrderId="+tempOid.substring(0,16));
-//                        var myUrl = tempUrl.split("bizOrderId=")[0]+"bizOrderId="+tempOid.substring(0,16);
                         var myUrl = "http://h5.m.taobao.com/mlapp/odetail.html?"+"bizOrderId="+tempOid.substring(0,16);
                         var paramsArray = tempUrl.split("bizOrderId=")[1].split("&");
                         for(var myPa = 1 ; myPa < paramsArray.length ; myPa ++){
@@ -154,7 +155,8 @@ dSpider("taobao", function(session,env,$){
                         //拿到position后开始爬取
                         var oip = session.get("OrderItemPosition");
                         session.set("OrderItemPosition",oip+1);
-                        setTimeout( function(){location.url = history.go(-1)},1000);
+//                        setTimeout( function(){location.url = history.go(-1)},1000);
+                        location = "http://h5.m.taobao.com/mlapp/olist.html?"+session.get("currentSpm");
                     }
             }
             //特殊订单的处理----------------------保险
@@ -374,7 +376,8 @@ dSpider("taobao", function(session,env,$){
                     getOrderDetail();
                 }
                 function closeOrderDetail(){
-                    $("div.back").click();//订单详情页的返回
+//                    $("div.back").click();//订单详情页的返回
+                    location = "http://h5.m.taobao.com/mlapp/olist.html"
                 }
             }
             //如果找不到界面就不停的变换链接
