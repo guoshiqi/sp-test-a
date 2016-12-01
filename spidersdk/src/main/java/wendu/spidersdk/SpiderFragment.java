@@ -308,7 +308,6 @@ public class SpiderFragment extends BaseFragment {
                     String js = Helper.getFromAssets(getContext(), "injector.js");
                     mWebView.loadUrl("javascript:" + js);
                 }
-
             }
         });
     }
