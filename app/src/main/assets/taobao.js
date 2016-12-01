@@ -176,22 +176,22 @@ dSpider("taobao", function(session,env,$){
                     var bxtotalProductArray = [];
                     var myproducts = {};
                     function getBxOrderDetail(){
-                        if($("div.box")[0]==undefined||$("div.box")[0].children[0]==undefined||$("div.box")[0].children[0].children==undefined||$("div.box")[0].children[0].children.length == 0){
-//                            setTimeout(getBxOrderDetail,100);
-                            log("--------------------------------3-----------------------------------");
-//                            return;
+                        var tt = $("span.textarea");
+                        if(tt.length == 0){
+                            if(tempOipn<14){
+                                setTimeout(getBxOrderDetail,100);
+                                return;
+                            }
                         }
-//                        var bxItemArray = $("div.box")[0].children[0].children;
                         var bxmyproducts = {};
                         bxmyproducts.name = "保险";
-//                        bxmyproducts.price = $(bxItemArray[2].children[0].children[1]).text();
-//                        bxmyproducts.number = parseInt($(bxItemArray[3].children[0].children[1]).text());
-//                        bxtbOrderDetailInfo.id = $(bxItemArray[1].children[0].children[1]).text();
-//                        bxtbOrderDetailInfo.time = $(bxItemArray[5].children[0].children[1]).text();
+                        bxmyproducts.price = $(tt[2]).text();
+                        bxmyproducts.number = parseInt($(tt[3]).text());
+                        bxtbOrderDetailInfo.id = $(tt[1]).text();
+                        bxtbOrderDetailInfo.time = $(tt[5]).text();
                         bxtbOrderDetailInfo.address = "无";
-//                        bxtbOrderDetailInfo.total = parseInt($(bxItemArray[3].children[0].children[1]).text());
+                        bxtbOrderDetailInfo.total = parseInt($(tt[3]).text());
                         bxtbOrderDetailInfo.products.push(bxmyproducts);
-                        log("--------------------------------4-----------------------------------");
                         bxtotalProductArray.push(bxtbOrderDetailInfo);
                         tmpeOay.push(bxtotalProductArray);
                         //保存数据
@@ -203,7 +203,7 @@ dSpider("taobao", function(session,env,$){
                         log("--------------------------------5-----------------------------------");
 
                     }
-                    setTimeout(getBxOrderDetail,500);
+                    setTimeout(getBxOrderDetail,100);
                 }
 
             }
