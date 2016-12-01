@@ -40,7 +40,7 @@ public class SpiderFragment extends BaseFragment {
     private SpiderActivity context;
     private String mUrl;
     private String userAgent;
-    private boolean mNeedInjected =true;
+    private String lastInjectUrl="";
     private final String contentType = "application/javascript";
     SharedPreferences sharedPreferences;
 
@@ -97,7 +97,6 @@ public class SpiderFragment extends BaseFragment {
     }
 
     public void loadUrl(final String url) {
-        mNeedInjected =true;
         mWebView.post(new Runnable() {
             @Override
             public void run() {
@@ -108,7 +107,6 @@ public class SpiderFragment extends BaseFragment {
 
     @Override
     public void loadUrl(final String url, final Map<String, String> additionalHttpHeaders){
-        mNeedInjected =true;
         mWebView.post(new Runnable() {
             @Override
             public void run() {
@@ -143,7 +141,6 @@ public class SpiderFragment extends BaseFragment {
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             Log.e("xy log","shouldOverrideUrlLoading: "+url);
             showLoadProgress();
-            mNeedInjected =true;
             return super.shouldOverrideUrlLoading(view, url);
         }
 
@@ -156,7 +153,6 @@ public class SpiderFragment extends BaseFragment {
                 userAgent=null;
             }
             injectJs();
-            mNeedInjected =true;
         }
 
 
@@ -303,13 +299,15 @@ public class SpiderFragment extends BaseFragment {
     }
 
     void injectJs() {
-        if(mNeedInjected ==false) return;
-        mNeedInjected =false;
         mWebView.post(new Runnable() {
             @Override
             public void run() {
-              String js = Helper.getFromAssets(getContext(), "injector.js");
-                mWebView.loadUrl("javascript:" + js);
+               String url= mWebView.getUrl();
+                if(!lastInjectUrl.equals(url)){
+                    lastInjectUrl=url;
+                    String js = Helper.getFromAssets(getContext(), "injector.js");
+                    mWebView.loadUrl("javascript:" + js);
+                }
             }
         });
     }

@@ -1,5 +1,6 @@
 
 dSpider("jd", function(session,env,$){
+    log("current page: "+location.href)
     var re = /sid=(.+)$/ig;
     var infokey = "infokey";
     var sid = "";
@@ -18,7 +19,7 @@ dSpider("jd", function(session,env,$){
 
 
     if (location.href.indexOf("://m.jd.com") != -1 ) {
-        session.showProgress(true);
+        session.showProgress(false);
         session.setProgressMax(100);
         session.setProgress(0);
         session.hideLoading();
@@ -169,8 +170,6 @@ dSpider("jd", function(session,env,$){
         }
         saveInfo();
         logout();
-
-
     }
 
     function saveInfo(){

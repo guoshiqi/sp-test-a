@@ -77,8 +77,8 @@ dSpider("taobao", function(session,env,$){
              * 进入订单的爬取操作
              */
             function intoOrderDetail(position) {
+                var myBizOrderIdList = session.get("orderIdList");
                 if($(".order-list>li").length == 0){//当lengt为0的时候的处理
-                    var myBizOrderIdList = session.get("orderIdList");
                     if(position>=myBizOrderIdList.length){
                         //更新状态并退回到个人页
                         session.set("taobaoState",1);
@@ -87,15 +87,21 @@ dSpider("taobao", function(session,env,$){
                         return;
                     }else{
                         var myBizOrderId = myBizOrderIdList[position];
-                        var tempUrl = session.get("detailUrl");
+                        session.set("currentBizOrderId","bizOrderId="+myBizOrderId);
+                        var tempUrl = session.get("detailUrl");//tempUrl记录的事最新的详情页地址,用于更新签名参数
                         //从控件中获取订单id
-                        var myUrl = tempUrl.split("bizOrderId=")[0]+"bizOrderId="+myBizOrderId;
+//                        var myUrl = tempUrl.split("bizOrderId=")[0]+"bizOrderId="+myBizOrderId;
+                        var myUrl = "http://h5.m.taobao.com/mlapp/odetail.html?"+"bizOrderId="+myBizOrderId;
                         var paramsArray = tempUrl.split("bizOrderId=")[1].split("&");
                         for(var myPa = 1 ; myPa < paramsArray.length ; myPa ++){
-                            myUrl = myUrl + "&" + paramsArray[myPa];
+                            if(paramsArray[myPa].indexOf("spm") != -1){
+                                session.set("currentSpm",paramsArray[myPa]);
+                            }
                         }
+                        myUrl = myUrl + "&archive=false&" + session.get("currentSpm");
                         log("mytesturl = "+myUrl);
                         location = myUrl;
+                        log("--------------------------通过url访问订单详情----------------------------");
                         return;
                     }
                 }
@@ -113,12 +119,19 @@ dSpider("taobao", function(session,env,$){
                     }else{
                         var tempUrl = session.get("detailUrl");
                         //从控件中获取订单id
-                        var tempOid = ($($(".order-list>li")[position]).children().eq(0)).attr("class").toString().split(" ")[1];
-                        var myUrl = tempUrl.split("bizOrderId=")[0]+"bizOrderId="+tempOid.substring(0,16);
+                        //var tempOid = ($($(".order-list>li")[position]).children().eq(0)).attr("class").toString().split(" ")[1];
+                        //从保存的url中取地址
+                        //var myUrl = tempUrl.split("bizOrderId=")[0]+"bizOrderId="+tempOid.substring(0,16);
+                        var tempOid = myBizOrderIdList[position];
+                        session.set("currentBizOrderId","bizOrderId="+tempOid.substring(0,16));
+                        var myUrl = "http://h5.m.taobao.com/mlapp/odetail.html?"+"bizOrderId="+tempOid.substring(0,16);
                         var paramsArray = tempUrl.split("bizOrderId=")[1].split("&");
                         for(var myPa = 1 ; myPa < paramsArray.length ; myPa ++){
-                            myUrl = myUrl + "&" + paramsArray[myPa];
+                            if(paramsArray[myPa].indexOf("spm") != -1){
+                                session.set("currentSpm",paramsArray[myPa]);
+                            }
                         }
+                        myUrl = myUrl + "&archive=false&" + session.get("currentSpm");
                         log("mytesturl = "+myUrl);
                         location = myUrl;
                     }
@@ -127,21 +140,79 @@ dSpider("taobao", function(session,env,$){
             /**
              * 爬取订单数据
              */
-            if (window.location.pathname.indexOf("mymovie/pages") != -1) {//特殊订单的处理
-                var oa = session.get("orderArray");
-                if(oa == undefined){
+            //特殊订单的处理----------------------电影票
+            if (window.location.pathname.indexOf("mymovie/pages") != -1) {
+                //记录爬取的订单的类型: 2-电影票
+                session.set("orderDeatilType",2);
+//                changeUrl();
+                    var oa = session.get("orderArray");
+                    if(oa == undefined){
+                        session.set("taobaoState",-1);
+                        //关闭当前页面
+                        closeOrderDetail();
+                    }else{
+                        currentOrderData = oa;
+                        //拿到position后开始爬取
+                        var oip = session.get("OrderItemPosition");
+                        session.set("OrderItemPosition",oip+1);
+//                        setTimeout( function(){location.url = history.go(-1)},1000);
+                        location = "http://h5.m.taobao.com/mlapp/olist.html?"+session.get("currentSpm");
+                    }
+            }
+            //特殊订单的处理----------------------保险
+            if (window.location.pathname.indexOf("bx/orderdetail.html") != -1) {
+                //记录爬取的订单的类型: 1-保险
+                session.set("orderDeatilType",1);
+                changeUrl();
+                var tmpeOay = session.get("orderArray");
+                if(tmpeOay == undefined){
                     session.set("taobaoState",-1);
                     //关闭当前页面
-                    closeOrderDetail();
+                    setTimeout(function(){location.url = history.go(-1)},100);
                 }else{
-                    currentOrderData = oa;
-                    //拿到position后开始爬取
-                    var oip = session.get("OrderItemPosition");
-                    session.set("OrderItemPosition",oip+1);
-                    setTimeout( function(){location.url = history.go(-1)},1000);
+                    var tempOipn = session.get("OrderItemPosition");
+                    var bxtbOrderDetailInfo = {};
+                    bxtbOrderDetailInfo.products = [];
+                    var bxtotalProductArray = [];
+                    var myproducts = {};
+                    function getBxOrderDetail(){
+                        var tt = $("span.textarea");
+                        if(tt.length == 0){
+                            if(tempOipn<14){
+                                setTimeout(getBxOrderDetail,100);
+                                return;
+                            }
+                        }
+                        var bxmyproducts = {};
+                        bxmyproducts.name = "保险";
+                        bxmyproducts.price = $(tt[2]).text();
+                        bxmyproducts.number = parseInt($(tt[3]).text());
+                        bxtbOrderDetailInfo.id = $(tt[1]).text();
+                        bxtbOrderDetailInfo.time = $(tt[5]).text();
+                        bxtbOrderDetailInfo.address = "无";
+                        bxtbOrderDetailInfo.total = parseInt($(tt[3]).text());
+                        bxtbOrderDetailInfo.products.push(bxmyproducts);
+                        bxtotalProductArray.push(bxtbOrderDetailInfo);
+                        tmpeOay.push(bxtotalProductArray);
+                        //保存数据
+                        session.set("orderArray",tmpeOay);
+                        //更新position
+                        session.set("OrderItemPosition",tempOipn+1);
+                        //跳转到列表页
+                        location = "http://h5.m.taobao.com/mlapp/olist.html?"+session.get("currentSpm");
+                        log("--------------------------------5-----------------------------------");
+
+                    }
+                    setTimeout(getBxOrderDetail,100);
                 }
+
             }
+
             if (window.location.pathname.indexOf("mlapp/odetail") != -1) {
+                //记录爬取的订单的类型: 0-正常订单
+                session.set("orderDeatilType",0);
+                //判断是不是找不到订单的情况
+                changeUrl();
                 session.set("detailUrl",window.location.href);
                 var currentPosition;
                 var currentOrderData = [];
@@ -252,8 +323,8 @@ dSpider("taobao", function(session,env,$){
                                                 myproducts.price = orderInfoList[oil].price;
                                                 myproducts.number = orderInfoList[oil].number;
                                                 tbOrderDetailInfo.products.push(myproducts);
-                                                totalProductArray.push(tbOrderDetailInfo);
                                             }
+                                            totalProductArray.push(tbOrderDetailInfo);
                                         } else if (orderInfoList.length == 1) {//此订单中只有一个商品
                                             var myproducts = {};
                                             myproducts.name = orderInfoList[0].name;
@@ -263,9 +334,7 @@ dSpider("taobao", function(session,env,$){
                                             totalProductArray.push(tbOrderDetailInfo);
                                         }
                                         //存放数据
-                                        for(var sd = 0 ; sd < totalProductArray.length ; sd++ ){
-                                            currentOrderData.push(totalProductArray[sd]);
-                                        }
+                                        currentOrderData.push(totalProductArray);
                                         //保存数据
                                         session.set("orderArray",currentOrderData);
                                         //更新position
@@ -307,9 +376,31 @@ dSpider("taobao", function(session,env,$){
                     getOrderDetail();
                 }
                 function closeOrderDetail(){
-                    $("div.back").click();//订单详情页的返回
+//                    $("div.back").click();//订单详情页的返回
+                    location = "http://h5.m.taobao.com/mlapp/olist.html"
                 }
             }
+            //如果找不到界面就不停的变换链接
+            function changeUrl(){
+                if($(".o-error").length == 0){
+                //-------------------------------------------------0-----------------------------------changeUrl-------------------------------------------0---------------------------------
+                    setTimeout(changeUrl,500);
+                }else{
+                    var tempBOI = session.get("currentBizOrderId");
+                    var tempSpm = session.get("currentSpm");
+                    var tempOrderDetailType = session.get("orderDeatilType");
+                    if(tempOrderDetailType == 0){//正常订单
+                        location = "http://h5.m.taobao.com/bx/orderdetail.html?"+tempBOI+"&"+tempSpm;
+                    }else if(tempOrderDetailType == 1){//保险
+                        location = "";
+                    }else if(tempOrderDetailType == 2){//电影票
+
+                    }else{
+                        log("__________tempOrderDetailType__________"+tempOrderDetailType);
+                    }
+                }
+            }
+
         }
     //------------------------------------------------------------------------------------爬取收货地址----------------------------------------------------------------------------
     else if(state == 1){
@@ -463,6 +554,7 @@ dSpider("taobao", function(session,env,$){
         tempOrderDetail.order_detail = orderArray;
         data.order_info = tempOrderDetail;
         log("-------上传数据----------");
+        log(data);
         session.upload(data);
         session.finish();
     }

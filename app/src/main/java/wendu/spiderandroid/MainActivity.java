@@ -60,17 +60,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         });
     }
 
-
-
     void openJd() {
         String startUrl="https://plogin.m.jd.com/user/login.action?appid=100";
         startDspider(startUrl,scriptUrl+"jd","京东信息爬取", "jd.js");
     }
 
     void openTaoBaoActivity() {
-        //
-        String baseUrl="https://www.taobao.com/index.php?from=wap";
-        //String baseUrl="https://login.m.taobao.com/login.htm";
+        //String baseUrl="https://www.taobao.com/index.php?from=wap";
+        String baseUrl="https://login.m.taobao.com/login.htm";
         startDspider(baseUrl,scriptUrl+"taobao","淘宝爬取", "taobao.js");
     }
 
