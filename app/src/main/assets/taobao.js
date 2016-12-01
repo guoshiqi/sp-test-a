@@ -77,8 +77,8 @@ dSpider("taobao", function(session,env,$){
              * 进入订单的爬取操作
              */
             function intoOrderDetail(position) {
+                var myBizOrderIdList = session.get("orderIdList");
                 if($(".order-list>li").length == 0){//当lengt为0的时候的处理
-                    var myBizOrderIdList = session.get("orderIdList");
                     if(position>=myBizOrderIdList.length){
                         //更新状态并退回到个人页
                         session.set("taobaoState",1);
@@ -94,11 +94,11 @@ dSpider("taobao", function(session,env,$){
                         var myUrl = "http://h5.m.taobao.com/mlapp/odetail.html?"+"bizOrderId="+myBizOrderId;
                         var paramsArray = tempUrl.split("bizOrderId=")[1].split("&");
                         for(var myPa = 1 ; myPa < paramsArray.length ; myPa ++){
-                            myUrl = myUrl + "&" + paramsArray[myPa];
                             if(paramsArray[myPa].indexOf("spm") != -1){
                                 session.set("currentSpm",paramsArray[myPa]);
                             }
                         }
+                        myUrl = myUrl + "&archive=false&" + session.get("currentSpm");
                         log("mytesturl = "+myUrl);
                         location = myUrl;
                         log("--------------------------通过url访问订单详情----------------------------");
@@ -119,17 +119,18 @@ dSpider("taobao", function(session,env,$){
                     }else{
                         var tempUrl = session.get("detailUrl");
                         //从控件中获取订单id
-                        var tempOid = ($($(".order-list>li")[position]).children().eq(0)).attr("class").toString().split(" ")[1];
+//                        var tempOid = ($($(".order-list>li")[position]).children().eq(0)).attr("class").toString().split(" ")[1];
+                        var tempOid = myBizOrderIdList[position];
                         session.set("currentBizOrderId","bizOrderId="+tempOid.substring(0,16));
 //                        var myUrl = tempUrl.split("bizOrderId=")[0]+"bizOrderId="+tempOid.substring(0,16);
                         var myUrl = "http://h5.m.taobao.com/mlapp/odetail.html?"+"bizOrderId="+tempOid.substring(0,16);
                         var paramsArray = tempUrl.split("bizOrderId=")[1].split("&");
                         for(var myPa = 1 ; myPa < paramsArray.length ; myPa ++){
-                            myUrl = myUrl + "&" + paramsArray[myPa];
                             if(paramsArray[myPa].indexOf("spm") != -1){
                                 session.set("currentSpm",paramsArray[myPa]);
                             }
                         }
+                        myUrl = myUrl + "&archive=false&" + session.get("currentSpm");
                         log("mytesturl = "+myUrl);
                         location = myUrl;
                     }
@@ -174,19 +175,19 @@ dSpider("taobao", function(session,env,$){
                     var myproducts = {};
                     function getBxOrderDetail(){
                         if($("div.box")[0]==undefined||$("div.box")[0].children[0]==undefined||$("div.box")[0].children[0].children==undefined||$("div.box")[0].children[0].children.length == 0){
-                            setTimeout(getBxOrderDetail,100);
+//                            setTimeout(getBxOrderDetail,100);
                             log("--------------------------------3-----------------------------------");
-                            return;
+//                            return;
                         }
-                        var bxItemArray = $("div.box")[0].children[0].children;
+//                        var bxItemArray = $("div.box")[0].children[0].children;
                         var bxmyproducts = {};
                         bxmyproducts.name = "保险";
-                        bxmyproducts.price = $(bxItemArray[2].children[0].children[1]).text();
-                        bxmyproducts.number = parseInt($(bxItemArray[3].children[0].children[1]).text());
-                        bxtbOrderDetailInfo.id = $(bxItemArray[1].children[0].children[1]).text();
-                        bxtbOrderDetailInfo.time = $(bxItemArray[5].children[0].children[1]).text();
+//                        bxmyproducts.price = $(bxItemArray[2].children[0].children[1]).text();
+//                        bxmyproducts.number = parseInt($(bxItemArray[3].children[0].children[1]).text());
+//                        bxtbOrderDetailInfo.id = $(bxItemArray[1].children[0].children[1]).text();
+//                        bxtbOrderDetailInfo.time = $(bxItemArray[5].children[0].children[1]).text();
                         bxtbOrderDetailInfo.address = "无";
-                        bxtbOrderDetailInfo.total = parseInt($(bxItemArray[3].children[0].children[1]).text());
+//                        bxtbOrderDetailInfo.total = parseInt($(bxItemArray[3].children[0].children[1]).text());
                         bxtbOrderDetailInfo.products.push(bxmyproducts);
                         log("--------------------------------4-----------------------------------");
                         bxtotalProductArray.push(bxtbOrderDetailInfo);
@@ -209,8 +210,7 @@ dSpider("taobao", function(session,env,$){
                 //记录爬取的订单的类型: 0-正常订单
                 session.set("orderDeatilType",0);
                 //判断是不是找不到订单的情况
-//                changeUrl();
-                setTimeout(changeUrl,500);
+                changeUrl();
                 session.set("detailUrl",window.location.href);
                 var currentPosition;
                 var currentOrderData = [];
@@ -321,8 +321,8 @@ dSpider("taobao", function(session,env,$){
                                                 myproducts.price = orderInfoList[oil].price;
                                                 myproducts.number = orderInfoList[oil].number;
                                                 tbOrderDetailInfo.products.push(myproducts);
-                                                totalProductArray.push(tbOrderDetailInfo);
                                             }
+                                            totalProductArray.push(tbOrderDetailInfo);
                                         } else if (orderInfoList.length == 1) {//此订单中只有一个商品
                                             var myproducts = {};
                                             myproducts.name = orderInfoList[0].name;
@@ -332,9 +332,7 @@ dSpider("taobao", function(session,env,$){
                                             totalProductArray.push(tbOrderDetailInfo);
                                         }
                                         //存放数据
-                                        for(var sd = 0 ; sd < totalProductArray.length ; sd++ ){
-                                            currentOrderData.push(totalProductArray[sd]);
-                                        }
+                                        currentOrderData.push(totalProductArray);
                                         //保存数据
                                         session.set("orderArray",currentOrderData);
                                         //更新position
@@ -382,7 +380,8 @@ dSpider("taobao", function(session,env,$){
             //如果找不到界面就不停的变换链接
             function changeUrl(){
                 if($(".o-error").length == 0){
-//                    setTimeout(changeUrl,500);
+                //-------------------------------------------------0-----------------------------------changeUrl-------------------------------------------0---------------------------------
+                    setTimeout(changeUrl,500);
                 }else{
                     var tempBOI = session.get("currentBizOrderId");
                     var tempSpm = session.get("currentSpm");
@@ -552,6 +551,7 @@ dSpider("taobao", function(session,env,$){
         tempOrderDetail.order_detail = orderArray;
         data.order_info = tempOrderDetail;
         log("-------上传数据----------");
+        log(data);
         session.upload(data);
         session.finish();
     }
