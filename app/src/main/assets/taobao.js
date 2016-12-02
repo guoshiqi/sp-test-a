@@ -39,10 +39,16 @@ dSpider("taobao", function(session,env,$){
             //获取订单列表
             if (window.location.pathname.indexOf("mlapp/olist") != -1) {
                 var op = session.get("OrderItemPosition");
-                if(op == undefined){
-                    getOrderList();
+                //判断是不是需要爬取特殊订单
+                var odt = session.get("orderDeatilType");
+                if(odt == 101){
+                    getDetailInfoFromList();
                 }else{
-                    intoOrderDetail(op);
+                    if(op == undefined){
+                        getOrderList();
+                    }else{
+                        intoOrderDetail(op);
+                    }
                 }
             }
             function getOrderList(){
@@ -178,10 +184,8 @@ dSpider("taobao", function(session,env,$){
                     function getBxOrderDetail(){
                         var tt = $("span.textarea");
                         if(tt.length == 0){
-                            if(tempOipn<14){
-                                setTimeout(getBxOrderDetail,100);
-                                return;
-                            }
+                            setTimeout(getBxOrderDetail,100);
+                            return;
                         }
                         var bxmyproducts = {};
                         bxmyproducts.name = "保险";
@@ -200,7 +204,6 @@ dSpider("taobao", function(session,env,$){
                         session.set("OrderItemPosition",tempOipn+1);
                         //跳转到列表页
                         location = "http://h5.m.taobao.com/mlapp/olist.html?"+session.get("currentSpm");
-                        log("--------------------------------5-----------------------------------");
 
                     }
                     setTimeout(getBxOrderDetail,100);
@@ -382,22 +385,80 @@ dSpider("taobao", function(session,env,$){
             }
             //如果找不到界面就不停的变换链接
             function changeUrl(){
-                if($(".o-error").length == 0){
-                //-------------------------------------------------0-----------------------------------changeUrl-------------------------------------------0---------------------------------
+                //无淘宝订单、无保险订单、无飞机票订单
+                if($(".o-error").length == 0 && $("span#J_Message").length == 0){
                     setTimeout(changeUrl,500);
                 }else{
                     var tempBOI = session.get("currentBizOrderId");
                     var tempSpm = session.get("currentSpm");
                     var tempOrderDetailType = session.get("orderDeatilType");
-                    if(tempOrderDetailType == 0){//正常订单
+                    if(tempOrderDetailType == 0){//找不到正常订单,将连接改成保险订单
                         location = "http://h5.m.taobao.com/bx/orderdetail.html?"+tempBOI+"&"+tempSpm;
-                    }else if(tempOrderDetailType == 1){//保险
-                        location = "";
-                    }else if(tempOrderDetailType == 2){//电影票
+                    }else if(tempOrderDetailType == 1){//找不到保险订单,设置状态并回到订单列表,直接获取列表里的信息
+                        location = "http://h5.m.taobao.com/mlapp/olist.html"
+                        session.set("orderDeatilType",101);
+                    }else if(tempOrderDetailType == 2){//找不到电影票订单,跳出该订单的爬取。
 
                     }else{
                         log("__________tempOrderDetailType__________"+tempOrderDetailType);
                     }
+                }
+            }
+            //处理非正常订单和非保险订单的之外所有的订单
+            function getDetailInfoFromList(){
+                var tmpeOay = session.get("orderArray");
+                if(tmpeOay == undefined){
+                    session.set("taobaoState",-1);
+                    //关闭当前页面
+                    setTimeout(function(){location.url = history.go(-1)},100);//回到淘宝首页
+                }else{
+                    var tempOipn = session.get("OrderItemPosition");
+                    var bxtbOrderDetailInfo = {};
+                    bxtbOrderDetailInfo.products = [];
+                    var bxtotalProductArray = [];
+                    var myproducts = {};
+                    function getBxOrderDetail(){
+                        var ol = $(".order-list>li");
+                        if(ol.length == 0){
+                            setTimeout(getBxOrderDetail,100);
+                            return;
+                        }
+                        var tempDetailArray = ol[tempOipn].children;
+                        for(var tda = 0 ; tda <= tempDetailArray.length ; tda ++){
+                            if(tempDetailArray[tda].className.indexOf("item") != -1){
+                                var bxmyproducts = {};
+                                var tempInfo = tempDetailArray[tda].children[0].children;
+                                for(var tif = 0 ; tif <= tempInfo.length ; tif ++){
+                                    if(tempInfo[tif].className.indexOf("item-info") != -1){
+                                        bxmyproducts.name = $(tempInfo[tif].children[0]).text();
+                                    }
+                                    if(tempInfo[tif].className.indexOf("item-pay") != -1){
+                                        bxmyproducts.price = $(tempInfo[tif].children[0]).text();;
+                                        bxmyproducts.number = $(tempInfo[tif].children[1]).text();;
+                                    }
+                                }
+                                bxtbOrderDetailInfo.products.push(bxmyproducts);
+                            }
+                            if(tempDetailArray[tda].className.indexOf("pay") != -1){
+                                bxtbOrderDetailInfo.total = parseInt($(tempDetailArray[tda].children[0].children[0].children[1].children[0]).text());//获取总价
+                            }
+                        }
+                        bxtbOrderDetailInfo.id = "非商品类型订单";
+                        bxtbOrderDetailInfo.time = "非商品类型订单";
+                        bxtbOrderDetailInfo.address = "无";
+                        bxtotalProductArray.push(bxtbOrderDetailInfo);
+                        tmpeOay.push(bxtotalProductArray);
+
+//                        tempDetailArray.children[3].children[0].children[0].click();//跳转到飞机票的界面获取订单id
+                        //保存数据
+                        session.set("orderArray",tmpeOay);
+                        //更新position
+                        session.set("OrderItemPosition",tempOipn+1);
+                        session.set("orderDeatilType",0);
+                        //刷新列表页
+                        location = "http://h5.m.taobao.com/mlapp/olist.html"
+                    }
+                    setTimeout(getBxOrderDetail,100);
                 }
             }
 
