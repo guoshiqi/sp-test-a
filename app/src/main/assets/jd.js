@@ -7,6 +7,7 @@ dSpider("jd", function(session,env,$){
     var max_order_num = 30;
     var max_order_date = 100;
     var globalInfo;
+    log("xxxxurl" + location.href);
 
     sid = session.get("sid");
     session.onNavigate=function(url){
@@ -18,7 +19,7 @@ dSpider("jd", function(session,env,$){
 
 
     if (location.href.indexOf("://m.jd.com") != -1 ) {
-        session.showProgress(false);
+        session.showProgress(true);
         session.setProgressMax(100);
         session.setProgress(0);
         session.hideLoading();
@@ -41,7 +42,7 @@ dSpider("jd", function(session,env,$){
         session.setProgress(20);
 
         globalInfo = session.get(infokey);
-        log("globalinfo",globalInfo)
+        log("globalinfo" + globalInfo);
         global_contact_info = new contact_info([]);
         var taskAddr = [];
         var urlarray = $(".ia-r");
@@ -84,6 +85,8 @@ dSpider("jd", function(session,env,$){
                if( globalInfo.order_info.order_detail.length <=  max_order_num && d.orderList.length!=0 && (orders.order_detail.length == 0 || d.orderList[d.orderList.length-1].orderId != orders.order_detail[orders.order_detail.length-1].orderId) ){
                    orders.order_detail = orders.order_detail.concat(d.orderList);
                    var task = [];
+                   log("xxdebug-orderList" + d.orderList);
+                   var tempOrder = [];
                    task.push($.each(d.orderList,function(i,e){
                         $.get("http://home.m.jd.com/newAllOrders/queryOrderDetailInfo.action?orderId="+ d.orderList[i].orderId+"&from=newUserAllOrderList&passKey="+d.passKeyList[i]+"&sid="+sid,
                                                                           function(response,status){
@@ -99,14 +102,16 @@ dSpider("jd", function(session,env,$){
                                                                                     orderitem.products.push(new product(name,  num ,price));
                                                                                 });
                                                                                 if(globalInfo.order_info.order_detail.length < max_order_num &&
-                                                                                Date.parse(new Date()) < (new Date(orderitem.time)).getTime() + max_order_date * 24 * 60 * 60 * 1000){
+                                                                                Date.parse(new Date()) < (new Date(orderitem.time.split(" ")[0])).getTime() + max_order_date * 24 * 60 * 60 * 1000){
+                                                                                                      log("xxxxxxxq" + JSON.stringify(tempOrder));
                                                                                         globalInfo.order_info.order_detail.push(orderitem);
                                                                                 }
                                                                           });
                       }));
-                      $.when(task).done(function(){
-                                     getPageOrder(page);
 
+                      $.when(task).done(function(){
+                           getPageOrder(page);
+                           globalInfo.order_info.order_detail.sort(compare());
                       });
 
                }else {
@@ -120,7 +125,13 @@ dSpider("jd", function(session,env,$){
        getPageOrder(1);
     }
 
-
+    function compare(){
+        return function(a,b){
+            var value1 = (new Date(a.time.split(" ")[0])).getTime();
+            var value2 = (new Date(b.time.split(" ")[0])).getTime();
+            return value2 - value1;
+    }
+    }
 
     function getUserInfo(){
            location.href = "http://home.m.jd.com/user/accountCenter.action";
@@ -129,8 +140,6 @@ dSpider("jd", function(session,env,$){
         session.setProgress(70);
         if($('#shimingrenzheng')[0] != undefined){
            $('#shimingrenzheng')[0].click();
-        }else{
-           logout();
         }
     }
 
@@ -151,10 +160,11 @@ dSpider("jd", function(session,env,$){
     }
 
     function logout(){
+
         alert("爬取订单总计:" + session.get(infokey).order_info.order_detail.length);
         location.href = "https://passport.m.jd.com/user/logout.action?sid="+session.get("sid");
         session.setProgress(100);
-        session.upload(globalInfo);
+        session.upload(session.get(infokey));
         session.finish();
     }
     //快捷卡实名用户
