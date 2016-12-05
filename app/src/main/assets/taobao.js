@@ -89,7 +89,7 @@ dSpider("taobao", function(session,env,$){
                         //更新状态并退回到个人页
                         session.set("taobaoState",1);
                         session.setProgress(65);
-                        setTimeout(function(){location.url = history.go(-1)},1000);
+                        location="http://h5.m.taobao.com/mlapp/mytaobao.html";
                     }else{
                         function toOrder(){
                             ($($(".order-list>li")[position]).children().eq(3).children().eq(0).children().eq(0)).trigger("click");
@@ -156,10 +156,10 @@ dSpider("taobao", function(session,env,$){
                         session.set("OrderItemPosition",tempOipn+1);
                         //跳转到列表页
                         location = "http://h5.m.taobao.com/mlapp/olist.html?"
+                        log("--------------------------爬取保险end----------------------------");
                     }
                     setTimeout(getBxOrderDetail,100);
                 }
-                log("--------------------------爬取保险end----------------------------");
             }
             //特殊订单的处理----------------------飞机票
             if (window.location.pathname.indexOf("trip/flight") != -1) {
@@ -197,10 +197,10 @@ dSpider("taobao", function(session,env,$){
                         session.set("OrderItemPosition",tempOipn+1);
                         //跳转到列表页
                         location = "http://h5.m.taobao.com/mlapp/olist.html?"
+                        log("--------------------------爬取飞机票end----------------------------");
                     }
                     setTimeout(getFJPOrderDetail,100);
                 }
-                log("--------------------------爬取飞机票end----------------------------");
             }
 
             //订单详情,目前外卖的订单详情跟淘宝自己的订单详情布局链接都一致
