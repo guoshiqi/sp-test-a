@@ -116,7 +116,7 @@ dSpider("taobao", function(session,env,$){
                         //拿到position后开始爬取
                         var oip = session.get("OrderItemPosition");
                         session.set("OrderItemPosition",oip+1);
-                        location = "http://h5.m.taobao.com/mlapp/olist.html?"
+                        location = "http://h5.m.taobao.com/mlapp/olist.html"
                     }
             }
             //特殊订单的处理----------------------保险
@@ -155,7 +155,7 @@ dSpider("taobao", function(session,env,$){
                         //更新position
                         session.set("OrderItemPosition",tempOipn+1);
                         //跳转到列表页
-                        location = "http://h5.m.taobao.com/mlapp/olist.html?"
+                        location = "http://h5.m.taobao.com/mlapp/olist.html"
                         log("--------------------------爬取保险end----------------------------");
                     }
                     setTimeout(getBxOrderDetail,100);
@@ -196,7 +196,7 @@ dSpider("taobao", function(session,env,$){
                         //更新position
                         session.set("OrderItemPosition",tempOipn+1);
                         //跳转到列表页
-                        location = "http://h5.m.taobao.com/mlapp/olist.html?"
+                        location = "http://h5.m.taobao.com/mlapp/olist.html"
                         log("--------------------------爬取飞机票end----------------------------");
                     }
                     setTimeout(getFJPOrderDetail,100);
