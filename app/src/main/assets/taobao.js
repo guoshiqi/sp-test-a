@@ -18,7 +18,7 @@ dSpider("taobao", function(session,env,$){
                 session.set("taobaoState",0);
                 session.set("orderArray",[]);
                 //显示进度为0
-                session.showProgress(true);
+                session.showProgress(false);
                 session.setProgressMax(100);
                 session.setProgress(2);
             }
@@ -52,6 +52,7 @@ dSpider("taobao", function(session,env,$){
                 }
             }
             function getOrderList(){
+                log("--------------------------getOrderList方法----------------------------");
                 var myInterval;
                 //循环调用获取订单的方法
                 function getOrder() {
@@ -83,6 +84,7 @@ dSpider("taobao", function(session,env,$){
              * 进入订单的爬取操作
              */
             function intoOrderDetail(position) {
+                log("-------------------当前爬去的订单id----------------"+position);
                 var myBizOrderIdList = session.get("orderIdList");
                 if($(".order-list>li").length == 0){//当lengt为0的时候的处理
                     if(position>=myBizOrderIdList.length){
@@ -167,6 +169,7 @@ dSpider("taobao", function(session,env,$){
             }
             //特殊订单的处理----------------------保险
             if (window.location.pathname.indexOf("bx/orderdetail.html") != -1) {
+                log("--------------------------爬取保险----------------------------");
                 //记录爬取的订单的类型: 1-保险
                 session.set("orderDeatilType",1);
                 changeUrl();
@@ -208,7 +211,7 @@ dSpider("taobao", function(session,env,$){
                     }
                     setTimeout(getBxOrderDetail,100);
                 }
-
+                log("--------------------------爬取保险end----------------------------");
             }
 
             if (window.location.pathname.indexOf("mlapp/odetail") != -1) {
@@ -232,6 +235,7 @@ dSpider("taobao", function(session,env,$){
                         setTimeout(getOrderDetail,100);
                         return;
                     }
+                    log("--------------------------开始爬取订单----------------------------");
                     for (var i = 0; i < ol.length; i++) {
                         if (ol[i].className.indexOf("orderinfo") != -1) {
                             //订单编号
@@ -365,6 +369,7 @@ dSpider("taobao", function(session,env,$){
                             }
                         }
                     }
+                    log("--------------------------爬取订单end----------------------------");
                 }
                 var oay = session.get("orderArray");
                 if(oay == undefined){
@@ -392,6 +397,7 @@ dSpider("taobao", function(session,env,$){
                     var tempBOI = session.get("currentBizOrderId");
                     var tempSpm = session.get("currentSpm");
                     var tempOrderDetailType = session.get("orderDeatilType");
+                    log("__________变换url__________"+tempOrderDetailType);
                     if(tempOrderDetailType == 0){//找不到正常订单,将连接改成保险订单
                         location = "http://h5.m.taobao.com/bx/orderdetail.html?"+tempBOI+"&"+tempSpm;
                     }else if(tempOrderDetailType == 1){//找不到保险订单,设置状态并回到订单列表,直接获取列表里的信息
@@ -417,10 +423,10 @@ dSpider("taobao", function(session,env,$){
                     bxtbOrderDetailInfo.products = [];
                     var bxtotalProductArray = [];
                     var myproducts = {};
-                    function getBxOrderDetail(){
+                    function getOtherAllOrderDetail(){
                         var ol = $(".order-list>li");
                         if(ol.length == 0){
-                            setTimeout(getBxOrderDetail,100);
+                            setTimeout(getOtherAllOrderDetail,100);
                             return;
                         }
                         var tempDetailArray = ol[tempOipn].children;
@@ -458,7 +464,7 @@ dSpider("taobao", function(session,env,$){
                         //刷新列表页
                         location = "http://h5.m.taobao.com/mlapp/olist.html"
                     }
-                    setTimeout(getBxOrderDetail,100);
+                    setTimeout(getOtherAllOrderDetail,100);
                 }
             }
 
