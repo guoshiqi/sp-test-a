@@ -160,12 +160,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         final int size = list.size();
         if (size == 0) {
             if (TextUtils.isEmpty(errMsg)) {
-                showDialog("提示", "没有符合条件的邮件", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onBackPressed();
-                    }
-                });
+                showDialog("提示", "没有符合条件的邮件");
             } else {
                 ReportError(errMsg);
             }
