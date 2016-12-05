@@ -181,13 +181,13 @@ dSpider("taobao", function(session,env,$){
                             return;
                         }
                         var bxmyproducts = {};
-                        bxmyproducts.name = $($("span.order-shareflight")[0]).text();
-                        bxmyproducts.price = $("div.price").text();//$("div.price").text()
+                        bxmyproducts.name = $($("span.order-shareflight")[0]).text().trim();
+                        bxmyproducts.price = $("div.price").text().trim();//$("div.price").text()
                         bxmyproducts.number = "1";//1
                         bxtbOrderDetailInfo.id = $($("div h5")[1]).text().split("订单号")[1];//
                         bxtbOrderDetailInfo.time = $("span.date").text();//
-                        bxtbOrderDetailInfo.address = $("span.city").text();//这里的地址写的是里程的起始站和终点站
-                        bxtbOrderDetailInfo.total = $("div.price").text();//div.price.text()
+                        bxtbOrderDetailInfo.address = $("span.city").text().trim();//这里的地址写的是里程的起始站和终点站
+                        bxtbOrderDetailInfo.total = $("span.money").text().split("￥")[1];//div.price.text()
                         bxtbOrderDetailInfo.products.push(bxmyproducts);
                         bxtotalProductArray.push(bxtbOrderDetailInfo);
                         tmpeOay.push(bxtotalProductArray);
