@@ -182,7 +182,7 @@ dSpider("taobao", function(session,env,$){
                         }
                         var bxmyproducts = {};
                         bxmyproducts.name = $($("span.order-shareflight")[0]).text().trim();
-                        bxmyproducts.price = $("div.price").text().trim();//$("div.price").text()
+                        bxmyproducts.price = $("span.money").text().split("￥")[1];//$("div.price").text()
                         bxmyproducts.number = "1";//1
                         bxtbOrderDetailInfo.id = $($("div h5")[1]).text().split("订单号")[1];//
                         bxtbOrderDetailInfo.time = $("span.date").text();//
@@ -411,7 +411,7 @@ dSpider("taobao", function(session,env,$){
                         tempAddaress.phone = dQuery("input#J_Mobile").attr("value");//电话号
                         addressData.push(tempAddaress);
                         session.set("AddressData",addressData);
-                        session.setProgress(65+(((urlPosition+1)/7)*20));
+                        session.setProgress(65+(((urlPosition+1)/(urlArray.length))*20));
                         if(urlPosition<urlArray.length-1){
                             session.set("addressUrlPosition",urlPosition+1);
                             location.href = urlArray[urlPosition+1];
