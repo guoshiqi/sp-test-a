@@ -18,7 +18,7 @@ dSpider("taobao", function(session,env,$){
                 session.set("taobaoState",0);
                 session.set("orderArray",[]);
                 //显示进度为0
-                session.showProgress(false);
+                session.showProgress(true);
                 session.setProgressMax(100);
                 session.setProgress(2);
             }
@@ -175,7 +175,11 @@ dSpider("taobao", function(session,env,$){
                     bxtbOrderDetailInfo.products = [];
                     var bxtotalProductArray = [];
                     var myproducts = {};
-                    function getBxOrderDetail(){
+                    function getFJPOrderDetail(){
+                        if($("div.detail-list-item-box").length == 0){
+                            setTimeout(getFJPOrderDetail,100);
+                            return;
+                        }
                         var bxmyproducts = {};
                         bxmyproducts.name = $($("span.order-shareflight")[0]).text();
                         bxmyproducts.price = $("div.price").text();//$("div.price").text()
@@ -194,7 +198,7 @@ dSpider("taobao", function(session,env,$){
                         //跳转到列表页
                         location = "http://h5.m.taobao.com/mlapp/olist.html?"
                     }
-                    setTimeout(getBxOrderDetail,100);
+                    setTimeout(getFJPOrderDetail,100);
                 }
                 log("--------------------------爬取飞机票end----------------------------");
             }
