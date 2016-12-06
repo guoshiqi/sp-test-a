@@ -77,8 +77,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     void openEmail() {
-        //String baseUrl="http://172.19.23.62/spider-script/emails/";
-        String baseUrl="http://119.29.112.230:4832/emails/";
+        String baseUrl="http://172.19.23.62/spider-script/emails/";
+        //String baseUrl="http://119.29.112.230:4832/emails/";
         startDspider(baseUrl+ "email.html?t=" + System.currentTimeMillis(),baseUrl+"inject.php?sid=email","邮箱爬取","",false);
     }
     void startDspider(String startUrl,String scriptUrl,String title,String debugSrcFileName) {
@@ -160,12 +160,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         final int size = list.size();
         if (size == 0) {
             if (TextUtils.isEmpty(errMsg)) {
-                showDialog("提示", "没有符合条件的邮件", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onBackPressed();
-                    }
-                });
+                showDialog("提示", "没有符合条件的邮件");
             } else {
                 ReportError(errMsg);
             }
