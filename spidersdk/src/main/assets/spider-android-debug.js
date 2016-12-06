@@ -25,10 +25,11 @@ function log(){
         console.log("xy log: "+ str);
     }
 }
+
 //异常捕获
-function errorReport(e){
-    console.error("xy log: 语法错误: "+e.message+e.stack);
-    window.curSession&&curSession.finish(e.toString(),"")
+function errorReport(e) {
+    console.error("xy log: 语法错误: " + e.message + e.stack.replace(/ http.*?inject\.php/ig," http://119.29.112.230:4832/"));
+    window.curSession && curSession.finish(e.toString(), "")
 }
 
 String.prototype.endWith = function (str) {
@@ -44,6 +45,7 @@ for (var b = 0; b < a.length; ++b) {
     var temp = a[b].split('=');
     qs[temp[0]] = temp[1] ? temp[1] : null;
 }
+
 MutationObserver = window.MutationObserver ||
     window.WebKitMutationObserver ||
     window.MozMutationObserver;

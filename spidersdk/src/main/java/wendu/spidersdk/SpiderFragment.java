@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.JsResult;
 import android.webkit.SslErrorHandler;
@@ -211,11 +212,18 @@ public class SpiderFragment extends BaseFragment {
                             js = sharedPreferences.getString("jscache","");
                         }
                         if (TextUtils.isEmpty(js)){
-                            URL uri = new URL(SpiderActivity.INJECT_URL + "&platform=android&refer=" + url.substring(url.indexOf("refer=") + 6));
+                            final String scriptUrl= SpiderActivity.INJECT_URL + "&platform=android&refer=" + url.substring(url.indexOf("refer=") + 6);
+                            URL uri = new URL(scriptUrl);
                             HttpURLConnection urlCon = (HttpURLConnection) uri.openConnection();
                             urlCon.setRequestMethod("GET");
                             urlCon.setConnectTimeout(10000);
                             js=Helper.inputStream2String(urlCon.getInputStream());
+                            mWebView.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                  mWebView.loadUrl("javascript:window._scriptUrl="+scriptUrl);
+                                }
+                            });
                             if(SpiderActivity.SCRIPT_CACHED) {
                                 sharedPreferences.edit().putString("jscache",js);
                             }
@@ -284,6 +292,11 @@ public class SpiderFragment extends BaseFragment {
             Log.e("dspider sdk:","alert called");
             result.confirm();
             return true;
+        }
+
+        @Override
+        public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+            return super.onConsoleMessage(consoleMessage);
         }
     };
 
