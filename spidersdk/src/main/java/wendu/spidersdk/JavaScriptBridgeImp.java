@@ -163,4 +163,12 @@ import java.util.Map;
         mContxt.autoLoadImg(load);
     }
 
+    public void log(String msg){
+
+    }
+
+    public void setProgressMsg(String msg) {
+
+    }
+
 }

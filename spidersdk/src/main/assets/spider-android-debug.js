@@ -1,7 +1,7 @@
 /**
  * Created by du on 16/9/1.
  */
-
+var _su="local script";
 String.prototype.format = function () {
     var args = Array.prototype.slice.call(arguments);
     var count = 0;
@@ -18,18 +18,20 @@ String.prototype.empty = function () {
     return this.trim() === "";
 };
 
-function log(){
-    for(var i=0;i<arguments.length;++i)  {
-        var str=arguments[i];
-        str = typeof str !== "string" ? JSON.stringify(str) : str;
-        console.log("xy log: "+ str);
-    }
+function log(str) {
+   var s= window.curSession
+   if(s){
+       s.log(str)
+   }else {
+       console.log("dSpider: "+typeof str=="string"?str:JSON.stringify(str))
+   }
 }
 
 //异常捕获
 function errorReport(e) {
-    console.error("xy log: 语法错误: " + e.message + e.stack.replace(/ http.*?inject\.php/ig," http://119.29.112.230:4832/"));
-    window.curSession && curSession.finish(e.toString(), "")
+    var stack=e.stack.replace(/http.*?inject\.php.*?:/ig," "+_su+":");
+    console.error("dSpider: 语法错误: " + e.message + stack) ;
+    window.curSession && curSession.finish(e, "",3,stack);
 }
 
 String.prototype.endWith = function (str) {
@@ -273,6 +275,15 @@ DataSession.prototype = {
 
     "string": function () {
         log(this.data)
+    },
+
+    log: function(str) {
+            str=str||"";
+            if(typeof str !="string") {
+                str=JSON.stringify(str);
+            }
+            console.log("dSpider: "+str)
+            callHandler("log",{"msg":str})
     }
 };
 apiInit();

@@ -218,12 +218,6 @@ public class SpiderFragment extends BaseFragment {
                             urlCon.setRequestMethod("GET");
                             urlCon.setConnectTimeout(10000);
                             js=Helper.inputStream2String(urlCon.getInputStream());
-                            mWebView.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                  mWebView.loadUrl("javascript:window._scriptUrl="+scriptUrl);
-                                }
-                            });
                             if(SpiderActivity.SCRIPT_CACHED) {
                                 sharedPreferences.edit().putString("jscache",js);
                             }
@@ -294,10 +288,6 @@ public class SpiderFragment extends BaseFragment {
             return true;
         }
 
-        @Override
-        public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
-            return super.onConsoleMessage(consoleMessage);
-        }
     };
 
     @Override
