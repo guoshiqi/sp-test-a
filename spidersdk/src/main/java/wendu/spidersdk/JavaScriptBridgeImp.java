@@ -32,6 +32,7 @@ import java.util.Map;
     }
 
     public void start(String sessionKey) {
+        save("_log","");
         if (datas.get(sessionKey) == null) {
             datas.put(sessionKey, new ArrayList<String>());
         }
@@ -164,7 +165,8 @@ import java.util.Map;
     }
 
     public void log(String msg){
-
+        String str=read("_log");
+        save("_log",str+"dSpider: "+msg+"\n\n");
     }
 
     public void setProgressMsg(String msg) {

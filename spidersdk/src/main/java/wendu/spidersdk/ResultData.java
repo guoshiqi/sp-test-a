@@ -41,5 +41,8 @@ public class ResultData implements Serializable{
     public static ResultData getResult(Context ctx){
         return getResult(ctx,true);
     }
+    public static String getLog(Context ctx){
+        return ctx.getSharedPreferences("spider", Context.MODE_PRIVATE).getString("_log","");
+    }
 
 }

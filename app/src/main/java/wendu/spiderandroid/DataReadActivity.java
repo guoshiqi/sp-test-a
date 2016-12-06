@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import wendu.common.base.BaseActivity;
+import wendu.spidersdk.ResultData;
 
 public class DataReadActivity extends BaseActivity {
 
@@ -15,29 +16,33 @@ public class DataReadActivity extends BaseActivity {
         setActivityTitle("内容");
         final int index=getIntent().getIntExtra("index",-1);
         final TextView textView=getView(R.id.text);
-        if(index!=-1){
-            textView.setText(LatestResult.getInstance().getData().get(index));
+        if(getIntent().getBooleanExtra("log",false)){
+            textView.setText(ResultData.getLog(this));
         }else {
-            textView.setText("no data");
-        }
-        final TextView  toggle=getView(R.id.toggle);
-        toggle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(toggle.getText().equals("Text")){
-                    String content= LatestResult.getInstance().getData().get(index);
-                    content=content.replaceAll("<[^>]+>","");
-                    content = content.replaceAll("[(\\s+)｜(&nbsp;)]", "");
-                    if (TextUtils.isEmpty(content)) {
-                        content = "[无文本内容]";
-                    }
-                   textView.setText(content);
-                   toggle.setText("Html");
-                }else {
-                   textView.setText(LatestResult.getInstance().getData().get(index));
-                   toggle.setText("Text");
-                }
+            if (index != -1) {
+                textView.setText(LatestResult.getInstance().getData().get(index));
+            } else {
+                textView.setText("no data");
             }
-        });
+            final TextView toggle = getView(R.id.toggle);
+            toggle.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (toggle.getText().equals("Text")) {
+                        String content = LatestResult.getInstance().getData().get(index);
+                        content = content.replaceAll("<[^>]+>", "");
+                        content = content.replaceAll("[(\\s+)｜(&nbsp;)]", "");
+                        if (TextUtils.isEmpty(content)) {
+                            content = "[无文本内容]";
+                        }
+                        textView.setText(content);
+                        toggle.setText("Html");
+                    } else {
+                        textView.setText(LatestResult.getInstance().getData().get(index));
+                        toggle.setText("Text");
+                    }
+                }
+            });
+        }
     }
 }

@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    >
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -96,6 +102,19 @@
         android:textColor="@color/white"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/log"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/b1_press_selector"
+        android:elevation="2dp"
+        android:padding="10dp"
+        android:text="查看上次爬取日志"
+        android:textColor="@color/white"
+        android:visibility="gone"
+        />
+
 
 </LinearLayout>
-
+</ScrollView>

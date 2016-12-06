@@ -26,6 +26,7 @@ import wendu.spidersdk.SpiderActivity;
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     TextView result;
+    TextView log;
     String billId = "";
     SwitchCompat debugSwitch;
     //private SpiderService spiderService = DataController.getUploadSerivce();
@@ -48,6 +49,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         debugSwitch.setChecked(isDebug);
         result = getView(R.id.result);
         result.setOnClickListener(this);
+        log=getView(R.id.log);
+        log.setOnClickListener(this);
         setActivityTitle("Spider Demon");
         result = getView(R.id.result);
         hideBackImg();
@@ -77,8 +80,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     void openEmail() {
-        //String baseUrl="http://172.19.23.62/spider-script/emails/";
-        String baseUrl="http://119.29.112.230:4832/emails/";
+        String baseUrl="http://172.19.23.62/spider-script/emails/";
+       // String baseUrl="http://119.29.112.230:4832/emails/";
         startDspider(baseUrl+ "email.html?t=" + System.currentTimeMillis(),baseUrl+"inject.php?sid=email","邮箱爬取","",false);
     }
     void startDspider(String startUrl,String scriptUrl,String title,String debugSrcFileName) {
@@ -113,6 +116,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             result.setText("查看上次爬取结果 " + list.size() + "条记录");
         } else {
             result.setVisibility(View.GONE);
+        }
+        if (ResultData.getLog(this).isEmpty()){
+          log.setVisibility(View.GONE);
+        }else {
+          log.setVisibility(View.VISIBLE);
         }
         super.onResume();
     }
@@ -152,6 +160,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.result:
                 startActivity(ResultActivity.class);
+                break;
+            case R.id.log:
+                Intent intent=new Intent();
+                intent.putExtra("log",true);
+                intent.setClass(this,DataReadActivity.class);
+                startActivity(intent);
                 break;
         }
     }
