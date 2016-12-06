@@ -18,7 +18,7 @@ dSpider("taobao", function(session,env,$){
                 session.set("taobaoState",0);
                 session.set("orderArray",[]);
                 //显示进度为0
-                session.showProgress(true);
+                session.showProgress(false);
                 session.setProgressMax(100);
                 session.setProgress(2);
             }
@@ -77,7 +77,7 @@ dSpider("taobao", function(session,env,$){
             /**
              * 进入订单的爬取操作
              */
-            function intoOrderDetail(position) {
+            function intoOrderDetail() {
                 log("--------------------------intoOrderDetail----------------------------");
                 if($(".order-list>li").length == 0){//当lengt为0的时候的处理
                     setTimeout(intoOrderDetail,100);
@@ -92,9 +92,9 @@ dSpider("taobao", function(session,env,$){
                         location="http://h5.m.taobao.com/mlapp/mytaobao.html";
                     }else{
                         function toOrder(){
-                            ($($(".order-list>li")[position]).children().eq(3).children().eq(0).children().eq(0)).trigger("click");
+                            ($($(".order-list>li")[position]).children().eq(3).children().eq(0).children().eq(1)).trigger("click");
                             session.setProgress(5+(position/($(".order-list>li").length))*60);
-                            log("--------------------------进入订单----------------------------");
+                            log("--------------------------进入订单----------------------------"+position);
                         }
                         setTimeout(toOrder,500);//必须延时执行该方法,因为click事件有可能还没有绑定到dom上
                     }
