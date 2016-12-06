@@ -470,7 +470,6 @@ dSpider("taobao", function(session,env,$){
              */
             if(window.location.pathname.indexOf("baseInfoSet") != -1){//个人资料设置
                 var tempPersonInfo = {};
-                tempPersonInfo.username = dQuery(dQuery("div.menu-hd>a")[0]).text();//账号
                 tempPersonInfo.name = dQuery("input#J_realname").attr("value");//姓名
                 //保存tempPersonInfo
                 session.set("persionInfo",tempPersonInfo);
@@ -483,13 +482,18 @@ dSpider("taobao", function(session,env,$){
                     perInfo = {};
                 //电话号码
                 var phone;
+                var username;
                 var tempArray = dQuery("span.t");
                 for(var ta = 0 ; ta<tempArray.length;ta++){
+                    if(dQuery(tempArray[ta]).text().indexOf("会员名")!=-1){
+                        username = dQuery(dQuery(tempArray[ta]).next()).text().trim();
+                    }
                     if(dQuery(tempArray[ta]).text().indexOf("绑 定 手 机")!=-1){
                         phone = dQuery(dQuery(tempArray[ta]).next()).text().trim();
                     }
                 }
                 //保存手机号
+                perInfo.username = username;
                 perInfo.phone = phone;
                 session.set("persionInfo",perInfo);
                 session.setProgress(97);
