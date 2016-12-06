@@ -276,7 +276,10 @@ DataSession.prototype = {
     "string": function () {
         log(this.data)
     },
-
+    setProgressMsg:function(str){
+        if(!str) return;
+        _xy.setProgressMsg(str);
+    },
     log: function(str) {
             str=str||"";
             if(typeof str !="string") {
