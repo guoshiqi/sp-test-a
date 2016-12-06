@@ -202,6 +202,27 @@ dSpider("taobao", function(session,env,$){
                     setTimeout(getFJPOrderDetail,100);
                 }
             }
+            //-----------------------------------------位置类型订单的处理
+            if (window.location.pathname.indexOf("mlapp/olist") == -1//当前页面不是订单列表
+                &&window.location.pathname.indexOf("mymovie/pages") == -1//当前页面不是电影票订单
+                &&window.location.pathname.indexOf("bx/orderdetail") == -1//当前页面不是保险订单
+                &&window.location.pathname.indexOf("trip/flight") == -1//当前页面不是飞机票订单
+                &&window.location.pathname.indexOf("mlapp/odetail") == -1//当前页面不是淘宝订单
+                ) {
+                    var oa = session.get("orderArray");
+                    if(oa == undefined){
+                        session.set("taobaoState",-1);
+                        //关闭当前页面
+                        closeOrderDetail();
+                    }else{
+                        currentOrderData = oa;
+                        //拿到position后开始爬取
+                        var oip = session.get("OrderItemPosition");
+                        session.set("OrderItemPosition",oip+1);
+                        location = "http://h5.m.taobao.com/mlapp/olist.html"
+                    }
+            }
+
 
             //订单详情,目前外卖的订单详情跟淘宝自己的订单详情布局链接都一致
             if (window.location.pathname.indexOf("mlapp/odetail") != -1) {
