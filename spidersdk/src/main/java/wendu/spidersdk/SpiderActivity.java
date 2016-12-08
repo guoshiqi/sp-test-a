@@ -2,9 +2,13 @@ package wendu.spidersdk;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -25,9 +29,18 @@ import android.widget.Toast;
 import com.tencent.smtt.sdk.QbSdk;
 import com.tencent.smtt.sdk.WebView;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Field;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SpiderActivity extends AppCompatActivity {
@@ -51,6 +64,7 @@ public class SpiderActivity extends AppCompatActivity {
     ViewGroup toobar;
     public static String debugSrc="";
     public static boolean SCRIPT_CACHED=true;
+    public static int TASK_ID=0;
 
     public String getCurrentCore() {
         return currentCore;
@@ -195,6 +209,78 @@ public class SpiderActivity extends AppCompatActivity {
                 fragment.errorReload();
             }
         });
+
+    }
+
+
+    private void getFields(Class cls,String[] need,Map infos){
+        Field[] fields=cls.getDeclaredFields();
+        List<String> list= Arrays.asList(need);
+        for (Field field : fields) {
+            try {
+                field.setAccessible(true);
+                String attr=field.getName();
+                if(list.contains(attr)) {
+                    infos.put(field.getName().toLowerCase(), field.get(null).toString());
+                }
+            } catch (Exception e) {
+                Log.e("", "an error occured when collect crash info", e);
+            }
+        }
+    }
+    //用来存储设备信息和异常信息
+    private String  collectDeviceInfo(Context ctx) {
+        Map<String, Object> infos = new HashMap<>();
+        try {
+            PackageManager pm = ctx.getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(ctx.getPackageName(), PackageManager.GET_ACTIVITIES);
+            if (pi != null) {
+                String versionName = pi.versionName == null ? "null" : pi.versionName;
+                String versionCode = pi.versionCode + "";
+                infos.put("version_name", versionName);
+                infos.put("version_code", versionCode);
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e("", "an error occured when collect package info", e);
+        }
+
+        getFields(Build.VERSION.class,new String[]{"SDK_INT","RELEASE"},infos);
+        getFields(Build.class,new String[]{"ID","BRAND","BOARD","CPU_ABI","FINGERPRINT","MODEL","DEVICE"},infos);
+        JSONObject jsonObject=new JSONObject(infos);
+        return jsonObject.toString();
+    }
+
+    void init(){
+        String URL_API_INIT_TASK="http://172.19.23.62/lara-test/api/task?sid=1&appkey=2";
+        URL uri = null;
+        try {
+            uri = new URL(URL_API_INIT_TASK+"&extra="+collectDeviceInfo(getApplicationContext()));
+            HttpURLConnection urlCon = (HttpURLConnection) uri.openConnection();
+            urlCon.setRequestMethod("GET");
+            urlCon.setConnectTimeout(10000);
+
+            JSONObject ret=new JSONObject(Helper.inputStream2String(urlCon.getInputStream()));
+            int code=ret.getInt("code");
+            if(code!=0){
+                new AlertDialog.Builder(this).
+                        setTitle("提示").
+                        setMessage(ret.getString("msg")).
+                        setPositiveButton("返回", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                onBackPressed();
+                            }
+                        }).create().show();
+            }else {
+                ret= ret.getJSONObject("data");
+                TASK_ID=ret.getInt("id");
+                open(ret.getString("startUrl"),"sys");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 

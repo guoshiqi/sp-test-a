@@ -25,7 +25,8 @@
 -keepclassmembers class wendu.spidersdk.JavaScriptBridgeForCrossWalk{
       public *;
    }
--keep class wendu.spidersdk.ResultData
+-keep class wendu.spidersdk.DSpider
+-keep class wendu.spidersdk.DSpider.Result
 -keep class wendu.spidersdk.CrossWalkInitializer
 -keep class wendu.spidersdk.SpiderActivity
 

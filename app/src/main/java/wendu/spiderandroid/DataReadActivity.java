@@ -5,7 +5,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import wendu.common.base.BaseActivity;
-import wendu.spidersdk.ResultData;
+import wendu.spidersdk.DSpider;
 
 public class DataReadActivity extends BaseActivity {
 
@@ -17,7 +17,7 @@ public class DataReadActivity extends BaseActivity {
         final int index=getIntent().getIntExtra("index",-1);
         final TextView textView=getView(R.id.text);
         if(getIntent().getBooleanExtra("log",false)){
-            textView.setText(ResultData.getLog(this));
+            textView.setText(DSpider.getLog(this));
         }else {
             if (index != -1) {
                 textView.setText(LatestResult.getInstance().getData().get(index));

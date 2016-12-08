@@ -10,17 +10,14 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import wendu.common.base.BaseActivity;
 import wendu.common.utils.KvStorage;
-import wendu.spidersdk.ResultData;
+import wendu.spidersdk.DSpider;
 import wendu.spidersdk.SpiderActivity;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
@@ -117,7 +114,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         } else {
             result.setVisibility(View.GONE);
         }
-        if (ResultData.getLog(this).isEmpty()){
+        if (DSpider.getLog(this).isEmpty()){
           log.setVisibility(View.GONE);
         }else {
           log.setVisibility(View.VISIBLE);
@@ -130,7 +127,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         if (requestCode == 1 ) {
             //获取爬取数据
             if(resultCode == RESULT_OK) {
-                ResultData resultData = ResultData.getResult(this);
+                DSpider.Result resultData = DSpider.getResult(this);
                 if (resultData != null) {
                     LatestResult.getInstance().getData().clear();
                     LatestResult.getInstance().getData().addAll(resultData.datas);
