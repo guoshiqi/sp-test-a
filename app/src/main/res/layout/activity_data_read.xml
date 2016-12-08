@@ -22,17 +22,17 @@
             />
 
     </ScrollView>
-    <TextView
-        android:id="@+id/toggle"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:text="Text"
-        android:textColor="@color/white"
-        android:background="@drawable/circle"
-        android:gravity="center"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="20dp"
-        android:elevation="5dp"
-        android:layout_alignParentRight="true"
-        />
+    <!--<TextView-->
+        <!--android:id="@+id/toggle"-->
+        <!--android:layout_width="60dp"-->
+        <!--android:layout_height="60dp"-->
+        <!--android:text="Text"-->
+        <!--android:textColor="@color/white"-->
+        <!--android:background="@drawable/circle"-->
+        <!--android:gravity="center"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_margin="20dp"-->
+        <!--android:elevation="5dp"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--/>-->
 </RelativeLayout>

@@ -3,4 +3,5 @@
     <!--Theme color defined in common project-->
     <color name="colorPrimary">#3cc09c</color>
     <color name="colorPrimaryDark">#3cc09c</color>
+    <color name="colorBtn2">#30967c</color>
 </resources>

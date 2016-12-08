@@ -66,16 +66,20 @@ public class DSpider implements Serializable{
         return this;
     }
 
-    public DSpider setDebug(boolean debug ){
+    public DSpider setDebug(boolean debug){
        isDebug=debug;
        return  this;
     }
 
-    public void start(int sid,String title,String debugSrcFileName) {
-        if (isDebug&& TextUtils.isEmpty(debugSrcFileName)){
+    public void start(int sid,String title){
+        start(sid,title,"","");
+    }
+
+    public void start(int sid,String title,String debugSrcFileName,String debugStartUrl) {
+        if (isDebug&& (TextUtils.isEmpty(debugSrcFileName)||TextUtils.isEmpty(debugStartUrl))){
             new AlertDialog.Builder(ctx).
                     setTitle("提示").
-                    setMessage("该业务暂不支持调试！").
+                    setMessage("该业务不持调试或却少调试参数").
                     setPositiveButton("返回", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -91,6 +95,7 @@ public class DSpider implements Serializable{
         intent.putExtra("sid",sid);
         intent.putExtra("appkey",appKey);
         intent.putExtra("debugSrc",debugSrcFileName);
+        intent.putExtra("startUrl",debugStartUrl);
         intent.putExtra("arguments",new JSONObject(arguments).toString());
         ctx.startActivityForResult(intent, REQUEST);
     }

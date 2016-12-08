@@ -105,13 +105,17 @@ public class SpiderActivity extends AppCompatActivity {
         workProgress.setForegroundColor(Color.argb(70,19,94,148),Color.argb(170,19,94,148));
 
         String title = getIntent().getStringExtra("title");
+        arguments =getIntent().getStringExtra("arguments");
+        titleTv.setText(TextUtils.isEmpty(title) ? "爬取" : title);
         Helper.isDebug = getIntent().getBooleanExtra("debug", false);
         if (Helper.isDebug) {
             debugSrc=getIntent().getStringExtra("debugSrc");
+            open(getIntent().getStringExtra("startUrl"));
+        }else {
+            init(getIntent().getIntExtra("sid",-1),getIntent().getStringExtra("appkey"));
         }
-        arguments =getIntent().getStringExtra("arguments");
-        titleTv.setText(TextUtils.isEmpty(title) ? "爬取" : title);
-        init(getIntent().getIntExtra("sid",-1),getIntent().getStringExtra("appkey"));
+
+
 
         handler = new Handler() {
             @Override

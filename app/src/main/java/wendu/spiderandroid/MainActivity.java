@@ -35,7 +35,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //   x.Ext.init(getApplication());
         setContentView(R.layout.activity_main);
         findViewById(R.id.email).setOnClickListener(this);
         findViewById(R.id.am_tv_taobao).setOnClickListener(this);
@@ -77,14 +76,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     void openEmail() {
-        startDspider(1,"测试","");
+        startDspider(1,"测试","","");
     }
 
-    void startDspider(int sid,String title,String debugSrcFileName) {
+    void startDspider(int sid,String title,String debugSrcFileName,String debugStartUrl) {
         DSpider.build(this,"2")
                 .addArgument("test",7)
                 .setDebug(isDebug)
-                .start(sid,title,debugSrcFileName);
+                .start(sid,title,debugSrcFileName,debugStartUrl);
     }
 
     @Override
