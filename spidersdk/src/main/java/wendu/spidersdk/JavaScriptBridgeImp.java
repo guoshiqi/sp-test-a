@@ -5,9 +5,15 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +23,7 @@ import java.util.Map;
  * Created by du on 16/8/17.
  */
 
- class JavaScriptBridgeImp {
+class JavaScriptBridgeImp {
     private SpiderActivity mContxt;
     private HashMap<String, String> session = new HashMap<>();
     private HashMap<String, List<String>> datas = new HashMap<>();
@@ -25,11 +31,11 @@ import java.util.Map;
 
     public JavaScriptBridgeImp(Context mContxt) {
         this.mContxt = (SpiderActivity) mContxt;
-        sharedPreferences=mContxt.getSharedPreferences("spider", Context.MODE_PRIVATE);
+        sharedPreferences = mContxt.getSharedPreferences("spider", Context.MODE_PRIVATE);
     }
 
     public void start(String sessionKey) {
-        save("_log","");
+        save("_log", "");
         if (datas.get(sessionKey) == null) {
             datas.put(sessionKey, new ArrayList<String>());
         }
@@ -38,19 +44,21 @@ import java.util.Map;
     public void set(String sessionKey, String value) {
         session.put(sessionKey, value);
     }
+
     public String get(String sessionKey) {
         return session.get(sessionKey);
     }
+
     public void save(String key, String value) {
-        if(TextUtils.isEmpty(value)) {
-           sharedPreferences.edit().remove(key).commit();
-        }else {
+        if (TextUtils.isEmpty(value)) {
+            sharedPreferences.edit().remove(key).commit();
+        } else {
             sharedPreferences.edit().putString(key, value).commit();
         }
     }
 
-    public String read(String key){
-       return sharedPreferences.getString(key, "");
+    public String read(String key) {
+        return sharedPreferences.getString(key, "");
     }
 
     public String clear(String sessionKey) {
@@ -59,24 +67,30 @@ import java.util.Map;
 
 
     public String getExtraData() {
-        Map<String, String> info = new HashMap<String, String>();
-        info.put("os_version", Build.VERSION.SDK_INT+"" );
-        info.put("os", "android" );
-//        info.put("device_info",extra);
-        info.put("webcore",mContxt.getCurrentCore());
-        JSONObject jsonObject=new JSONObject(info);
-        return jsonObject.toString() ;
+        Map<String, Object> info = new HashMap<>();
+        info.put("os_version", Build.VERSION.SDK_INT );
+        info.put("os", "android");
+//      info.put("device_info",extra);
+        info.put("webcore", "sys");
+        JSONObject arguments=null;
+        try {
+            arguments=new JSONObject(mContxt.arguments);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        info.put("arguments", arguments);
+        JSONObject jsonObject = new JSONObject(info);
+        return jsonObject.toString();
     }
 
 
-      public boolean push(String sessionKey, String value) {
-          List<String> list= datas.get(sessionKey);
-          if (list==null){
-              return false;
-          }
-          return list.add(value);
-      }
-
+    public boolean push(String sessionKey, String value) {
+        List<String> list = datas.get(sessionKey);
+        if (list == null) {
+            return false;
+        }
+        return list.add(value);
+    }
 
 
     public void setProgress(int progress) {
@@ -100,23 +114,52 @@ import java.util.Map;
     }
 
 
-    public void finish(String sessionKey,int reslut,String msg) {
+    public void finish(String sessionKey, int reslut, String msg) {
 
         //已经关闭
-        if (datas.get(sessionKey)==null){
+        if (datas.get(sessionKey) == null) {
             return;
         }
         //网络错误
-        if (reslut==1){
+        if (reslut == 1) {
             mContxt.getHandler().sendEmptyMessage(6);
-        }else {
+        } else {
+            reportState(reslut,msg);
             Message message = new Message();
             message.what = 7;
-            message.obj=new DSpider.Result(sessionKey,datas.get(sessionKey),msg);
+            message.obj = new DSpider.Result(sessionKey, datas.get(sessionKey), msg);
             mContxt.getHandler().sendMessage(message);
+
+
         }
         datas.remove(sessionKey);
 
+    }
+
+    private void reportState(final int result, final String msg) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL  uri = new URL(mContxt.reportUrl);
+                    HttpURLConnection urlCon = (HttpURLConnection) uri.openConnection();
+                    urlCon.setRequestMethod("POST");
+                    urlCon.setDoOutput(true);
+                    urlCon.setDoInput(true);
+                    urlCon.setRequestProperty("X-Requested-With","XMLHttpRequest");
+                    urlCon.setConnectTimeout(30000);
+                    PrintWriter pw = new PrintWriter(urlCon.getOutputStream());
+                    String data=URLEncoder.encode(msg,"UTF-8");
+                    pw.print(String.format("&state=%d&msg=%s",result,data));
+                    pw.flush();
+                    pw.close();
+                    String s= Helper.inputStream2String(urlCon.getInputStream());
+                    Log.d("dSpider sdk",s);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
 
@@ -126,7 +169,6 @@ import java.util.Map;
         message.obj = show;
         mContxt.getHandler().sendMessage(message);
     }
-
 
     public void showLoading(String s) {
         Message message = new Message();
@@ -141,20 +183,10 @@ import java.util.Map;
         mContxt.getHandler().sendMessage(message);
     }
 
-    public void   openWithSpecifiedCore(String url, String webcore){
-        if (TextUtils.isEmpty(webcore)){
-            webcore="x5|sys|cs";
-        }
-        if (webcore.startsWith(mContxt.getCurrentCore())){
-            mContxt.loadUrl(url);
-            return;
-        }
-        mContxt.open(url,webcore);
-    }
 
-    public void load(String url, String headers){
-        if (!TextUtils.isEmpty(headers)){
-            mContxt.loadUrl(url,Helper.getMapForJson(headers));
+    public void load(String url, String headers) {
+        if (!TextUtils.isEmpty(headers)) {
+            mContxt.loadUrl(url, Helper.getMapForJson(headers));
         }
     }
 
@@ -162,13 +194,13 @@ import java.util.Map;
         mContxt.setUserAgent(userAgent);
     }
 
-    public void autoLoadImg(boolean load){
+    public void autoLoadImg(boolean load) {
         mContxt.autoLoadImg(load);
     }
 
-    public void log(String msg){
-        String str=read("_log");
-        save("_log",str+"dSpider: "+msg+"\n\n");
+    public void log(String msg) {
+        String str = read("_log");
+        save("_log", str + "dSpider: " + msg + "\n\n");
     }
 
     public void setProgressMsg(String msg) {

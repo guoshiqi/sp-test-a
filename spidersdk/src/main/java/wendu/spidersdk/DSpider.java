@@ -2,8 +2,12 @@ package wendu.spidersdk;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,15 +24,18 @@ public class DSpider implements Serializable{
     private Activity ctx;
     private HashMap<String,Object> arguments=new HashMap<>();
     private boolean isDebug=false;
-    private DSpider(Activity ctx){
+    private String appKey="";
+    public static int REQUEST=2000;
+    private DSpider(Activity ctx,String appKey){
         this.ctx=ctx;
+        this.appKey=appKey;
     }
 
-    public static DSpider init(Activity ctx){
-        return new DSpider(ctx);
+    public static DSpider build(Activity ctx,String appKey){
+        return new DSpider(ctx,appKey);
     }
 
-    public  static Result getResult(Context ctx, boolean clearResultCache){
+    public  static Result getLastResult(Context ctx, boolean clearResultCache){
         File file=new File(ctx.getCacheDir()+"/spider.dat") ;
         FileInputStream fileInputStream = null;
         Result resultData=null;
@@ -45,16 +52,16 @@ public class DSpider implements Serializable{
 
         return resultData;
     }
-    public static Result getResult(Context ctx){
-        return getResult(ctx,true);
+    public static Result getLastResult(Context ctx){
+        return getLastResult(ctx,true);
     }
 
 
-    public static String getLog(Context ctx){
+    public static String getLastLog(Context ctx){
         return ctx.getSharedPreferences("spider", Context.MODE_PRIVATE).getString("_log","");
     }
 
-    public DSpider setArgument(String key,Object value){
+    public DSpider addArgument(String key,Object value){
         arguments.put(key,value);
         return this;
     }
@@ -64,27 +71,31 @@ public class DSpider implements Serializable{
        return  this;
     }
 
-    public void start(String startUrl, String scriptUrl,String title,String debugSrcFileName,boolean scriptCached) {
+    public void start(int sid,String title,String debugSrcFileName) {
         if (isDebug&& TextUtils.isEmpty(debugSrcFileName)){
-            //showDialog("该业务暂不支持调试！");
+            new AlertDialog.Builder(ctx).
+                    setTitle("提示").
+                    setMessage("该业务暂不支持调试！").
+                    setPositiveButton("返回", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).create().show();
             return;
         }
         Intent intent = new Intent();
         intent.setClass(ctx, SpiderActivity.class);
-
-        //将要打开页面url
-        intent.putExtra("url",startUrl);
-        //注入url
-        intent.putExtra("inject", scriptUrl);
         intent.putExtra("title", title);
-        //调试模式
         intent.putExtra("debug", isDebug);
-        intent.putExtra("cache",scriptCached );
+        intent.putExtra("sid",sid);
+        intent.putExtra("appkey",appKey);
         intent.putExtra("debugSrc",debugSrcFileName);
-        ctx.startActivityForResult(intent, 1);
+        intent.putExtra("arguments",new JSONObject(arguments).toString());
+        ctx.startActivityForResult(intent, REQUEST);
     }
 
-    public static class Result{
+    public static class Result implements Serializable{
         public List<String>datas;
         public String sessionKey;
         public String errorMsg;

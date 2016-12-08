@@ -51,11 +51,12 @@ class Helper {
     public   static   String   inputStream2String(InputStream   is) {
         String result = "";
         String line ;
+        InputStreamReader inputReader = new InputStreamReader(is);
+        BufferedReader bufReader = new BufferedReader(inputReader);
         try {
-            InputStreamReader inputReader = new InputStreamReader(is);
-            BufferedReader bufReader = new BufferedReader(inputReader);
             while ((line = bufReader.readLine()) != null)
                 result += line+"\r\n";
+            bufReader.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

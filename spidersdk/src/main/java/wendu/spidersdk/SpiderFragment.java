@@ -42,14 +42,15 @@ public class SpiderFragment extends BaseFragment {
     private String mUrl;
     private String userAgent;
     private String lastInjectUrl="";
+    private String injectUrl="";
     private final String contentType = "application/javascript";
     SharedPreferences sharedPreferences;
 
-    public static SpiderFragment newInstance(String url, boolean showBack) {
+    public static SpiderFragment newInstance(String url,String injectUrl ) {
         SpiderFragment fragment = new SpiderFragment();
         Bundle args = new Bundle();
         args.putString("mUrl", url);
-        args.putBoolean("showBack", showBack);
+        args.putString("injectUrl", injectUrl);
         fragment.setArguments(args);
         return fragment;
     }
@@ -58,8 +59,9 @@ public class SpiderFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                     Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_spider, container, false);
-        Log.e("spider", "system webview loaded!");
+
         mUrl = getArguments().getString("mUrl");
+        injectUrl=getArguments().getString("injectUrl");
 
         mProgressBar = (ProgressBar) rootView.findViewById(R.id.progress);
         showLoadProgress();
@@ -207,20 +209,15 @@ public class SpiderFragment extends BaseFragment {
                     }
                 } else {
                     try {
-                        String js="";
-                        if(SpiderActivity.SCRIPT_CACHED) {
-                            js = sharedPreferences.getString("jscache","");
-                        }
+                        String js= sharedPreferences.getString("jscache","");
                         if (TextUtils.isEmpty(js)){
-                            final String scriptUrl= SpiderActivity.INJECT_URL + "&platform=android&refer=" + url.substring(url.indexOf("refer=") + 6);
-                            URL uri = new URL(scriptUrl);
+                            URL uri = new URL(injectUrl);
                             HttpURLConnection urlCon = (HttpURLConnection) uri.openConnection();
                             urlCon.setRequestMethod("GET");
                             urlCon.setConnectTimeout(10000);
+                            urlCon.setRequestProperty("X-Requested-With","XMLHttpRequest");
                             js=Helper.inputStream2String(urlCon.getInputStream());
-                            if(SpiderActivity.SCRIPT_CACHED) {
-                                sharedPreferences.edit().putString("jscache",js);
-                            }
+                            sharedPreferences.edit().putString("jscache",js);
                         }
                         response = new WebResourceResponse(contentType,
                                 "UTF-8", new ByteArrayInputStream(js.getBytes()));

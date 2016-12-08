@@ -17,7 +17,7 @@ public class DataReadActivity extends BaseActivity {
         final int index=getIntent().getIntExtra("index",-1);
         final TextView textView=getView(R.id.text);
         if(getIntent().getBooleanExtra("log",false)){
-            textView.setText(DSpider.getLog(this));
+            textView.setText(DSpider.getLastLog(this));
         }else {
             if (index != -1) {
                 textView.setText(LatestResult.getInstance().getData().get(index));

@@ -4,10 +4,10 @@ function init(){
         window.inject=true;
         var js = document.createElement("script");
         js.setAttribute("type","application/javascript");
-        js.src = "xiaoying/inject.php?t="+new Date().getTime()+"&refer="+encodeURIComponent(location.href);
+        js.src = "xiaoying/inject.php?t="+new Date().getTime();
         var parent= document.head||document.body;
         parent.appendChild(js);
-        console.log("inject succeed!");
+        console.log("inject succeed: "+location.href);
     };
 };
 

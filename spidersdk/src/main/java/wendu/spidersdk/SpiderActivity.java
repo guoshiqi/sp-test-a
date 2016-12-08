@@ -26,8 +26,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.tencent.smtt.sdk.QbSdk;
-import com.tencent.smtt.sdk.WebView;
 
 import org.json.JSONObject;
 
@@ -36,8 +34,8 @@ import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -55,27 +53,19 @@ public class SpiderActivity extends AppCompatActivity {
     BaseFragment fragment;
     Handler handler;
     TextView titleTv;
-    CrossWalkInitializer crossWalkInitializer;
     RelativeLayout errorLayout;
     RelativeLayout loading;
     WaveProgress waveProgress;
     TextView msg;
-    TextView webcore;
     ViewGroup toobar;
+
     public static String debugSrc="";
-    public static boolean SCRIPT_CACHED=true;
-    public static int TASK_ID=0;
-
-    public String getCurrentCore() {
-        return currentCore;
-    }
-
-    String currentCore = "";
-    public static String INJECT_URL = "";
+    private  String  BASE_URL="http://172.19.23.62/lara-test/api/";
+    private   String injectUrl = BASE_URL+"script";
+    public   String reportUrl =BASE_URL+"report";
+    public  String arguments ="";
     private int max = 100;
     private static final String TAG = "SpiderActivity";
-    private String url;
-    boolean isInit = false;
 
     public <T extends View> T getView(int viewId) {
         View view = findViewById(viewId);
@@ -86,7 +76,6 @@ public class SpiderActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spider);
-        QbSdk.preInit(this);
         container = getView(R.id.container);
         webviewLayout = getView(R.id.fragment);
         waveProgress=getView(R.id.wave);
@@ -112,23 +101,18 @@ public class SpiderActivity extends AppCompatActivity {
         errorLayout = getView(R.id.error_layout);
         loading = getView(R.id.loading);
         msg = getView(R.id.msg);
-        webcore = getView(R.id.webcore);
         fm = getSupportFragmentManager();
         workProgress.setForegroundColor(Color.argb(70,19,94,148),Color.argb(170,19,94,148));
-        crossWalkInitializer = CrossWalkInitializer.create(SpiderActivity.this);
-        crossWalkInitializer.init(false);
-        url = getIntent().getStringExtra("url");
-        INJECT_URL = getIntent().getStringExtra("inject");
+
         String title = getIntent().getStringExtra("title");
         Helper.isDebug = getIntent().getBooleanExtra("debug", false);
-        SCRIPT_CACHED=getIntent().getBooleanExtra("cache",true );
         if (Helper.isDebug) {
-            webcore.setVisibility(View.VISIBLE);
             debugSrc=getIntent().getStringExtra("debugSrc");
         }
+        arguments =getIntent().getStringExtra("arguments");
         titleTv.setText(TextUtils.isEmpty(title) ? "爬取" : title);
-        //open(url, "x5|sys|cs");
-        open(url, "sys|x5|cs");
+        init(getIntent().getIntExtra("sid",-1),getIntent().getStringExtra("appkey"));
+
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -184,21 +168,14 @@ public class SpiderActivity extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isInit) {
                     onBackPressed();
-                } else {
-                    SpiderActivity.super.onBackPressed();
-                }
             }
         });
         getView(R.id.back_gray).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isInit) {
                     onBackPressed();
-                } else {
-                    SpiderActivity.super.onBackPressed();
-                }
+
             }
         });
         errorLayout.setOnClickListener(new View.OnClickListener() {
@@ -250,37 +227,55 @@ public class SpiderActivity extends AppCompatActivity {
         return jsonObject.toString();
     }
 
-    void init(){
-        String URL_API_INIT_TASK="http://172.19.23.62/lara-test/api/task?sid=1&appkey=2";
-        URL uri = null;
-        try {
-            uri = new URL(URL_API_INIT_TASK+"&extra="+collectDeviceInfo(getApplicationContext()));
-            HttpURLConnection urlCon = (HttpURLConnection) uri.openConnection();
-            urlCon.setRequestMethod("GET");
-            urlCon.setConnectTimeout(10000);
+    void init(final int sid, final String appkey){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String extra= URLEncoder.encode(collectDeviceInfo(getApplicationContext()),"UTF-8");
+                    URL uri = new URL(BASE_URL+"task?platform=android&sid="+sid+"&appkey="+appkey+"&extra="+extra);
+                    HttpURLConnection urlCon = (HttpURLConnection) uri.openConnection();
+                    urlCon.setRequestMethod("GET");
+                    urlCon.setRequestProperty("X-Requested-With","XMLHttpRequest");
+                    urlCon.setConnectTimeout(10000);
+                    JSONObject ret=new JSONObject(Helper.inputStream2String(urlCon.getInputStream()));
+                    int code=ret.getInt("code");
+                    if(code!=0){
+                        showDialog(ret.getString("msg"));
+                    }else {
+                        ret= ret.getJSONObject("data");
+                        int taskId=ret.getInt("id");
+                        String common="?id="+taskId+"&appkey="+appkey;
+                        injectUrl=injectUrl+common;
+                        reportUrl = reportUrl +common;
+                        open(ret.getString("startUrl"));
+                    }
 
-            JSONObject ret=new JSONObject(Helper.inputStream2String(urlCon.getInputStream()));
-            int code=ret.getInt("code");
-            if(code!=0){
-                new AlertDialog.Builder(this).
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    showDialog(e.getMessage());
+                }
+            }
+        }).start();
+    }
+
+     public void showDialog(final String msg){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AlertDialog.Builder(SpiderActivity.this).
                         setTitle("提示").
-                        setMessage(ret.getString("msg")).
+                        setMessage(msg).
+                        setCancelable(false).
                         setPositiveButton("返回", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
-                                onBackPressed();
+                                SpiderActivity.super.onBackPressed();
                             }
                         }).create().show();
-            }else {
-                ret= ret.getJSONObject("data");
-                TASK_ID=ret.getInt("id");
-                open(ret.getString("startUrl"),"sys");
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        });
 
     }
 
@@ -298,146 +293,21 @@ public class SpiderActivity extends AppCompatActivity {
         errorLayout.setVisibility(View.VISIBLE);
     }
 
-    public void open(final String url, final String webCore) {
-        this.url = url;
+    public void open(final String url) {
         webviewLayout.post(new Runnable() {
             @Override
             public void run() {
-                String[] cores = webCore.split("\\|");
-                for (String core : cores) {
-                    currentCore = core;
-                    switch (core) {
-                        case "sys":
-                            openInDefault();
-                            return;
-                        case "cs":
-                            openInCrossWalk();
-                            return;
-                        case "x5": {
-                            if (openInX5()) return;
-                            continue;
-                        }
-                    }
-                }
-            }
-        });
-
-    }
-
-    private void init(final String url) {
-        webviewLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                if (isX5()) {
-                    fragment = SpiderX5Fragment.newInstance(url, true);
-                    startFragment();
-                } else {
-                    openInCrossWalk();
-                }
-            }
-        });
-    }
-
-    public boolean openInX5() {
-        if (isX5()) {
-            fragment = SpiderX5Fragment.newInstance(url, true);
-            startFragment();
-            return true;
-        }
-        return false;
-    }
-
-    public boolean openInDefault() {
-        fragment = SpiderFragment.newInstance(url, true);
-        //fragment =SpiderIosLikeFragment.newInstance(url, true);
-        startFragment();
-        return true;
-    }
-
-    public void openInCrossWalk() {
-        if (crossWalkInitializer.isAvaiable()) {
-            fragment = SpiderCrossWalkFragment.newInstance(url, true);
-            startFragment();
-        } else {
-            Dialog alertDialog = new AlertDialog.Builder(this).
-                    setTitle("提示").
-                    setMessage("首次加载需要下载数据，建议在wifi环境下下载,确定？").
-                    setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            downloadCrossWalkAndOpen();
-                        }
-                    }).
-                    setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            onBackPressed();
-                        }
-                    }).create();
-            alertDialog.show();
-        }
-    }
-
-    private void downloadCrossWalkAndOpen() {
-        initView.setVisibility(View.VISIBLE);
-        isInit = true;
-        crossWalkInitializer.setInitListener(new CrossWalkInitializer.InitListener() {
-            @Override
-            void onSuccess() {
-                fragment = SpiderCrossWalkFragment.newInstance(url, true);
+                fragment = SpiderFragment.newInstance(url, injectUrl);
                 startFragment();
-                initView.setVisibility(View.GONE);
-                isInit = false;
-            }
-
-            @Override
-            void onFailed() {
-                Dialog alertDialog = new AlertDialog.Builder(SpiderActivity.this).
-                        setTitle("提示").
-                        setMessage("加载失败").
-                        setPositiveButton("返回", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                isInit = false;
-                                onBackPressed();
-                            }
-                        }).create();
-                alertDialog.show();
-            }
-
-            @Override
-            void onDownloadStart() {
-                initView.setText("首次加载初始化中：");
-            }
-
-            @Override
-            void onProgress(int progress) {
-                if (progress > 95) {
-                    initView.setText("正在验证.....");
-                } else {
-                    initView.setText("首次加载初始化中：" + progress + "%");
-                }
             }
         });
-        crossWalkInitializer.init(true);
-    }
 
+    }
 
     public void startFragment() {
         fm.beginTransaction()
                 .replace(R.id.fragment, fragment, "")
                 .commit();
-        webcore.setText("webcore: " + currentCore);
-    }
-
-    boolean isX5() {
-        boolean isX5 = false;
-        if (QbSdk.getTbsVersion(this) != 0) {
-            WebView webView = new WebView(this);
-            isX5 = (webView.getX5WebViewExtension() != null);
-        }
-        return isX5;
     }
 
     public void loadUrl(String url) {
@@ -541,14 +411,13 @@ public class SpiderActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (isInit) {
+
             Dialog alertDialog = new AlertDialog.Builder(SpiderActivity.this).
                     setTitle("提示").
-                    setMessage("正在初始化，确定要退出吗？").
+                    setMessage("确定要退出吗？").
                     setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            crossWalkInitializer.cancel();
                             SpiderActivity.super.onBackPressed();
                         }
                     })
@@ -560,10 +429,6 @@ public class SpiderActivity extends AppCompatActivity {
                     })
                     .create();
             alertDialog.show();
-        } else {
-            super.onBackPressed();
-        }
-
     }
 
 }

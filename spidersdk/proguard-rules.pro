@@ -22,19 +22,13 @@
 -keepclassmembers class wendu.spidersdk.JavaScriptBridge {
       public *;
    }
--keepclassmembers class wendu.spidersdk.JavaScriptBridgeForCrossWalk{
-      public *;
-   }
 -keep class wendu.spidersdk.DSpider
 -keep class wendu.spidersdk.DSpider.Result
--keep class wendu.spidersdk.CrossWalkInitializer
--keep class wendu.spidersdk.SpiderActivity
-
-#xwalk
--keep class org.xwalk.core.** { *;}
--keep class org.chromium.** { *;}
--keepattributes **
--keep  class  junit.framework.**{*;}
-#x5
--keep class com.tencent.smtt.**{*;}
--keep class com.tencent.tbs.**{*;}
+##xwalk
+#-keep class org.xwalk.core.** { *;}
+#-keep class org.chromium.** { *;}
+#-keepattributes **
+#-keep  class  junit.framework.**{*;}
+##x5
+#-keep class com.tencent.smtt.**{*;}
+#-keep class com.tencent.tbs.**{*;}

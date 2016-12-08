@@ -265,10 +265,6 @@ DataSession.prototype = {
         return _xy.push(this.key, value)
     },
 
-    "openWithSpecifiedCore":function(url, core){
-        _xy.openWithSpecifiedCore(url, core)
-    },
-
     autoLoadImg:function(load){
            _xy.autoLoadImg(load)
     },
