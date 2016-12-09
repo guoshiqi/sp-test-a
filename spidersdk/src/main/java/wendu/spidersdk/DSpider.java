@@ -80,7 +80,7 @@ public class DSpider implements Serializable{
             new AlertDialog.Builder(ctx).
                     setTitle("提示").
                     setMessage("该业务不持调试或却少调试参数").
-                    setPositiveButton("返回", new DialogInterface.OnClickListener() {
+                    setPositiveButton("关闭", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
