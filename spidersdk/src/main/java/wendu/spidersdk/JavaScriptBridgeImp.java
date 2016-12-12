@@ -78,7 +78,7 @@ class JavaScriptBridgeImp {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        info.put("arguments", arguments);
+        info.put("args", arguments);
         JSONObject jsonObject = new JSONObject(info);
         return jsonObject.toString();
     }
