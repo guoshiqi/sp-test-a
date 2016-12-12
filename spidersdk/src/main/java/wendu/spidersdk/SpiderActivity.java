@@ -60,7 +60,7 @@ public class SpiderActivity extends AppCompatActivity {
     ViewGroup toobar;
 
     public static String debugSrc="";
-    private  String  BASE_URL="http://172.19.23.62/lara-test/api/";
+    private  String  BASE_URL=DSpider.BASE_URL;
     private   String injectUrl = BASE_URL+"script";
     public   String reportUrl =BASE_URL+"report";
     public  String arguments ="";
@@ -194,50 +194,31 @@ public class SpiderActivity extends AppCompatActivity {
     }
 
 
-    private void getFields(Class cls,String[] need,Map infos){
-        Field[] fields=cls.getDeclaredFields();
-        List<String> list= Arrays.asList(need);
-        for (Field field : fields) {
-            try {
-                field.setAccessible(true);
-                String attr=field.getName();
-                if(list.contains(attr)) {
-                    infos.put(field.getName().toLowerCase(), field.get(null).toString());
-                }
-            } catch (Exception e) {
-                Log.e("", "an error occured when collect crash info", e);
-            }
-        }
-    }
+
     //用来存储设备信息和异常信息
-    private String  collectDeviceInfo(Context ctx) {
-        Map<String, Object> infos = new HashMap<>();
+    private String  getExtraInfo() {
+        String versionName ="";
         try {
-            PackageManager pm = ctx.getPackageManager();
-            PackageInfo pi = pm.getPackageInfo(ctx.getPackageName(), PackageManager.GET_ACTIVITIES);
+            PackageManager pm = getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(getPackageName(), PackageManager.GET_ACTIVITIES);
             if (pi != null) {
-                String versionName = pi.versionName == null ? "null" : pi.versionName;
-                String versionCode = pi.versionCode + "";
-                infos.put("version_name", versionName);
-                infos.put("version_code", versionCode);
+                versionName = pi.versionName == null ? "" : pi.versionName;
             }
         } catch (PackageManager.NameNotFoundException e) {
             Log.e("", "an error occured when collect package info", e);
         }
+        return String.format("&app_version=%s&sdk_version=%s&device_id=%d",
+                versionName,DSpider.SDK_VERSION,DSpider.DEVICE_ID);
 
-        getFields(Build.VERSION.class,new String[]{"SDK_INT","RELEASE"},infos);
-        getFields(Build.class,new String[]{"ID","BRAND","BOARD","CPU_ABI","FINGERPRINT","MODEL","DEVICE"},infos);
-        JSONObject jsonObject=new JSONObject(infos);
-        return jsonObject.toString();
     }
+
 
     void init(final int sid, final String appkey){
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    String extra= URLEncoder.encode(collectDeviceInfo(getApplicationContext()),"UTF-8");
-                    URL uri = new URL(BASE_URL+"task?platform=android&sid="+sid+"&appkey="+appkey+"&extra="+extra);
+                    URL uri = new URL(BASE_URL+"task?sid="+sid+"&appkey="+appkey+getExtraInfo());
                     HttpURLConnection urlCon = (HttpURLConnection) uri.openConnection();
                     urlCon.setRequestMethod("GET");
                     urlCon.setRequestProperty("X-Requested-With","XMLHttpRequest");
@@ -250,7 +231,7 @@ public class SpiderActivity extends AppCompatActivity {
                         ret= ret.getJSONObject("data");
                         int taskId=ret.getInt("id");
                         String common="?id="+taskId+"&appkey="+appkey;
-                        injectUrl=injectUrl+common;
+                        injectUrl=injectUrl+common+"&platform=1";
                         reportUrl = reportUrl +common;
                         open(ret.getString("startUrl"));
                     }

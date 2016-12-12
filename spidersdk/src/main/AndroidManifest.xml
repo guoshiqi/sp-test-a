@@ -1,34 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="wendu.spidersdk">
 
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:allowBackup="true"
         android:label="@string/app_name"
         android:supportsRtl="true">
-        <uses-permission android:name="android.permission.INTERNET"/>
         <activity android:name=".SpiderActivity"   android:theme="@style/ColorTranslucentTheme" />
-        <meta-data
-            android:name="QBSDKAppKey"
-            android:value="Him/QbcsWWwbclSrL6AkioXU" />
-        <meta-data
-            android:name="xwalk_enable_download_mode"
-            android:value="enable" />
-        <meta-data
-            android:name="xwalk_verify"
-            android:value="disable" />
-
-        <!--<meta-data-->
-            <!--android:name="xwalk_apk_url"-->
-            <!--android:value="http://119.29.112.230:9350/webcores" />-->
-
-        <meta-data
-        android:name="xwalk_apk_url"
-        android:value="http://119.29.112.230:4832/crosswalk.php" />
-
-        <!--<meta-data-->
-            <!--android:name="xwalk_apk_url"-->
-            <!--android:value="http://172.19.22.235/h5Test/dist/crosswalk.php" />-->
-
     </application>
 
 </manifest>

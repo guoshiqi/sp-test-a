@@ -80,8 +80,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     void startDspider(int sid,String title,String debugSrcFileName,String debugStartUrl) {
-        DSpider.build(this,"2")
-                .addArgument("test",7)
+        DSpider.build(this,"1")
+                //.addArgument("test",7)
                 .setDebug(isDebug)
                 .start(sid,title,debugSrcFileName,debugStartUrl);
     }
