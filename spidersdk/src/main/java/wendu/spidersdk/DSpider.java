@@ -84,7 +84,7 @@ public class DSpider implements Serializable{
         ctx.startActivityForResult(intent, 1);
     }
 
-    public static class Result{
+    public static class Result implements Serializable{
         public List<String>datas;
         public String sessionKey;
         public String errorMsg;
@@ -94,6 +94,5 @@ public class DSpider implements Serializable{
             this.errorMsg=errorMsg;
         }
     }
-
 
 }
