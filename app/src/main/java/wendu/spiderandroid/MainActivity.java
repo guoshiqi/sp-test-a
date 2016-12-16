@@ -10,22 +10,20 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import wendu.common.base.BaseActivity;
 import wendu.common.utils.KvStorage;
-import wendu.spidersdk.ResultData;
+import wendu.spidersdk.DSpider;
 import wendu.spidersdk.SpiderActivity;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     TextView result;
+    TextView log;
     String billId = "";
     SwitchCompat debugSwitch;
     //private SpiderService spiderService = DataController.getUploadSerivce();
@@ -48,6 +46,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         debugSwitch.setChecked(isDebug);
         result = getView(R.id.result);
         result.setOnClickListener(this);
+        log=getView(R.id.log);
+        log.setOnClickListener(this);
         setActivityTitle("Spider Demon");
         result = getView(R.id.result);
         hideBackImg();
@@ -78,7 +78,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     void openEmail() {
         String baseUrl="http://172.19.23.62/spider-script/emails/";
-        //String baseUrl="http://119.29.112.230:4832/emails/";
+       // String baseUrl="http://119.29.112.230:4832/emails/";
         startDspider(baseUrl+ "email.html?t=" + System.currentTimeMillis(),baseUrl+"inject.php?sid=email","邮箱爬取","",false);
     }
     void startDspider(String startUrl,String scriptUrl,String title,String debugSrcFileName) {
@@ -114,6 +114,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         } else {
             result.setVisibility(View.GONE);
         }
+        if (DSpider.getLog(this).isEmpty()){
+          log.setVisibility(View.GONE);
+        }else {
+          log.setVisibility(View.VISIBLE);
+        }
         super.onResume();
     }
 
@@ -122,7 +127,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         if (requestCode == 1 ) {
             //获取爬取数据
             if(resultCode == RESULT_OK) {
-                ResultData resultData = ResultData.getResult(this);
+                DSpider.Result resultData = DSpider.getResult(this);
                 if (resultData != null) {
                     LatestResult.getInstance().getData().clear();
                     LatestResult.getInstance().getData().addAll(resultData.datas);
@@ -152,6 +157,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.result:
                 startActivity(ResultActivity.class);
+                break;
+            case R.id.log:
+                Intent intent=new Intent();
+                intent.putExtra("log",true);
+                intent.setClass(this,DataReadActivity.class);
+                startActivity(intent);
                 break;
         }
     }
