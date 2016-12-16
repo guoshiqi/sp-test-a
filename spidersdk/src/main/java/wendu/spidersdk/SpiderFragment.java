@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
@@ -103,6 +104,7 @@ public class SpiderFragment extends BaseFragment {
         mWebView.post(new Runnable() {
             @Override
             public void run() {
+                context.showLoadView();
                 mWebView.loadUrl(url);
             }
         });
@@ -118,6 +120,7 @@ public class SpiderFragment extends BaseFragment {
                     userAgent=mWebView.getSettings().getUserAgentString();
                    mWebView.getSettings().setUserAgentString(str);
                 }
+                context.showLoadView();
                 mWebView.loadUrl(url,additionalHttpHeaders);
             }
         });
@@ -143,7 +146,7 @@ public class SpiderFragment extends BaseFragment {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             Log.e("xy log","shouldOverrideUrlLoading: "+url);
-            showLoadProgress();
+            context.showLoadView();
             return super.shouldOverrideUrlLoading(view, url);
         }
 
@@ -151,14 +154,13 @@ public class SpiderFragment extends BaseFragment {
         @Override
         public void onPageFinished(final WebView view, String url) {
             super.onPageFinished(view, url);
+            context.hideLoadView();
             if(!TextUtils.isEmpty(userAgent)){
                 setUserAgent(userAgent);
                 userAgent=null;
             }
             injectJs();
         }
-
-
 
         @SuppressWarnings("deprecation")
         @Override

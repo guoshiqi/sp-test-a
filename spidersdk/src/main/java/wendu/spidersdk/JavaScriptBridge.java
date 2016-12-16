@@ -77,14 +77,7 @@ import android.webkit.JavascriptInterface;
     }
 
     @JavascriptInterface
-    public void showLoading(String s) {
-       jsbImp.showLoading(s);
-    }
-
-    @JavascriptInterface
-    public void hideLoading() {
-        jsbImp.hideLoading();
-    }
+    public String getArguments(){return jsbImp.getArguments();}
 
     @JavascriptInterface
     public void load(String url, String headers){
@@ -102,8 +95,8 @@ import android.webkit.JavascriptInterface;
     }
 
     @JavascriptInterface
-    public void log(String msg) {
-        jsbImp.log(msg);
+    public void log(String msg,int type) {
+        jsbImp.log(msg,type);
     }
 
     @JavascriptInterface

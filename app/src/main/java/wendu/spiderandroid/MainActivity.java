@@ -76,14 +76,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     void openEmail() {
-        startDspider(1,"测试","","");
+        startDspider(1,"","");
     }
 
-    void startDspider(int sid,String title,String debugSrcFileName,String debugStartUrl) {
+    void startDspider(int sid,String debugSrcFileName,String debugStartUrl) {
         DSpider.build(this,"1")
                 //.addArgument("test",7)
                 .setDebug(isDebug)
-                .start(sid,title,debugSrcFileName,debugStartUrl);
+                .start(sid,debugSrcFileName,debugStartUrl);
     }
 
     @Override

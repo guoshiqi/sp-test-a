@@ -89,11 +89,11 @@ public class DSpider implements Serializable{
        return  this;
     }
 
-    public void start(int sid,String title){
-        start(sid,title,"","");
+    public void start(int sid){
+        start(sid,"","");
     }
 
-    public void start(final int sid, final String title, final String debugSrcFileName, final String debugStartUrl) {
+    public void start(final int sid,  final String debugSrcFileName, final String debugStartUrl) {
         if (isDebug&& (TextUtils.isEmpty(debugSrcFileName)||TextUtils.isEmpty(debugStartUrl))){
             showDialog("该业务不持调试或却少调试参数");
             return;
@@ -117,7 +117,7 @@ public class DSpider implements Serializable{
                         }else {
                             DEVICE_ID=ret.getInt("data");
                             ctx.getSharedPreferences("spider", Context.MODE_PRIVATE).edit().putInt("device_id",DEVICE_ID).commit();
-                            start_(sid, title, debugSrcFileName, debugStartUrl);
+                            start_(sid,  debugSrcFileName, debugStartUrl);
                         }
 
                     } catch (Exception e) {
@@ -128,7 +128,7 @@ public class DSpider implements Serializable{
             }).start();
         }else {
            DEVICE_ID=device_id;
-           start_(sid, title, debugSrcFileName, debugStartUrl);
+           start_(sid, debugSrcFileName, debugStartUrl);
         }
     }
 
@@ -150,11 +150,11 @@ public class DSpider implements Serializable{
 
     }
 
-    private void start_(int sid,String title,String debugSrcFileName,String debugStartUrl) {
+    private void start_(int sid,String debugSrcFileName,String debugStartUrl) {
 
         Intent intent = new Intent();
         intent.setClass(ctx, SpiderActivity.class);
-        intent.putExtra("title", title);
+        //intent.putExtra("title", title);
         intent.putExtra("debug", isDebug);
         intent.putExtra("sid",sid);
         intent.putExtra("appkey",appKey);

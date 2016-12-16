@@ -18,7 +18,6 @@ String.prototype.empty = function () {
     return this.trim() === "";
 };
 
-
 function log(str) {
     var s= window.curSession
     if(s){
@@ -27,12 +26,14 @@ function log(str) {
         console.log("dSpider: "+typeof str=="string"?str:JSON.stringify(str))
     }
 }
-
 //异常捕获
 function errorReport(e) {
-    var stack=e.stack.replace(/http.*?inject\.php.*?:/ig," "+_su+":");
-    log("语法错误: " + e.message + stack) ;
-    window.curSession && curSession.finish(e.message,"",3,stack);
+    var stack=e.stack?e.stack.replace(/http.*?inject\.php.*?:/ig," "+_su+":"): e.toString();
+    var msg="语法错误: " + e.message +"\nscript_url:"+_su+"\n"+stack
+    if(window.curSession){
+        curSession.log(msg);
+        curSession.finish(e.message,"",3,msg);
+    }
 }
 
 String.prototype.endWith = function (str) {
@@ -159,17 +160,21 @@ function dSpider(sessionKey, callback) {
         window.curSession = session;
         session._init(function(){
             DataSession.getExtraData(function (extras) {
-                $(safeCallback(function(){
-                    $("body").on("click","a",function(){
-                        $(this).attr("target",function(_,v){
-                            if(v=="_blank") return "_self"
+                extras=JSON.parse(extras||"{}")
+                DataSession.getArguments(function(args){
+                    $(safeCallback(function(){
+                        $("body").on("click","a",function(){
+                            $(this).attr("target",function(_,v){
+                                if(v=="_blank") return "_self"
+                            })
                         })
-                    })
-                    log("dSpider start!")
-                    extras.config=typeof _config==="object"?_config:"{}";
-                    session._args=extras.args;
-                    callback(session, extras, $);
-                }))
+                        log("dSpider start!")
+                        extras.config=typeof _config==="object"?_config:"{}";
+                        session.getArguments=function(){return JSON.parse(args)}
+                        session.getConfig=function(){return typeof _config==="object"?_config:{} }
+                        callback(session, extras, $);
+                    }))
+                })
             })
         })
     }, 20);
@@ -226,15 +231,9 @@ DataSession.prototype = {
     setProgress: function (progress) {
         _xy.setProgress(progress);
     },
-    getProgress: function (f) {
-        f = safeCallback(f);
-        f && f(_xy.getProgress());
-    },
-    showLoading: function (s) {
-        _xy.showLoading(s || "正在爬取,请耐心等待...")
-    },
-    hideLoading: function () {
-        _xy.hideLoading()
+    setProgressMsg:function(str){
+        if(!str) return;
+        _xy.setProgressMsg(str);
     },
     finish: function (errmsg, content, code, stack) {
         this.finished = true;
@@ -243,7 +242,7 @@ DataSession.prototype = {
                 url: location.href,
                 msg: errmsg,
                 //content: content || document.documentElement.outerHTML,
-                args: this._args
+                args: this.getArguments()
             }
             stack && (ob.stack = stack);
             return _xy.finish(this.key || "", code || 2, JSON.stringify(ob));
@@ -267,26 +266,22 @@ DataSession.prototype = {
     setUserAgent: function (str) {
         _xy.setUserAgent(str)
     },
-    openWithSpecifiedCore: function (url, core) {
-        _xy.openWithSpecifiedCore(url, core)
-    },
+
     autoLoadImg: function (load) {
         _xy.autoLoadImg(load === true)
     },
+
     string: function () {
         log(this.data)
     },
-    setProgressMsg:function(str){
-        if(!str) return;
-        _xy.setProgressMsg(str);
-    },
-    log: function(str) {
+
+    log: function(str,type) {
         str=str||"";
         if(typeof str !="string") {
             str=JSON.stringify(str);
         }
         console.log("dSpider: "+str)
-        _xy.log(str)
+        _xy.log(str,type||1)
     },
     setLocal: function (k, v) {
         this.local[k]=v

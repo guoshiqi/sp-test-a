@@ -68,19 +68,23 @@ class JavaScriptBridgeImp {
 
     public String getExtraData() {
         Map<String, Object> info = new HashMap<>();
-        info.put("os_version", Build.VERSION.SDK_INT );
+        info.put("os_version", Build.VERSION.RELEASE );
         info.put("os", "android");
-//      info.put("device_info",extra);
-        info.put("webcore", "sys");
+        info.put("sdk_version", DSpider.SDK_VERSION);
+        JSONObject jsonObject = new JSONObject(info);
+        return jsonObject.toString();
+    }
+
+    public String getArguments(){
+        Map<String, Object> info = new HashMap<>();
         JSONObject arguments=null;
         try {
             arguments=new JSONObject(mContxt.arguments);
+            return arguments.toString();
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        info.put("args", arguments);
-        JSONObject jsonObject = new JSONObject(info);
-        return jsonObject.toString();
+        return "{}";
     }
 
 
@@ -170,19 +174,9 @@ class JavaScriptBridgeImp {
         mContxt.getHandler().sendMessage(message);
     }
 
-    public void showLoading(String s) {
-        Message message = new Message();
-        message.what = 4;
-        message.obj = s;
-        mContxt.getHandler().sendMessage(message);
-    }
+    public void setProgressMsg(String msg) {
 
-    public void hideLoading() {
-        Message message = new Message();
-        message.what = 5;
-        mContxt.getHandler().sendMessage(message);
     }
-
 
     public void load(String url, String headers) {
         if (!TextUtils.isEmpty(headers)) {
@@ -198,13 +192,11 @@ class JavaScriptBridgeImp {
         mContxt.autoLoadImg(load);
     }
 
-    public void log(String msg) {
+    public void log(String msg,int type) {
         String str = read("_log");
         save("_log", str + "dSpider: " + msg + "\n\n");
     }
 
-    public void setProgressMsg(String msg) {
 
-    }
 
 }

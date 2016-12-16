@@ -65,6 +65,7 @@ public class SpiderActivity extends AppCompatActivity {
     public   String reportUrl =BASE_URL+"report";
     public  String arguments ="";
     private int max = 100;
+    private boolean showProgress=false;
     private static final String TAG = "SpiderActivity";
 
     public <T extends View> T getView(int viewId) {
@@ -131,15 +132,8 @@ public class SpiderActivity extends AppCompatActivity {
                         max = msg.arg1;
                         break;
                     case 3:
-                        showProgress((boolean) msg.obj);
-                        break;
-                    case 4:
-                        fragment.showInput(false);
-                        showLoadView((String) msg.obj);
-                        break;
-                    case 5:
-                        fragment.showInput(true);
-                        hideLoadView();
+                        showProgress=(boolean) msg.obj;
+                        showProgress(showProgress);
                         break;
                     case 6:
                         showLoadErrorView();
@@ -220,7 +214,7 @@ public class SpiderActivity extends AppCompatActivity {
                 try {
                     URL uri = new URL(BASE_URL+"task?sid="+sid+"&appkey="+appkey+getExtraInfo());
                     HttpURLConnection urlCon = (HttpURLConnection) uri.openConnection();
-                    urlCon.setRequestMethod("GET");
+                    urlCon.setRequestMethod("POST");
                     urlCon.setRequestProperty("X-Requested-With","XMLHttpRequest");
                     urlCon.setConnectTimeout(10000);
                     JSONObject ret=new JSONObject(Helper.inputStream2String(urlCon.getInputStream()));
@@ -266,8 +260,13 @@ public class SpiderActivity extends AppCompatActivity {
 
 
     void showLoadView(String message) {
+        if(showProgress) return;
         loading.setVisibility(View.VISIBLE);
         msg.setText(message);
+    }
+
+    void showLoadView(){
+        showLoadView("正在加载...");
     }
 
     void hideLoadView() {
@@ -308,6 +307,9 @@ public class SpiderActivity extends AppCompatActivity {
     }
 
     public void showProgress(boolean show) {
+        if (show){
+          hideLoadView();
+        }
         fragment.showInput(!show);
         webviewLayout.setVisibility(show ? View.GONE : View.VISIBLE);
         spider.setVisibility(show ? View.VISIBLE : View.GONE);
