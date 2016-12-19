@@ -118,16 +118,13 @@ dSpider("unicom", function(session,env,$){
         } else {
             var thxd = session.get("thxd")
             log("爬取通话详单完毕----------" + JSON.stringify(thxd))
-
             //跳转到服务首页
             window.location.href = "http://wap.10010.com/mobileService/siteMap.htm"
-            /*session.upload(JSON.stringify(thxd))
-            session.finish()
-            session.showProgress(false)*/
         }
     }
 
     function endSpide(thxd) {
+        log("爬取完毕----------" + JSON.stringify(thxd))
         session.upload(JSON.stringify(thxd))
         session.setProgress(session.get("max") - 0)
         session.finish()
@@ -155,10 +152,10 @@ dSpider("unicom", function(session,env,$){
             }
             monthArr.push({ "year": year, "month": month });
         }
-        var max = monthArr.length;
+        var max = monthArr.length + 1;
         //设置月份信息
         session.set("months", monthArr)
-        session.set("max", max + 1)
+        session.set("max", max)
         session.setProgressMax(max)
         log("开始爬取....." + JSON.stringify(monthArr))
         spide()
@@ -182,30 +179,31 @@ dSpider("unicom", function(session,env,$){
             endSpide(thxd)
         }
     } else if(window.location.href.indexOf("t/operationservice/getUserinfo.htm") !=-1 ) {//获取个人信息
+        log("开始爬取用户信息----------")
         var userInfo = {}
         try {
             userInfo["mobile"] = $(".clientInfo4_top").find("p:eq(0)").html().replace(/[\n|\s]/g, "").replace()
-        } cache (e) {
+        } catch (e) {
         }
         try{
             userInfo["name"] = $(".clientInfo4_list").find("li:eq(0)").find("span:eq(1)").html().replace(/[\n|\s]/g, "").replace()
-        } cache (e) {
+        } catch (e) {
         }
         try{
             userInfo["taocan"] = $(".clientInfo4_list").find("li:eq(1)").find("span:eq(1)").html().replace(/[\n|\s]/g, "").replace()
-        } cache (e) {
+        } catch (e) {
         }
         try{
             userInfo["registration_time"] = $(".detail_con.con_ft:eq(0)").find("p:eq(6)").find("span:eq(1)").text().replace(/[\n|\s]/g, "").replace()
-        } cache (e) {
+        } catch (e) {
         }
         try{
             userInfo["idcard_no"] = $(".detail_con.con_ft:eq(1)").find("p:eq(4)").find("span:eq(1)").text().replace(/[\n|\s]/g, "").replace()
-        } cache (e) {
+        } catch (e) {
         }
         try{
             userInfo["household_address"] = $(".detail_con.con_ft:eq(1)").find("p:eq(18)").find("span:eq(1)").text().replace(/[\n|\s]/g, "").replace()
-        } cache (e) {
+        } catch (e) {
         }
         var thxd = session.get("thxd")
         thxd["user_info"] = userInfo
