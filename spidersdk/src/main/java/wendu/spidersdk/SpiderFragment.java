@@ -283,8 +283,18 @@ public class SpiderFragment extends BaseFragment {
 
         @Override
         public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
-            Log.e("dspider sdk:","alert called");
             result.confirm();
+            Dialog alertDialog = new AlertDialog.Builder(context)
+                    .setTitle("提示")
+                    .setMessage(message)
+                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .create();
+            alertDialog.show();
             return true;
         }
 
