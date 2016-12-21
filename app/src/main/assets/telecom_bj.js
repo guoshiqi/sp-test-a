@@ -1,15 +1,6 @@
 log("****************Debug model *******************")
 dSpider("sessionkey", function(session,env,$){
-
-    // session为会话对象
-    // env为平台环境参数
-    // $ 为dQuery
-    //session.upload([string|object])
-    //session.finish() 结束爬取
-
-    log(session,env,$)
-
-    //place your code here!
+    log("current page: "+location.href)
 
 
 // sendRandombySms();
@@ -318,11 +309,19 @@ dSpider("sessionkey", function(session,env,$){
 //    }
 
 
+    var count = 0;
+    var results = [];
 
     if(location.href.indexOf("http://www.189.cn/dqmh/my189/initMy189home.do")!=-1) {
-        waitDomAvailable("a:contains('我的详单')", function(dom,timeSpan) {
+//            session.showProgress(true);
+//            session.setProgressMax(100);
+//            session.setProgress(0);
+//            session.hideLoading();
+
+        log("waiting 我的详单");
+        waitDomAvailable("a:contains('详单')", function(dom,timeSpan) {
             log("wait 我的详单 success");
-            var detailPath=$('a:contains("我的详单")').attr("href");
+            var detailPath=$('a:contains("详单")').attr("href");
             var arrDetailPath = detailPath.split(/[,']/);
             var fastcode="01390638";
             if (arrDetailPath.length > 5) {
@@ -375,45 +374,104 @@ dSpider("sessionkey", function(session,env,$){
     } else if(location.href.indexOf("189.cn/iframe/feequery/detailBillIndex.action")!=-1) {
         waitDomAvailable("#smsRandCode", function(dom,timeSpan) {
             log("wait success");
+//            session.setProgress(10);
 
-            var userDetailLst = $('#userDetailLst');//the element I want to monitor
-            userDetailLst.bind('DOMNodeInserted', function(e) {
-                if($(".ued-table tbody").length>=1) {
-                    userDetailLst.unbind('DOMNodeInserted');
-//                    alert('element now contains: ' + userDetailLst.html());
+//            var userDetailLst = $('#userDetailLst');//the element I want to monitor
+//            userDetailLst.bind('DOMNodeInserted', function(e) {
+//                if($(".ued-table tbody").length>=1) {
+//                    userDetailLst.unbind('DOMNodeInserted');
+//
+//                    var now = new Date();
+//
+//                     var year;
+//                     var month;
+//                     var endDate;
+//                     var billDate;
+//                     for(var i=now.getMonth()+1;i>=now.getMonth()-5;i--){
+//                         if(i==now.getMonth()+1) {
+//                             year=now.getFullYear();
+//                             month=i;
+//                             endDate=now.getDate();
+//                         } else {
+//                             billDate = new Date(now.getFullYear(),i,0);
+//                             year=billDate.getFullYear();
+//                             month=billDate.getMonth()+1;
+//                             endDate=billDate.getDate();
+//                         }
+//                         if(month < 10){
+//                             month = "0" + month;
+//                         }
+//                         console.log(year + "年" + month + "月" + "|" + endDate);
+//                         loadData(year + "年" + month + "月", endDate, 1)
+//                     }
+//                }
+//
+//            });
+//            getRandombySms();
+//            sendRandombySms();
 
+            waitVarAvailable(func_rootpath, function (timeSpan) {
+                log("wait func_rootpath success");
+                session.setProgress(16);
+                var now = new Date();
 
-                    var now = new Date();
-
-                    var year;
-                    var month;
-                    var endDate;
-                    var billDate;
-                    for(var i=now.getMonth()+1;i>=now.getMonth()-5;i--){
-                        if(i==now.getMonth()+1) {
-                            year=now.getFullYear();
-                            month=i;
-                            endDate=now.getDate();
-                        } else {
-                            billDate = new Date(now.getFullYear(),i,0);
-                            year=billDate.getFullYear();
-                            month=billDate.getMonth()+1;
-                            endDate=billDate.getDate();
-                        }
-                        if(month < 10){
-                            month = "0" + month;
-                        }
-                        console.log(year + "年" + month + "月" + "|" + endDate);
-                        loadData(year + "年" + month + "月", endDate, 1)
-                    }
-                }
-
+                 var year;
+                 var month;
+                 var endDate;
+                 var billDate;
+//                 var progressMap = new Map();
+                 for(var i=now.getMonth()+1;i>=now.getMonth()-5;i--){
+                     if(i==now.getMonth()+1) {
+                         year=now.getFullYear();
+                         month=i;
+                         endDate=now.getDate();
+                     } else {
+                         billDate = new Date(now.getFullYear(),i,0);
+                         year=billDate.getFullYear();
+                         month=billDate.getMonth()+1;
+                         endDate=billDate.getDate();
+                     }
+                     if(month < 10){
+                         month = "0" + month;
+                     }
+                     var result = new Result();
+                     result.month = year + "年" + month + "月";
+                     result.list = [];
+                     results.push(result);
+//                     progressMap.put(month, 0);
+                     console.log(year + "年" + month + "月" + "|" + endDate);
+                     loadData(year + "年" + month + "月", endDate, 1)
+                 }
+            }, function () {
+                log("wait func_rootpath fail")
             });
-
-            sendRandombySms();
         },function() {
             log("wait fail");
             log($('#smsRandCode').val());
+        });
+    }
+
+    function getRandombySms() {
+        $.ajax({
+            type: "POST",
+            url: "/iframe/feequery/smsRandCodeSend.action",
+            cache: false,
+            data: {accNum:$("#qryAccNo").html()},
+            dataType: "json",
+            success: function (json) {
+
+                if (json.tip == null || json.tip == "") {
+                    log("sms:"+json.SRandomCode);
+                    //成功后,要隐藏,还原
+                    //                        timer_count = setInterval(countNum, 1000);
+                    //                        alert("随机码短信发送成功，请查收。");
+                } else {//失败了提示和计时器隐藏,链接显示
+                    alert(json.tip);
+                }
+            },
+            error: function (json) {
+                alert("对不起，随机码短信发送失败！请稍后重试。");
+            }
         });
     }
 
@@ -433,33 +491,105 @@ dSpider("sessionkey", function(session,env,$){
             },
             dataType: "html",
             success: function(page){
-                var s="";
-                $("<div>").append($(page)).find(".ued-table tbody tr:gt(0):not(.trlast)").each(function(i){
-                    log("class name:" + $(this).class);
-                    if($(this).class) {
-                        return true;
+
+                for(var j = 0; j < results.length; ++j) {
+                    if(results[j].month == month) {
+//                        var s="";
+                        $("<div>").append($(page)).find(".ued-table tbody tr:gt(0):not(.trlast)").each(function(k){
+                            log("class name:" + $(this).class);
+                            if($(this).class) {
+                                return true;
+                            }
+                            var record = new Record();
+                            $(this).children("td").each(function(i){
+                                switch(i) {
+                                    case 1:
+                                        record.callType = $(this).text();
+                                        break;
+                                    case 2:
+                                        record.callingType = $(this).text();
+                                        break;
+                                    case 3:
+                                        record.callLoc = $(this).text();
+                                        break;
+                                    case 4:
+                                        record.phone = $(this).text();
+                                        break;
+                                    case 5:
+                                        record.begin = $(this).text();
+                                        break;
+                                    case 6:
+                                        record.baseCost = $(this).text();
+                                        break;
+                                    case 7:
+                                        record.longCost = $(this).text();
+                                        break;
+                                    case 8:
+                                        record.duration = $(this).text();
+                                        break;
+                                    case 9:
+                                        record.totalCost = $(this).text();
+                                        break;
+                                }
+                                if(i == 1) {
+                                    log("i==1:" + $(this).text());
+                                }
+
+//                                s+="\t"+$(this).text();
+                            });
+                            results[j].list.push(record);
+//                            s+="\n"
+                        });
+                        content = session.get(month);
+                        if(pageNum <= 1) {
+                            content=s;
+                        } else {
+                            content+=s;
+                        }
+                        session.set(month,content);
+                        if($("<div>").append($(page)).find('a:contains("下一页")').length>=1){
+                            loadData(month,endTime,pageNum +1);
+                        } else {
+
+                            ++count;
+                            log(content);
+                            if(count >= 7) {
+                                session.upload(results);
+                                session.finish();
+                            }
+                        }
                     }
-                    $(this).children("td").each(function(i){
-                        s+="\t"+$(this).text();
-                    }); s+="\n"
-                });
-                content = session.get(month);
-                if(pageNum <= 1) {
-                    content=s;
-                } else {
-                    content+=s;
                 }
-                session.set(month,content);
-                if($("<div>").append($(page)).find('a:contains("下一页")').length>=1){
-                    loadData(month,endTime,pageNum +1);
-                } else {
-                    log(content);
-                }
+
+//                var progress = progressMap.get(month);
+//                progress = progress+2;
+//                if(progress > 12) {
+//                    progress = 12;
+//                }
+//                progressMap.put(month, progress);
+
             },
             error:function(){
                 alert("对不起，详单记录查询失败，请稍后重试！");
             }
         });
+    }
+
+
+    function waitVarAvailable(variable, success, fail) {
+        var timeout = 20000;
+        var t = setInterval(function () {
+            timeout -= 100;
+            log("timeout" + timeout);
+            if(variable != undefined) {
+                clearInterval(t)
+                success(10000 - timeout)
+            } else if (timeout == 0) {
+                clearInterval(t)
+                var f = fail || DomNotFindReport;
+                f(selector)
+            }
+        }, 100);
     }
 
 
@@ -526,6 +656,23 @@ dSpider("sessionkey", function(session,env,$){
 //            log($('#smsRandCode').val());
 //        });
 //    });
+
+function Result() {
+    var month;
+    var list;
+}
+
+function Record() {
+    var callType;
+    var callingType;
+    var callLoc;
+    var phone;
+    var begin;
+    var baseCost;
+    var longCost;
+    var duration;
+    var totalCost;
+}
 
 
 })
