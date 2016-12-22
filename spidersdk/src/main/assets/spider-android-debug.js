@@ -1,7 +1,6 @@
 /**
  * Created by du on 16/9/1.
  */
-var _su="local script";
 String.prototype.format = function () {
     var args = Array.prototype.slice.call(arguments);
     var count = 0;
@@ -18,12 +17,16 @@ String.prototype.empty = function () {
     return this.trim() === "";
 };
 
+function _logstr(str){
+ str=str||" "
+ return typeof str=="object"?JSON.stringify(str):(new String(str)).toString()
+}
 function log(str) {
     var s= window.curSession
     if(s){
         s.log(str)
     }else {
-        console.log("dSpider: "+typeof str=="string"?str:JSON.stringify(str))
+        console.log("dSpider: "+_logstr(str))
     }
 }
 
@@ -274,10 +277,7 @@ DataSession.prototype = {
         _xy.setProgressMsg(str);
     },
     log: function(str) {
-        str=str||"";
-        if(typeof str !="string") {
-            str=JSON.stringify(str);
-        }
+        str=_logstr(str);
         console.log("dSpider: "+str)
         _xy.log(str)
     },
