@@ -75,7 +75,7 @@ public class SpiderFragment extends BaseFragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             CookieManager.getInstance().setAcceptThirdPartyCookies(mWebView,true);
         }
-        mWebView.getSettings().setAllowFileAccess(false);
+        settings.setAllowFileAccess(true);
         mWebView.getSettings().setAppCacheEnabled(false);
         settings.setSavePassword(false);
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
@@ -89,7 +89,6 @@ public class SpiderFragment extends BaseFragment {
         loadUrl(mUrl);
         return rootView;
     }
-
 
 
     private void showLoadProgress() {
@@ -188,7 +187,6 @@ public class SpiderFragment extends BaseFragment {
         @Override
         public WebResourceResponse shouldInterceptRequest(final WebView view, String url) {
              WebResourceResponse response = super.shouldInterceptRequest(view, url);
-
             if (url.indexOf("xiaoying/jquery.min.js") != -1) {
                 try {
                     //加载本地jquery
@@ -201,7 +199,7 @@ public class SpiderFragment extends BaseFragment {
             } else if (url.indexOf("xiaoying/inject.php") != -1) {
                 if (Helper.isDebug) {
                     try {
-                        response=new WebResourceResponse(contentType, "UTF-8", Helper.getDebugScript(getContext()));
+                      response=new WebResourceResponse(contentType, "UTF-8", Helper.getDebugScript(getContext()));
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
