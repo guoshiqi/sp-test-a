@@ -203,6 +203,7 @@ dSpider("unicom", function(session,env,$){
             userInfo["household_address"] = $(".detail_con.con_ft:eq(1)").find("p:eq(18)").find("span:eq(1)").text().replace(/[\n|\s]/g, "").replace()
         } catch (e) {
         }
+        log("爬取用户信息结束-----" + JSON.stringify(userInfo))
         var thxd = session.get("thxd")
         thxd["user_info"] = userInfo
         endSpide(thxd)
