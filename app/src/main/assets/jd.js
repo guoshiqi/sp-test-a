@@ -1,6 +1,5 @@
 
 dSpider("jd", function(session,env,$){
-    log("current page: "+location.href)
     var re = /sid=(.+)$/ig;
     var infokey = "infokey";
     var sid = "";
@@ -27,7 +26,6 @@ dSpider("jd", function(session,env,$){
             session.set("sid",  sid);
          }
 
-        // log(JSON.stringify(new info({},{},{})));
         session.set(infokey, new info({},{},{}));
         globalInfo = session.get(infokey);
         globalInfo.base_info.username  = $("[report-eventid$='MCommonHTail_Account']").text().replace(/\n/g,"").replace(/\t/g,"");
@@ -40,7 +38,7 @@ dSpider("jd", function(session,env,$){
         session.setProgress(20);
 
         globalInfo = session.get(infokey);
-        log("globalinfo" + globalInfo);
+
         global_contact_info = new contact_info([]);
         var taskAddr = [];
         var urlarray = $(".ia-r");
@@ -91,7 +89,6 @@ dSpider("jd", function(session,env,$){
                         task.push($.each(d.orderList,function(i,e){
                                            $.get("http://home.m.jd.com/newAllOrders/queryOrderDetailInfo.action?orderId="+ d.orderList[i].orderId+"&from=newUserAllOrderList&passKey="+d.passKeyList[i]+"&sid="+sid,
                                                                                              function(response,status){
-                                                                                                   log("xxxxxstatus" + status);
                                                                                                    var addr = $("<div>").append($(response)).find(".step2-in-con").text();
                                                                                                    var orderitem = new order(d.orderList[i].orderId,d.orderList[i].dataSubmit,d.orderList[i].price,addr);
 
@@ -101,12 +98,8 @@ dSpider("jd", function(session,env,$){
                                                                                                        var name = $("<div>").append(products[k]).find(".sitem-m-txt").text();
                                                                                                        var price = $("<div>").append(products[k]).find(".sitem-r").text();
                                                                                                        var num = $("<div>").append(products[k]).find(".s3-num").text();
-                                                                                                       log("xxxxxstatus" + "push1");
                                                                                                        orderitem.products.push(new product(name,  num ,price));
                                                                                                    });
-                                                                                                   log("xxxxxstatus" + Date.parse(new Date()));
-                                                                                                    log("xxxxxstatus" + ((new Date(orderitem.time.split(" ")[0])).getTime() + max_order_date * 24 * 60 * 60 * 1000));
-                                                                                                   log("xxxxxstatus" +globalInfo.order_info.order_detail.length);
                                                                                                    if(Date.parse(new Date()) < ((new Date(orderitem.time.split(" ")[0])).getTime() + max_order_date * 24 * 60 * 60 * 1000)){
                                                                                                            if(globalInfo.order_info.order_detail.length < max_order_num){
                                                                                                                  globalInfo.order_info.order_detail.push(orderitem);
@@ -170,7 +163,6 @@ dSpider("jd", function(session,env,$){
     function logout(){
 
         alert("爬取订单总计:" + session.get(infokey).order_info.order_detail.length);
-            log("xxxxlength" + session.get(infokey).order_info.order_detail.length);
         location.href = "https://passport.m.jd.com/user/logout.action?sid="+session.get("sid");
         session.setProgress(100);
         session.upload(session.get(infokey));
