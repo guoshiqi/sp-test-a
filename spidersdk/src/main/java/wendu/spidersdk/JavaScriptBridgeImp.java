@@ -166,7 +166,7 @@ import java.util.Map;
         mContxt.autoLoadImg(load);
     }
 
-    public void log(String msg){
+    public void log(String msg,int type){
         String str=read("_log");
         save("_log",str+"dSpider: "+msg+"\n\n");
     }

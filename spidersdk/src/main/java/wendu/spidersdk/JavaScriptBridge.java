@@ -105,8 +105,8 @@ import android.webkit.JavascriptInterface;
     }
 
     @JavascriptInterface
-    public void log(String msg) {
-        jsbImp.log(msg);
+    public void log(String msg,int type) {
+        jsbImp.log(msg,type);
     }
 
     @JavascriptInterface
