@@ -9,8 +9,8 @@ import android.webkit.JavascriptInterface;
  class JavaScriptBridge {
 
     private JavaScriptBridgeImp jsbImp;
-    public JavaScriptBridge(Context mContext) {
-        jsbImp=new JavaScriptBridgeImp(mContext);
+    public JavaScriptBridge(DSWebview webview, JavaScriptHandler javaScriptHandler) {
+        jsbImp=new JavaScriptBridgeImp(webview,javaScriptHandler);
     }
 
     @JavascriptInterface
@@ -24,8 +24,8 @@ import android.webkit.JavascriptInterface;
     }
 
     @JavascriptInterface
-    public String get(String sessionKey) {
-        return jsbImp.get(sessionKey);
+    public String get(String key) {
+        return jsbImp.get(key);
     }
 
     @JavascriptInterface
@@ -61,10 +61,6 @@ import android.webkit.JavascriptInterface;
         jsbImp.setProgressMax(progress);
     }
 
-    @JavascriptInterface
-    public int getProgress() {
-        return jsbImp.getProgress();
-    }
 
     @JavascriptInterface
     public void finish(String name,int res,String msg) {

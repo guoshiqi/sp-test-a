@@ -18,7 +18,6 @@ import rx.schedulers.Schedulers;
 import wendu.common.base.BaseActivity;
 import wendu.common.utils.KvStorage;
 import wendu.spidersdk.DSpider;
-import wendu.spidersdk.SpiderActivity;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
@@ -57,6 +56,24 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
               KvStorage.getInstance().edit().putBoolean("debug", isDebug).commit();
             }
         });
+
+//        DSpiderView dSpiderView= getView(R.id.dspier_view);
+//        dSpiderView.start(1, null, new SpiderEventListener() {
+//            @Override
+//            public void onResult(String sessionKey, List<String> data) {
+//                super.onResult(sessionKey, data);
+//            }
+//
+//            @Override
+//            public void onProgress(int progress, int max) {
+//                super.onProgress(progress, max);
+//            }
+//
+//            @Override
+//            public void onError(int code, String msg) {
+//                super.onError(code, msg);
+//            }
+//        });
     }
 
     void openJd() {
@@ -71,16 +88,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     void openUnicomCall() {
-//        String baseUrl="http://wap.10010.com/t/query/getPhoneByDetailTip.htm";
-//        startDspider(baseUrl, scriptUrl+"unicom","联通通话详单爬去", "unicom.js");
+        String baseUrl="http://wap.10010.com/t/query/getPhoneByDetailTip.htm";
+        startDspider(1,"联通通话详单爬去","unicom.js", scriptUrl+"unicom");
     }
 
     void openEmail() {
-        startDspider(1,"","");
+        startDspider(1,"测试", "test.js","https://www.baidu.com");
     }
 
-    void startDspider(int sid,String debugSrcFileName,String debugStartUrl) {
-        DSpider.build(this,"1")
+    void startDspider(int sid,String title,String debugSrcFileName,String debugStartUrl) {
+        DSpider.build(this)
                 //.addArgument("test",7)
                 .setDebug(isDebug)
                 .start(sid,debugSrcFileName,debugStartUrl);

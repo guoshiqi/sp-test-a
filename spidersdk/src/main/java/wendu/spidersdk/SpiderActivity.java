@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -44,7 +45,7 @@ import java.util.Map;
 public class SpiderActivity extends AppCompatActivity {
 
     View container;
-    FrameLayout webviewLayout;
+    RelativeLayout webviewLayout;
     RelativeLayout spider;
     CircleProgress workProgress;
     TextView percentage;
@@ -57,12 +58,11 @@ public class SpiderActivity extends AppCompatActivity {
     RelativeLayout loading;
     WaveProgress waveProgress;
     TextView msg;
+    TextView progressMsg;
     ViewGroup toobar;
 
-    public static String debugSrc="";
-    private  String  BASE_URL=DSpider.BASE_URL;
-    private   String injectUrl = BASE_URL+"script";
-    public   String reportUrl =BASE_URL+"report";
+    private boolean isProgressShow=false;
+    private DSWebview mWebView;
     public  String arguments ="";
     private int max = 100;
     private boolean showProgress=false;
@@ -78,7 +78,7 @@ public class SpiderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spider);
         container = getView(R.id.container);
-        webviewLayout = getView(R.id.fragment);
+        webviewLayout = getView(R.id.webview_container);
         waveProgress=getView(R.id.wave);
         waveProgress.setProgress(90);
         waveProgress.setAmplitudeRatio(.05f);
@@ -102,42 +102,28 @@ public class SpiderActivity extends AppCompatActivity {
         errorLayout = getView(R.id.error_layout);
         loading = getView(R.id.loading);
         msg = getView(R.id.msg);
+        progressMsg=getView(R.id.progress_msg);
         fm = getSupportFragmentManager();
         workProgress.setForegroundColor(Color.argb(70,19,94,148),Color.argb(170,19,94,148));
 
         String title = getIntent().getStringExtra("title");
         arguments =getIntent().getStringExtra("arguments");
         titleTv.setText(TextUtils.isEmpty(title) ? "爬取" : title);
-        Helper.isDebug = getIntent().getBooleanExtra("debug", false);
-        if (Helper.isDebug) {
-            debugSrc=getIntent().getStringExtra("debugSrc");
-            open(getIntent().getStringExtra("startUrl"));
+        boolean isDebug= getIntent().getBooleanExtra("debug", false);
+        init();
+        if (isDebug) {
+            mWebView.loadUrl(getIntent().getStringExtra("startUrl"));
+            mWebView.setDebugSrc(getIntent().getStringExtra("debugSrc"));
+            mWebView.setDebug(true);
         }else {
-            init(getIntent().getIntExtra("sid",-1),getIntent().getStringExtra("appkey"));
+            open(getIntent().getIntExtra("sid",-1));
         }
-
-
 
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
                 switch (msg.what) {
-                    case 1:
-                        workProgress.setProgress(msg.arg1);
-                        percentage.setText((int) (msg.arg1 / (float) max * 100) + "%");
-                        break;
-                    case 2:
-                        workProgress.setMax(msg.arg1);
-                        max = msg.arg1;
-                        break;
-                    case 3:
-                        showProgress=(boolean) msg.obj;
-                        showProgress(showProgress);
-                        break;
-                    case 6:
-                        showLoadErrorView();
-                        break;
                     case 7:
                         Intent intent = new Intent();
                         try {
@@ -187,55 +173,139 @@ public class SpiderActivity extends AppCompatActivity {
 
     }
 
-
-
-    //用来存储设备信息和异常信息
-    private String  getExtraInfo() {
-        String versionName ="";
-        try {
-            PackageManager pm = getPackageManager();
-            PackageInfo pi = pm.getPackageInfo(getPackageName(), PackageManager.GET_ACTIVITIES);
-            if (pi != null) {
-                versionName = pi.versionName == null ? "" : pi.versionName;
+    public void init() {
+        mWebView= (DSWebview) findViewById(R.id.webview);
+        mWebView.setWebEventListener(new DSWebview.WebEventListener() {
+            @Override
+            void onPageStart(String url) {
+                if(!isProgressShow) {
+                    showLoadView();
+                }
+                super.onPageStart(url);
             }
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.e("", "an error occured when collect package info", e);
-        }
-        return String.format("&app_version=%s&sdk_version=%s&device_id=%d",
-                versionName,DSpider.SDK_VERSION,DSpider.DEVICE_ID);
+
+            @Override
+            void onReceivedError(String msg) {
+                super.onReceivedError(msg);
+                errorBack(msg,DSpider.Result.STATE_WEB_ERROR);
+            }
+
+            @Override
+            void onPageFinished(String url) {
+                hideLoadView();
+                super.onPageFinished(url);
+            }
+
+            @Override
+            void onSdkServerError(Exception e) {
+                showDialog("服务器罢工了！"+e.getMessage());
+                super.onSdkServerError(e);
+            }
+        });
+
+        mWebView.addJavascriptInterface(new JavaScriptBridge(mWebView, new JavaScriptHandler() {
+            @Override
+            public void setProgress(int progress) {
+                workProgress.setProgress(progress);
+                percentage.setText((int) (progress / (float) max * 100) + "%");
+            }
+
+            @Override
+            public void setProgressMax(int maxProgress) {
+                workProgress.setMax(maxProgress);
+                max=maxProgress;
+
+            }
+
+            @Override
+            public void setProgressMsg(String msg) {
+                progressMsg.setText(msg);
+                super.setProgressMsg(msg);
+            }
+
+            @Override
+            public void showProgress(boolean show) {
+                isProgressShow=show;
+                SpiderActivity.this.showProgress(show);
+            }
+
+            @Override
+            public void finish(DSpider.Result result) {
+                backResult(result);
+            }
+
+            @Override
+            public String getArguments() {
+                if(TextUtils.isEmpty(arguments)) {
+                    arguments="{}";
+                }
+                return  arguments;
+            }
+        }));
 
     }
 
 
-    void init(final int sid, final String appkey){
-        new Thread(new Runnable() {
+
+
+    public void open(final int sid) {
+        Helper.init(this, new InitStateListener() {
             @Override
-            public void run() {
+            public void onSucceed(int deviceId) {
                 try {
-                    URL uri = new URL(BASE_URL+"task?sid="+sid+"&appkey="+appkey+getExtraInfo());
-                    HttpURLConnection urlCon = (HttpURLConnection) uri.openConnection();
-                    urlCon.setRequestMethod("POST");
-                    urlCon.setRequestProperty("X-Requested-With","XMLHttpRequest");
-                    urlCon.setConnectTimeout(10000);
-                    JSONObject ret=new JSONObject(Helper.inputStream2String(urlCon.getInputStream()));
-                    int code=ret.getInt("code");
-                    if(code!=0){
-                        showDialog(ret.getString("msg"));
-                    }else {
-                        ret= ret.getJSONObject("data");
-                        int taskId=ret.getInt("id");
-                        String common="?id="+taskId+"&appkey="+appkey;
-                        injectUrl=injectUrl+common+"&platform=1";
-                        reportUrl = reportUrl +common;
-                        open(ret.getString("startUrl"));
+                    String url = DSpider.BASE_URL + "task?sid=" + sid + Helper.getExtraInfo(SpiderActivity.this);
+                    JSONObject ret = new JSONObject(Helper.post(url, ""));
+                    int code = ret.getInt("code");
+                    if (code != 0) {
+                       showDialog(ret.getString("msg"));
+                       errorBack(ret.getString("msg"),DSpider.Result.STATE_ERROR_MSG);
+                    } else {
+                        ret = ret.getJSONObject("data");
+                        int taskId = ret.getInt("id");
+                        String common = "?id=" + taskId + "&package=" + getPackageName() + "&appkey=" + ret.getInt("appkey");
+                        mWebView.setInjectUrl(DSpider.BASE_URL + "script" + common + "&platform=1");
+                        mWebView.setReportUrl(DSpider.BASE_URL + "report" + common);
+                        mWebView.loadUrl(ret.getString("startUrl"));
                     }
 
                 } catch (Exception e) {
                     e.printStackTrace();
                     showDialog(e.getMessage());
+                    errorBack(e.getLocalizedMessage(),DSpider.Result.STATE_DSPIDER_SERVER_ERROR);
                 }
             }
-        }).start();
+
+            @Override
+            public void onFail(final String msg, final int code) {
+               showDialog(msg);
+               errorBack(msg,code);
+            }
+        });
+    }
+
+    private void errorBack(String msg,int code){
+        DSpider.Result result=new  DSpider.Result("",null,msg,code);
+        backResult(result);
+    }
+
+    private void backResult(DSpider.Result result){
+        Intent intent = new Intent();
+        try {
+            String path = getCacheDir() + "/spider.dat";
+            File file = new File(path);
+            file.delete();
+            file.createNewFile();
+            FileOutputStream fileOutputStream = new FileOutputStream(file.toString());
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(result);
+            intent.putExtra("result", path);
+            setResult(Activity.RESULT_OK, intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+            setResult(Activity.RESULT_CANCELED, intent);
+        }
+
+        SpiderActivity.this.finish();
     }
 
      public void showDialog(final String msg){
@@ -273,63 +343,18 @@ public class SpiderActivity extends AppCompatActivity {
         loading.setVisibility(View.GONE);
     }
 
-    void showLoadErrorView() {
-        errorLayout.setVisibility(View.VISIBLE);
-    }
-
-    public void open(final String url) {
-        webviewLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                fragment = SpiderFragment.newInstance(url, injectUrl);
-                startFragment();
-            }
-        });
-
-    }
-
-    public void startFragment() {
-        fm.beginTransaction()
-                .replace(R.id.fragment, fragment, "")
-                .commit();
-    }
-
-    public void loadUrl(String url) {
-        fragment.loadUrl(url);
-    }
-
-    public void loadUrl(String url, Map<String, String> additionalHttpHeaders){
-        fragment.loadUrl(url,additionalHttpHeaders);
-    }
-
-    public void setUserAgent(String userAgent) {
-        fragment.setUserAgent(userAgent);
+    public void showInput(boolean show){
+      mWebView.setDescendantFocusability(show?ViewGroup.FOCUS_AFTER_DESCENDANTS:ViewGroup.FOCUS_BLOCK_DESCENDANTS);
     }
 
     public void showProgress(boolean show) {
         if (show){
           hideLoadView();
         }
-        fragment.showInput(!show);
+        showInput(!show);
         webviewLayout.setVisibility(show ? View.GONE : View.VISIBLE);
         spider.setVisibility(show ? View.VISIBLE : View.GONE);
         toobar.setVisibility(show ? View.GONE : View.VISIBLE);
-    }
-
-
-    public CircleProgress getProgress() {
-        return workProgress;
-    }
-
-
-    public Handler getHandler() {
-        return handler;
-    }
-
-    public void showBottomToast(String msg) {
-        Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.BOTTOM, 0, 0);
-        toast.show();
     }
 
     @Override
@@ -384,16 +409,6 @@ public class SpiderActivity extends AppCompatActivity {
         } else {
             Log.e(TAG, "delete file no exists " + file.getAbsolutePath());
         }
-    }
-
-    public void  autoLoadImg(final boolean load){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                fragment.autoLoadImg(load);
-            }
-        });
-
     }
 
     @Override

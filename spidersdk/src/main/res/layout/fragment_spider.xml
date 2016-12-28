@@ -11,7 +11,7 @@
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_height="2dp" />
 
-    <WebView
+    <wendu.spidersdk.DSWebview
         android:id="@+id/webview"
         android:layout_weight="1"
         android:layout_width="match_parent"

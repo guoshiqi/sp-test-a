@@ -39,19 +39,19 @@ public class DSpider implements Serializable{
     private Activity ctx;
     private HashMap<String,Object> arguments=new HashMap<>();
     private boolean isDebug=false;
-    private String appKey="";
-    public static int REQUEST=2000;
     public static int DEVICE_ID;
-    public static String SDK_VERSION="1.0";
-    public static String  BASE_URL="http://172.19.23.62/dSpider-web/api/";
+    public static int REQUEST=2000;
+    public static final String SDK_VERSION="1.0";
+    public static final String  BASE_URL="http://172.19.23.62/dSpider-web/1.0/";
+    //public static final String  BASE_URL="http://192.168.1.24/dSpider-web/1.0/";
 
-    private DSpider(Activity ctx,String appKey){
+
+    private DSpider(Activity ctx){
         this.ctx=ctx;
-        this.appKey=appKey;
     }
 
-    public static DSpider build(Activity ctx,String appKey){
-        return new DSpider(ctx,appKey);
+    public static DSpider build(Activity ctx){
+        return new DSpider(ctx);
     }
 
     public  static Result getLastResult(Context ctx, boolean clearResultCache){
@@ -93,43 +93,26 @@ public class DSpider implements Serializable{
         start(sid,"","");
     }
 
+
+
     public void start(final int sid,  final String debugSrcFileName, final String debugStartUrl) {
         if (isDebug&& (TextUtils.isEmpty(debugSrcFileName)||TextUtils.isEmpty(debugStartUrl))){
             showDialog("该业务不持调试或却少调试参数");
             return;
         }
-        final int device_id=ctx.getSharedPreferences("spider", Context.MODE_PRIVATE).getInt("device_id",0);
-        if(device_id==0){
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        //String extra= URLEncoder.encode(collectDeviceInfo(),"UTF-8");
-                        URL uri = new URL(BASE_URL+"device/save?"+collectDeviceInfo());
-                        HttpURLConnection urlCon = (HttpURLConnection) uri.openConnection();
-                        urlCon.setRequestMethod("GET");
-                        urlCon.setRequestProperty("X-Requested-With","XMLHttpRequest");
-                        urlCon.setConnectTimeout(10000);
-                        JSONObject ret=new JSONObject(Helper.inputStream2String(urlCon.getInputStream()));
-                        int code=ret.getInt("code");
-                        if(code!=0){
-                            showDialog(ret.getString("msg"));
-                        }else {
-                            DEVICE_ID=ret.getInt("data");
-                            ctx.getSharedPreferences("spider", Context.MODE_PRIVATE).edit().putInt("device_id",DEVICE_ID).commit();
-                            start_(sid,  debugSrcFileName, debugStartUrl);
-                        }
+        Helper.init(ctx, new InitStateListener() {
+            @Override
+            public void onSucceed(int deviceId) {
+                DEVICE_ID=deviceId;
+                start_(sid, debugSrcFileName, debugStartUrl);
+            }
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        showDialog(e.getMessage());
-                    }
-                }
-            }).start();
-        }else {
-           DEVICE_ID=device_id;
-           start_(sid, debugSrcFileName, debugStartUrl);
-        }
+            @Override
+            public void onFail(String msg,int code) {
+              showDialog(msg);
+            }
+        });
+
     }
 
     private void showDialog(final String msg) {
@@ -157,7 +140,6 @@ public class DSpider implements Serializable{
         //intent.putExtra("title", title);
         intent.putExtra("debug", isDebug);
         intent.putExtra("sid",sid);
-        intent.putExtra("appkey",appKey);
         intent.putExtra("debugSrc",debugSrcFileName);
         intent.putExtra("startUrl",debugStartUrl);
         intent.putExtra("arguments",new JSONObject(arguments).toString());
@@ -166,52 +148,26 @@ public class DSpider implements Serializable{
 
 
     public static class Result implements Serializable{
+        public static final int STATE_SUCCEED=0;
+        public static final int STATE_WEB_ERROR=1;
+        public static final int STATE_SCRIPT_ERROR=2;
+        public static final int STATE_PAGE_CHANGED=3;
+        public static final int STATE_DSPIDER_SERVER_ERROR=4;
+        public static final int STATE_ERROR_MSG=5;
         public List<String>datas;
         public String sessionKey;
         public String errorMsg;
-        public Result(String sessionKey, List<String>datas, String errorMsg){
+        public int  code;
+        public Result(String sessionKey, List<String>datas, String errorMsg,int code){
             this.sessionKey=sessionKey;
             this.datas=datas;
             this.errorMsg=errorMsg;
+            this.code=code;
         }
     }
 
 
-    public  String getDeviceId() {
-        try{
-            TelephonyManager tm = (TelephonyManager) ctx
-                    .getSystemService(Context.TELEPHONY_SERVICE);
 
-            String device_id = tm.getDeviceId();
 
-            WifiManager wifi = (WifiManager) ctx.getSystemService(Context.WIFI_SERVICE);
-
-            String mac = wifi.getConnectionInfo().getMacAddress();
-
-            if( TextUtils.isEmpty(device_id) ){
-                device_id = mac;
-            }
-
-            if( TextUtils.isEmpty(device_id) ){
-                device_id = android.provider.Settings.Secure.getString(ctx.getContentResolver(),android.provider.Settings.Secure.ANDROID_ID);
-            }
-
-            return device_id;
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return UUID.randomUUID().toString();
-    }
-
-    //用来存储设备信息和异常信息
-    private String  collectDeviceInfo() {
-        try {
-            return String.format("os_version=%s&os_type=1&model=%s&identifier=%s",
-                    Build.VERSION.RELEASE,URLEncoder.encode(Build.MODEL,"UTF-8"),getDeviceId());
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
 
 }

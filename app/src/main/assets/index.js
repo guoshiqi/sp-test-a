@@ -1,13 +1,8 @@
 
-dSpider("sessionkey", function(session,env,$){
-   // session为会话对象
-   // env为平台环境参数
-   // $ 为dQuery
-   //session.upload([string|object])
-   //session.finish() 结束爬取
+dSpider("test", function(session,env,$) {
 
-   log(session,env,$)
-
-
+ log(env)
+ session.upload("Hi, I am the test data!")
+ session.finish()
 
 })
