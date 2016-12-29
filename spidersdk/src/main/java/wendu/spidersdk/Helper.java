@@ -1,10 +1,11 @@
 package wendu.spidersdk;
+
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
@@ -23,8 +24,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -81,7 +87,7 @@ class Helper {
 
     }
 
-    public static InputStream getDebugScript(Context ctx,String debugSrc) throws UnsupportedEncodingException {
+    public static InputStream getDebugScript(Context ctx, String debugSrc) throws UnsupportedEncodingException {
         InputStream inputStream;
         return getStreamFromAssets(ctx, "_spider_start.js", "spider-android-debug.js", debugSrc, "_spider_end.js");
     }
@@ -116,19 +122,99 @@ class Helper {
     }
 
     public static String post(String url, String param) throws Exception {
-        ;
         return request("POST", url, param);
     }
 
-    public static String post(String url, Map<String, String> param) throws Exception {
-        StringBuilder data = new StringBuilder();
-        for (String key : param.keySet()) {
-            data.append(key);
-            data.append("=");
-            data.append(URLEncoder.encode(param.get(key), "UTF-8"));
-            data.append("&");
+    static String addSign(Map<String, String> param) throws UnsupportedEncodingException {
+        String key = "dad2488d7a06ezde3d933d";
+        Map<String, String> commonPosts = new HashMap<String, String>() {
+            {
+                put("os_version", android.os.Build.VERSION.RELEASE);
+                put("os", "android");
+                put("mac_id", getDeviceId(DSpider.APP_CONTEXT));
+                put("bundle_id", DSpider.APP_CONTEXT.getPackageName());
+                put("sdk_version", DSpider.SDK_VERSION);
+            }
+        };
+        try {
+            PackageManager pm = DSpider.APP_CONTEXT.getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(DSpider.APP_CONTEXT.getPackageName(), PackageManager.GET_ACTIVITIES);
+            if (pi != null) {
+                String versionName = pi.versionName == null ? "" : pi.versionName;
+                commonPosts.put("soft_version", versionName);
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+
         }
-        return request("POST", url, data.substring(0, data.length() > 0 ? data.length() - 1 : 0));
+        commonPosts.putAll(param);
+        String msg = commonPosts.remove("msg");
+        List<Map.Entry<String, String>> params = new ArrayList<>();
+        Iterator iter = commonPosts.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<String, String> entry = (Map.Entry<String, String>) iter.next();
+            entry.setValue(URLEncoder.encode(entry.getValue(), "UTF-8"));
+            params.add(entry);
+        }
+        Collections.sort(params, new Comparator<Map.Entry<String, String>>() {
+            @Override
+            public int compare(Map.Entry<String, String> lhs, Map.Entry<String, String> rhs) {
+                return lhs.getKey().compareTo(rhs.getKey());
+            }
+        });
+
+        StringBuffer sb = new StringBuffer();
+        sb.append(key);
+        for (int i = 0; i < params.size(); i++) {
+            sb.append(params.get(i).getKey() + "=" + params.get(i).getValue());
+            if (i < params.size() - 1) {
+                sb.append("&");
+            }
+        }
+        sb.append(key);
+        String sign = md5Encode(sb.toString());
+        commonPosts.put("sign", sign);
+        if (!TextUtils.isEmpty(msg)) {
+            commonPosts.put("msg", URLEncoder.encode(msg, "UTF-8"));
+        }
+
+        sb = new StringBuffer();
+
+        iter = commonPosts.entrySet().iterator();
+        int size = commonPosts.size();
+        while (iter.hasNext()) {
+            Map.Entry<String, String> entry = (Map.Entry<String, String>) iter.next();
+            sb.append(entry.getKey() + "=" + entry.getValue());
+            if (--size != 0) {
+                sb.append("&");
+            }
+        }
+
+        return sb.toString();
+
+
+    }
+
+    public static String md5Encode(String str) {
+        StringBuffer buf = new StringBuffer();
+        try {
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            md5.update(str.getBytes());
+            byte bytes[] = md5.digest();
+            for (int i = 0; i < bytes.length; i++) {
+                String s = Integer.toHexString(bytes[i] & 0xff);
+                if (s.length() == 1) {
+                    buf.append("0");
+                }
+                buf.append(s);
+            }
+
+        } catch (Exception ex) {
+        }
+        return buf.toString();
+    }
+
+    public static String post(String url, Map<String, String> param) throws Exception {
+        return request("POST", url, addSign(param));
     }
 
     public static String request(String method, String url, String param) throws Exception {
@@ -152,18 +238,9 @@ class Helper {
 
     }
 
-    private static String collectDeviceInfo(Context ctx) {
-        try {
-            return String.format("os_version=%s&os_type=1&model=%s&identifier=%s",
-                    Build.VERSION.RELEASE, URLEncoder.encode(Build.MODEL, "UTF-8"), getDeviceId(ctx));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
-
 
     public static String getDeviceId(Context ctx) {
+
         try {
             TelephonyManager tm = (TelephonyManager) ctx
                     .getSystemService(Context.TELEPHONY_SERVICE);
@@ -184,61 +261,89 @@ class Helper {
         return UUID.randomUUID().toString();
     }
 
-    //用来存储设备信息和异常信息
-    public static String getExtraInfo(Context ctx) {
-        String versionName = "";
-        try {
-            PackageManager pm = ctx.getPackageManager();
-            PackageInfo pi = pm.getPackageInfo(ctx.getPackageName(), PackageManager.GET_ACTIVITIES);
-            if (pi != null) {
-                versionName = pi.versionName == null ? "" : pi.versionName;
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.e("", "an error occured when collect package info", e);
-        }
-        return String.format("&app_version=%s&sdk_version=%s&device_id=%d&package=%s",
-                versionName, DSpider.SDK_VERSION, DSpider.DEVICE_ID, ctx.getPackageName());
 
-    }
-
-    public static void init(final Context ctx, @NonNull final InitStateListener initStateListener) {
-        final int device_id = ctx.getSharedPreferences("spider",
-                Context.MODE_PRIVATE).getInt("device_id", 0);
+    public static void init(final Activity ctx, final int sid, @NonNull final InitStateListener initStateListener) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                if (device_id == 0) {
-                    try {
-                        JSONObject ret = new JSONObject(Helper.post(DSpider.BASE_URL + "device/save",
-                                collectDeviceInfo(ctx)));
-                        int code = ret.getInt("code");
-                        if (code != 0) {
-                            initStateListener.onFail(ret.getString("msg"),
-                                    DSpider.Result.STATE_ERROR_MSG);
+                HashMap<String, String> param = new HashMap<>();
+                param.put("sid", sid + "");
+                try {
+                    final String response = Helper.post(DSpider.BASE_URL + "script", param);
+                    ctx.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                JSONObject ret = new JSONObject(response);
+                                int code = ret.getInt("errcode");
+                                if (code != 0) {
+                                    initStateListener.onFail(ret.getString("errmsg"),
+                                            DSpider.Result.STATE_ERROR_MSG);
 
-                        } else {
-                            int deviceId = ret.getInt("data");
-                            ctx.getSharedPreferences("spider", Context.MODE_PRIVATE)
-                                    .edit().putInt("device_id", deviceId).commit();
-                            DSpider.DEVICE_ID = deviceId;
-                            initStateListener.onSucceed(deviceId);
+                                } else {
+                                    ret = ret.getJSONObject("data");
+                                    initStateListener.onSucceed(ret.getInt("script_id"),
+                                            ret.getString("login_url"), ret.getString("script"));
+                                }
 
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                initStateListener.onFail(e.getMessage(),
+                                        DSpider.Result.STATE_DSPIDER_SERVER_ERROR);
+                            }
                         }
+                    });
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        initStateListener.onFail(e.getMessage(),
-                                DSpider.Result.STATE_DSPIDER_SERVER_ERROR);
-
-                    }
-                } else {
-                    DSpider.DEVICE_ID = device_id;
-                    initStateListener.onSucceed(device_id);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    initStateListener.onFail(e.getMessage(),
+                            DSpider.Result.STATE_DSPIDER_SERVER_ERROR);
                 }
             }
+
         }).start();
 
     }
+
+
+//    public static void initSpider(final Context ctx, @NonNull final InitStateListener initStateListener) {
+//        final int device_id = ctx.getSharedPreferences("spider",
+//                Context.MODE_PRIVATE).getInt("device_id", 0);
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                if (device_id == 0) {
+//                    try {
+//                        JSONObject ret = new JSONObject(Helper.post(DSpider.BASE_URL + "device/save",
+//                                collectDeviceInfo(ctx)));
+//                        int code = ret.getInt("code");
+//                        if (code != 0) {
+//                            initStateListener.onFail(ret.getString("msg"),
+//                                    DSpider.Result.STATE_ERROR_MSG);
+//
+//                        } else {
+//                            int deviceId = ret.getInt("data");
+//                            ctx.getSharedPreferences("spider", Context.MODE_PRIVATE)
+//                                    .edit().putInt("device_id", deviceId).commit();
+//                            DSpider.DEVICE_ID = deviceId;
+//                            initStateListener.onSucceed(deviceId);
+//
+//                        }
+//
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                        initStateListener.onFail(e.getMessage(),
+//                                DSpider.Result.STATE_DSPIDER_SERVER_ERROR);
+//
+//                    }
+//                } else {
+//                    DSpider.DEVICE_ID = device_id;
+//                    initStateListener.onSucceed(device_id);
+//                }
+//            }
+//        }).start();
+//
+//    }
 
 
     public static class ColorGradientHelper {

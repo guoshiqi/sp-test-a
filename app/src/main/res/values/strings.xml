@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Spider</string>
+    <string name="net_error">网络错误</string>
 </resources>

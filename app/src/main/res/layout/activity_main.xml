@@ -8,116 +8,12 @@
     >
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#fff"
     android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    android:layout_marginBottom="16dp"
     tools:context="wendu.androidcommonlibs.MainActivity">
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            >
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="16dp"
-                android:text="调试模式"
-                />
-            <android.support.v7.widget.SwitchCompat
-                android:id="@+id/debug"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-        </LinearLayout>
-
-        <!--<wendu.spidersdk.DSpiderView-->
-            <!--android:id="@+id/dspier_view"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="800dp" />-->
-
-        <TextView
-            android:id="@+id/email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/b1_press_selector"
-            android:elevation="2dp"
-            android:padding="10dp"
-            android:text="邮箱爬取"
-            android:textColor="@color/white" />
-
-        <TextView
-            android:id="@+id/jd"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/b1_press_selector"
-            android:elevation="2dp"
-            android:padding="10dp"
-            android:text="京东爬取"
-            android:textColor="@color/white" />
-
-
-        <TextView
-            android:id="@+id/am_tv_taobao"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/b1_press_selector"
-            android:elevation="2dp"
-            android:padding="10dp"
-            android:text="淘宝爬取"
-            android:textColor="@color/white" />
-
-        <TextView
-            android:id="@+id/mobile_unicom"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/b1_press_selector"
-            android:elevation="2dp"
-            android:padding="10dp"
-            android:onClick="openUnicomMobileCall"
-            android:layout_marginTop="15dp"
-            android:textColor="@color/white"
-            android:text="联通通话详单"/>
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/result"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:background="@drawable/b2_press_selector"
-        android:elevation="2dp"
-        android:padding="10dp"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:visibility="gone" />
-
-    <TextView
-        android:id="@+id/log"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/b2_press_selector"
-        android:elevation="2dp"
-        android:padding="10dp"
-        android:textAlignment="center"
-        android:text="查看上次爬取日志"
-        android:textColor="@color/white"
-        />
-
-
 </LinearLayout>
 </ScrollView>

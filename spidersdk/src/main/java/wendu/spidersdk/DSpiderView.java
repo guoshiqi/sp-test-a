@@ -1,5 +1,6 @@
 package wendu.spidersdk;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
@@ -81,7 +82,7 @@ public class DSpiderView extends LinearLayout {
             public String getArguments() {
                 try {
                     return new JSONObject(arguments).toString();
-                }catch (Exception e) {
+                } catch (Exception e) {
                     return "{}";
                 }
             }
@@ -89,47 +90,29 @@ public class DSpiderView extends LinearLayout {
 
     }
 
-
+    public void startDebug(String startUrl, String debugSrc) {
+        webview.setDebug(true);
+        webview.setDebugSrc(debugSrc);
+        webview.loadUrl(startUrl);
+    }
 
     public void start(final int sid, Map<String, Object> arguments, @NonNull final SpiderEventListener spiderEventListener) {
-        this.arguments=arguments;
+
+        this.arguments = arguments;
         this.spiderEventListener = spiderEventListener;
         final Context ctx = getContext();
-        Helper.init(ctx, new InitStateListener() {
+        Helper.init((Activity) ctx, sid, new InitStateListener() {
             @Override
-            public void onSucceed(int deviceId) {
-                try {
-                    String url = DSpider.BASE_URL + "task?sid=" + sid + Helper.getExtraInfo(ctx);
-                    JSONObject ret = new JSONObject(Helper.post(url, ""));
-                    int code = ret.getInt("code");
-                    if (code != 0) {
-                        spiderEventListener.onError(DSpider.Result.STATE_ERROR_MSG,ret.getString("msg"));
-
-                    } else {
-                        ret = ret.getJSONObject("data");
-                        int taskId = ret.getInt("id");
-                        String common = "?id=" + taskId + "&package=" + ctx.getPackageName() + "&appkey=" + ret.getInt("appkey");
-                        webview.setInjectUrl(DSpider.BASE_URL + "script" + common + "&platform=1");
-                        webview.setReportUrl(DSpider.BASE_URL + "report" + common);
-                        webview.loadUrl(ret.getString("startUrl"));
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    spiderEventListener.onError(DSpider.Result.STATE_DSPIDER_SERVER_ERROR,e.getMessage());
-                }
+            public void onSucceed(int taskId, String startUrl, String script) {
+                webview.setDebug(false);
+                webview.setTaskId(taskId + "");
+                webview.setInjectScript(script);
+                webview.loadUrl(startUrl);
             }
 
             @Override
             public void onFail(final String msg, final int code) {
-
-                post(new Runnable() {
-                    @Override
-                    public void run() {
-                        spiderEventListener.onError(code, msg);
-                    }
-                });
-
+                spiderEventListener.onError(code, msg);
             }
         });
     }

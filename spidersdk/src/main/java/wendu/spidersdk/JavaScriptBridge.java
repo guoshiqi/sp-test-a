@@ -1,5 +1,5 @@
 package wendu.spidersdk;
-import android.content.Context;
+
 import android.webkit.JavascriptInterface;
 
 /**
@@ -9,8 +9,9 @@ import android.webkit.JavascriptInterface;
  class JavaScriptBridge {
 
     private JavaScriptBridgeImp jsbImp;
+
     public JavaScriptBridge(DSWebview webview, JavaScriptHandler javaScriptHandler) {
-        jsbImp=new JavaScriptBridgeImp(webview,javaScriptHandler);
+        jsbImp = new JavaScriptBridgeImp(webview, javaScriptHandler);
     }
 
     @JavascriptInterface
@@ -73,7 +74,9 @@ import android.webkit.JavascriptInterface;
     }
 
     @JavascriptInterface
-    public String getArguments(){return jsbImp.getArguments();}
+    public String getArguments() {
+        return jsbImp.getArguments();
+    }
 
     @JavascriptInterface
     public void load(String url, String headers){

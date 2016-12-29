@@ -19,15 +19,16 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity android:name=".ResultActivity" />
-        <activity android:name=".DataReadActivity"></activity>
-        <!--<meta-data-->
-        <!--android:name="xwalk_apk_url"-->
-        <!--android:value="http://172.19.22.235/h5Test/dist/crosswalk.php" />-->
+        <activity android:name=".DataReadActivity" />
+        <!-- <meta-data -->
+        <!-- android:name="xwalk_apk_url" -->
+        <!-- android:value="http://172.19.22.235/h5Test/dist/crosswalk.php" /> -->
+        <activity android:name=".SettingActivity"></activity>
     </application>
 
 </manifest>

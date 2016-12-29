@@ -2,11 +2,13 @@ package wendu.spidersdk;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Dialog;
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.net.http.SslError;
 import android.os.Build;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -30,36 +32,40 @@ import java.util.Map;
  * Created by du on 16/12/23.
  */
 
- class DSWebview extends WebView {
+class DSWebview extends WebView {
 
     private String userAgent;
-    private String injectUrl="";
-    private boolean debug=false;
+    private boolean debug = false;
+    private String taskId;
+    private String script;
 
-    public  void setDebug(boolean isDebug){
-        debug=isDebug;
-    }
-    public boolean isDebug(){
-        return  debug;
-    }
-    public String getReportUrl() {
-        return reportUrl;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setReportUrl(String reportUrl) {
-        this.reportUrl = reportUrl;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
-    private String reportUrl="";
-    private String lastInjectUrl="";
+    public void setDebug(boolean isDebug) {
+        debug = isDebug;
+    }
+
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public void setInjectScript(String script) {
+        this.script = script;
+    }
+
+    private String lastInjectUrl = "";
 
     public void setDebugSrc(String debugSrc) {
         this.debugSrc = debugSrc;
     }
 
-    private String debugSrc="";
-
-    SharedPreferences sharedPreferences;
+    private String debugSrc = "";
     private final String contentType = "application/javascript";
 
     public DSWebview(Context context) {
@@ -73,8 +79,6 @@ import java.util.Map;
     }
 
     private void init(Context context) {
-        sharedPreferences=context.getSharedPreferences("spider", Context.MODE_PRIVATE);
-        sharedPreferences.edit().remove("jscache").commit();
         WebSettings settings = getSettings();
         settings.setDomStorageEnabled(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -91,7 +95,7 @@ import java.util.Map;
             settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }
         settings.setUseWideViewPort(true);
-        userAgent=settings.getUserAgentString();
+        userAgent = settings.getUserAgentString();
         setWebChromeClient(mWebChromeClient);
         setWebViewClient(mWebViewClient);
     }
@@ -105,7 +109,7 @@ import java.util.Map;
         post(new Runnable() {
             @Override
             public void run() {
-                if(webEventListener!=null){
+                if (webEventListener != null) {
                     webEventListener.onPageStart(url);
                 }
                 DSWebview.super.loadUrl(url);
@@ -125,17 +129,17 @@ import java.util.Map;
             public void run() {
                 String str = additionalHttpHeaders.get("User-Agent");
                 if (!TextUtils.isEmpty(str)) {
-                    userAgent=getSettings().getUserAgentString();
+                    userAgent = getSettings().getUserAgentString();
                     getSettings().setUserAgentString(str);
                 }
-                if(webEventListener!=null){
+                if (webEventListener != null) {
                     webEventListener.onPageStart(url);
                 }
                 DSWebview.super.loadUrl(url, additionalHttpHeaders);
             }
         });
 
-     }
+    }
 
 
     private WebEventListener webEventListener;
@@ -143,8 +147,8 @@ import java.util.Map;
     private WebViewClient mWebViewClient = new WebViewClient() {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            Log.e("xy log","shouldOverrideUrlLoading: "+url);
-            if(webEventListener!=null){
+            Log.e("xy log", "shouldOverrideUrlLoading: " + url);
+            if (webEventListener != null) {
                 webEventListener.onPageStart(url);
             }
             return false;
@@ -158,12 +162,12 @@ import java.util.Map;
         @Override
         public void onPageFinished(final WebView view, String url) {
             super.onPageFinished(view, url);
-            if(!TextUtils.isEmpty(userAgent)){
+            if (!TextUtils.isEmpty(userAgent)) {
                 setUserAgent(userAgent);
-                userAgent=null;
+                userAgent = null;
             }
             injectJs();
-            if(webEventListener!=null){
+            if (webEventListener != null) {
                 webEventListener.onPageFinished(url);
             }
 
@@ -172,11 +176,11 @@ import java.util.Map;
         @SuppressWarnings("deprecation")
         @Override
         public void onReceivedError(WebView view, int errorCode, String description, final String failingUrl) {
-            if(webEventListener!=null){
+            if (webEventListener != null) {
                 webEventListener.onReceivedError(
                         String.format("{\"url\":\"%s\",\"msg\":\"%s\",\"code\":%d}", failingUrl, description, errorCode));
             }
-            onReceivedError(view,errorCode,description,failingUrl);
+            onReceivedError(view, errorCode, description, failingUrl);
         }
 
         @TargetApi(Build.VERSION_CODES.M)
@@ -208,22 +212,17 @@ import java.util.Map;
 
                 if (isDebug()) {
                     try {
-                        response=new WebResourceResponse(contentType, "UTF-8", Helper.getDebugScript(getContext(),debugSrc));
+                        response = new WebResourceResponse(contentType, "UTF-8", Helper.getDebugScript(getContext(), debugSrc));
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
                 } else {
                     try {
-                        String js= sharedPreferences.getString("jscache","");
-                        if (TextUtils.isEmpty(js)){
-                            js=Helper.post(injectUrl,"");
-                            sharedPreferences.edit().putString("jscache",js);
-                        }
                         response = new WebResourceResponse(contentType,
-                                "UTF-8", new ByteArrayInputStream(js.getBytes()));
+                                "UTF-8", new ByteArrayInputStream(script.getBytes()));
                     } catch (final Exception e) {
                         e.printStackTrace();
-                        if(webEventListener!=null){
+                        if (webEventListener != null) {
                             webEventListener.onSdkServerError(e);
                         }
                     }
@@ -233,11 +232,15 @@ import java.util.Map;
         }
     };
 
+    public void clear() {
+
+    }
+
     private WebChromeClient mWebChromeClient = new WebChromeClient() {
 
         @Override
         public void onProgressChanged(WebView view, int newProgress) {
-            if(webEventListener!=null){
+            if (webEventListener != null) {
                 webEventListener.onProgressChanged(newProgress);
             }
         }
@@ -246,26 +249,42 @@ import java.util.Map;
         public void onReceivedTitle(WebView view, String title) {
             super.onReceivedTitle(view, title);
             injectJs();
-            if(webEventListener!=null){
+            if (webEventListener != null) {
                 webEventListener.onReceivedTitle(title);
             }
         }
 
         @Override
-        public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
-            Log.e("dspider sdk:","alert called");
+        public boolean onJsAlert(WebView view, String url, final String message, JsResult result) {
+            Log.e("dspider sdk:", "alert called");
             result.confirm();
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    Dialog alertDialog = new AlertDialog.Builder(getContext()).
+                            setTitle("提示").
+                            setMessage(message).
+                            setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .create();
+                    alertDialog.show();
+                }
+            });
             return true;
         }
 
     };
 
 
-    public void  autoLoadImg(final boolean load){
+    public void autoLoadImg(final boolean load) {
         post(new Runnable() {
             @Override
             public void run() {
-                getSettings().setLoadsImagesAutomatically(load) ;
+                getSettings().setLoadsImagesAutomatically(load);
             }
         });
 
@@ -275,9 +294,9 @@ import java.util.Map;
         post(new Runnable() {
             @Override
             public void run() {
-                String url= getUrl();
-                if(!lastInjectUrl.equals(url)){
-                    lastInjectUrl=url;
+                String url = getUrl();
+                if (!lastInjectUrl.equals(url)) {
+                    lastInjectUrl = url;
                     String js = Helper.getFromAssets(getContext(), "injector.js");
                     loadUrl("javascript:" + js);
                 }
@@ -286,15 +305,8 @@ import java.util.Map;
     }
 
 
-    public void setInjectUrl(String url){
-       injectUrl=url;
-    }
-
-
-
-
-    public void setWebEventListener(WebEventListener eventListener){
-        webEventListener=eventListener;
+    public void setWebEventListener(WebEventListener eventListener) {
+        webEventListener = eventListener;
     }
 
     public static abstract class WebEventListener {
@@ -309,10 +321,12 @@ import java.util.Map;
 
         void onSdkServerError(Exception e) {
         }
-        void onProgressChanged(int newProgress){
+
+        void onProgressChanged(int newProgress) {
 
         }
-        void onReceivedTitle(String title){
+
+        void onReceivedTitle(String title) {
 
         }
     }

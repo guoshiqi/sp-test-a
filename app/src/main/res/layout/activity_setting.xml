@@ -1,13 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_setting"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
     tools:context="wendu.spiderandroid.SettingActivity">
 
-</RelativeLayout>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        style="@style/paddingItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/white_press_selector"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="5dp"
+            android:text="调试开关"
+            android:textColor="@color/c1"
+            android:textSize="@dimen/c1" />
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/debug_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right|center_vertical"
+            android:paddingLeft="15dp" />
+    </LinearLayout>
+
+
+    <wendu.common.widget.SectionVerticalLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        android:background="@color/white">
+
+        <wendu.common.widget.MenuItemView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:m_title="关于我们" />
+
+        <wendu.common.widget.MenuItemView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:m_arrow="false"
+            app:m_text="1.0"
+            app:m_title="版本号" />
+    </wendu.common.widget.SectionVerticalLayout>
+</LinearLayout>

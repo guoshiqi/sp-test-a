@@ -8,7 +8,6 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -117,7 +116,7 @@ class JavaScriptBridgeImp {
         if (datas.get(sessionKey) == null) {
             return;
         }
-        if(!mWebview.isDebug()) {
+        if (!mWebview.isDebug()) {
             reportState(code, msg);
         }
         mWebview.post(new Runnable() {
@@ -135,9 +134,12 @@ class JavaScriptBridgeImp {
             @Override
             public void run() {
                 try {
-                    String data = URLEncoder.encode(msg, "UTF-8");
-                    String s = Helper.post(mWebview.getReportUrl(), String.format("&state=%d&msg=%s", result, data));
-                    Log.d("dSpider sdk", s);
+                    Map<String, String> map = new HashMap<String, String>();
+                    map.put("state", result + "");
+                    map.put("script_id", mWebview.getTaskId());
+                    map.put("msg", msg);
+                    String s = Helper.post(DSpider.REPORT_URL, map);
+                    Log.d("dspider finish!", s);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

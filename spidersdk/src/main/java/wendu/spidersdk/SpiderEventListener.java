@@ -7,13 +7,15 @@ import java.util.List;
  */
 
 public abstract class SpiderEventListener {
-    public void onResult(String sessionKey,List<String> data){
+    public void onResult(String sessionKey, List<String> data) {
 
     }
-    public void onProgress(int progress,int max){
+
+    public void onProgress(int progress, int max) {
 
     }
-    public void onError(int code,String msg){
+
+    public void onError(int code, String msg) {
 
     }
 

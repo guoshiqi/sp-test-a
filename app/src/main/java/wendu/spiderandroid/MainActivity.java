@@ -4,18 +4,25 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.SwitchCompat;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.CompoundButton;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import wendu.common.base.BaseActivity;
+import wendu.common.utils.DpiHelper;
 import wendu.common.utils.KvStorage;
 import wendu.spidersdk.DSpider;
 
@@ -27,35 +34,24 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     SwitchCompat debugSwitch;
     //private SpiderService spiderService = DataController.getUploadSerivce();
     private SpiderServiceTest spiderService=DataController.getUploadSerivceTest();
-    boolean isDebug=false;
     private String scriptUrl="http://119.29.112.230:4832/?sid=";
+    LinearLayout root;
     //private String scriptUrl="http://172.19.22.235/spider-script/?sid=";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        findViewById(R.id.email).setOnClickListener(this);
-        findViewById(R.id.am_tv_taobao).setOnClickListener(this);
-        findViewById(R.id.jd).setOnClickListener(this);
-        findViewById(R.id.mobile_unicom).setOnClickListener(this);
-        debugSwitch=getView(R.id.debug);
-        isDebug=KvStorage.getInstance().getBoolean("debug",false);
-        debugSwitch.setChecked(isDebug);
-        result = getView(R.id.result);
-        result.setOnClickListener(this);
-        log=getView(R.id.log);
-        log.setOnClickListener(this);
-        setActivityTitle("Spider Demon");
-        result = getView(R.id.result);
-        hideBackImg();
-        debugSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        setActivityTitle("数据爬虫");
+        setRightImg(R.drawable.setting, new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-              isDebug=isChecked;
-              KvStorage.getInstance().edit().putBoolean("debug", isDebug).commit();
+            public void onClick(View v) {
+                startActivity(SettingActivity.class);
             }
         });
+        root = getView(R.id.root);
+        hideBackImg();
+        initFromLocal();
 
 //        DSpiderView dSpiderView= getView(R.id.dspier_view);
 //        dSpiderView.start(1, null, new SpiderEventListener() {
@@ -76,63 +72,31 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 //        });
     }
 
-    void openJd() {
-//        String startUrl="https://plogin.m.jd.com/user/login.action?appid=100";
-//        startDspider(startUrl,scriptUrl+"jd","京东信息爬取", "jd.js");
-    }
-
-    void openTaoBaoActivity() {
-        //String baseUrl="https://www.taobao.com/index.php?from=wap";
-//        String baseUrl="https://login.m.taobao.com/login.htm";
-//        startDspider(baseUrl,scriptUrl+"taobao","淘宝爬取", "taobao.js");
-    }
-
-    void openUnicomCall() {
-        String baseUrl="http://wap.10010.com/t/query/getPhoneByDetailTip.htm";
-        startDspider(1,"联通通话详单爬去","unicom.js", scriptUrl+"unicom");
-    }
-
-    void openEmail() {
-        startDspider(1,"测试", "test.js","https://www.baidu.com");
-    }
-
-    void startDspider(int sid,String title,String debugSrcFileName,String debugStartUrl) {
+    void startDspider(int sid, String title, String debugSrcFileName, String debugStartUrl) {
         DSpider.build(this)
                 //.addArgument("test",7)
-                .setDebug(isDebug)
-                .start(sid,debugSrcFileName,debugStartUrl);
-    }
-
-    @Override
-    protected void onResume() {
-        List<String> list = LatestResult.getInstance().getData();
-        if (list.size() != 0) {
-            result.setVisibility(View.VISIBLE);
-            result.setText("查看上次爬取结果 " + list.size() + "条记录");
-        } else {
-            result.setVisibility(View.GONE);
-        }
-        if (DSpider.getLastLog(this).isEmpty()){
-          log.setVisibility(View.GONE);
-        }else {
-          log.setVisibility(View.VISIBLE);
-        }
-        super.onResume();
+                .setDebug(KvStorage.getInstance().getBoolean("debug", false))
+                .start(sid, debugSrcFileName, debugStartUrl);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == DSpider.REQUEST ) {
+        if (requestCode == DSpider.REQUEST) {
             //获取爬取数据
-            if(resultCode == RESULT_OK) {
+            if (resultCode == RESULT_OK) {
                 DSpider.Result resultData = DSpider.getLastResult(this);
                 if (resultData != null) {
-                    LatestResult.getInstance().getData().clear();
-                    LatestResult.getInstance().getData().addAll(resultData.datas);
-                    upload(resultData.datas, resultData.errorMsg);
+                    if (resultData.code != resultData.STATE_SUCCEED) {
+                        showDialog("失败了，" + resultData.errorMsg);
+                    } else {
+                        LatestResult.getInstance().getData().clear();
+                        LatestResult.getInstance().getData().addAll(resultData.datas);
+                        startActivity(ResultActivity.class);
+                        upload(resultData.datas, resultData.errorMsg);
+                    }
                 }
             } else {
-                showToast("爬取任务取消");
+                showBottomToast("爬取任务取消");
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -141,28 +105,179 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.email:
-                openEmail();
-                break;
-            case R.id.am_tv_taobao:
-                openTaoBaoActivity();
-                break;
-            case R.id.jd:
-                openJd();
-                break;
-            case R.id.mobile_unicom:
-                openUnicomCall();
-                break;
-            case R.id.result:
-                startActivity(ResultActivity.class);
-                break;
-            case R.id.log:
-                Intent intent=new Intent();
-                intent.putExtra("log",true);
-                intent.setClass(this,DataReadActivity.class);
-                startActivity(intent);
-                break;
+
         }
+    }
+
+
+    public void initFromLocal() {
+        List<SpiderCategory> items = new ArrayList<>();
+        SpiderCategory category = new SpiderCategory();
+        category.name = "消费信息认证";
+        category.spiders = new ArrayList<SpiderItem>() {{
+            add(new SpiderItem(2, R.drawable.taobao, "淘宝", "https://login.m.taobao.com/login.htm", "taobao.js"));
+            add(new SpiderItem(3, R.drawable.alipay, "支付宝", "https://custweb.alipay.com/account/index.htm", "alipay.js"));
+            add(new SpiderItem(1, R.drawable.jd, "京东", "https://plogin.m.jd.com/user/login.action?appid=100", "jd.js"));
+        }};
+        items.add(category);
+
+        category = new SpiderCategory();
+        category.name = "通话详单";
+        category.spiders = new ArrayList<SpiderItem>() {{
+            add(new SpiderItem(1, R.drawable.taobao, "淘宝"));
+            add(new SpiderItem(2, R.drawable.jd, "京东"));
+            add(new SpiderItem(1, R.drawable.taobao, "淘宝"));
+        }};
+        items.add(category);
+
+        category = new SpiderCategory();
+        category.name = "资产资质认证";
+        category.spiders = new ArrayList<SpiderItem>() {{
+            add(new SpiderItem(1, R.drawable.taobao, "淘宝"));
+            add(new SpiderItem(2, R.drawable.jd, "京东"));
+            add(new SpiderItem(1, R.drawable.taobao, "淘宝"));
+            add(new SpiderItem(2, R.drawable.jd, "京东"));
+        }};
+        items.add(category);
+
+        category = new SpiderCategory();
+        category.name = "身份信息认证";
+        category.spiders = new ArrayList<SpiderItem>() {{
+            add(new SpiderItem(1, R.drawable.taobao, "淘宝"));
+            add(new SpiderItem(2, R.drawable.jd, "京东"));
+            add(new SpiderItem(1, R.drawable.taobao, "淘宝"));
+            add(new SpiderItem(2, R.drawable.jd, "京东"));
+        }};
+        items.add(category);
+
+        category = new SpiderCategory();
+        category.name = "社交信息认证";
+        category.spiders = new ArrayList<SpiderItem>() {{
+            add(new SpiderItem(1, R.drawable.taobao, "淘宝"));
+            add(new SpiderItem(2, R.drawable.jd, "京东"));
+            add(new SpiderItem(1, R.drawable.taobao, "淘宝"));
+            add(new SpiderItem(2, R.drawable.jd, "京东"));
+        }};
+
+        category = new SpiderCategory();
+        category.name = "征信信息认证";
+        category.spiders = new ArrayList<SpiderItem>() {{
+            add(new SpiderItem(1, R.drawable.taobao, "淘宝"));
+            add(new SpiderItem(2, R.drawable.jd, "京东"));
+            add(new SpiderItem(1, R.drawable.taobao, "淘宝"));
+            add(new SpiderItem(2, R.drawable.jd, "京东"));
+        }};
+        items.add(category);
+
+
+        parseCategories(items);
+
+    }
+
+    public void parseCategories(List<SpiderCategory> items) {
+        for (final SpiderCategory category : items) {
+            View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.categroy_item, null);
+            TextView title = (TextView) view.findViewById(R.id.title);
+            GridView gridView = (GridView) view.findViewById(R.id.grid_view);
+            title.setText(category.name);
+            GridViewAdapter adapter = new GridViewAdapter(category.spiders);
+            gridView.setAdapter(adapter);
+            gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    SpiderItem item = category.spiders.get(position);
+                    startDspider(item.sid, item.title, item.debugSrc, item.startUrl);
+                }
+            });
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            layoutParams.bottomMargin = DpiHelper.dip2px(8);
+            root.addView(view, layoutParams);
+        }
+    }
+
+
+    public class GridViewAdapter extends BaseAdapter {
+
+        private List<SpiderItem> items;
+
+        public GridViewAdapter(List<SpiderItem> list) {
+            items = list;
+        }
+
+        @Override
+        public int getCount() {
+            return items.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return items.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = LayoutInflater.from(MainActivity.this).inflate(R.layout.spider_item, null);
+            }
+            SpiderItem item = items.get(position);
+            TextView view = (TextView) convertView;
+            view.setCompoundDrawablesWithIntrinsicBounds(0, item.icon, 0, 0);
+            view.setText(item.name);
+            return convertView;
+        }
+    }
+
+    private void ReportError(final String msg) {
+        showLoadDialog("正在上报错误信息...");
+        spiderService.upload(msg).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<String>() {
+                    @Override
+                    public void onCompleted() {
+                        hideLoadDialog();
+                        showDialog("错误信息上报成功");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        hideLoadDialog();
+                        showDialog("提示", "错误上报失败" + e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(String String) {
+
+                    }
+                });
+    }
+
+    private void Report(final String msg) {
+        showLoadDialog("正在上报数据...");
+        spiderService.upload(msg).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<String>() {
+                    @Override
+                    public void onCompleted() {
+                        hideLoadDialog();
+                        showDialog("提示", "爬取成功");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        hideLoadDialog();
+                        showDialog("上传数据失败" + e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(String String) {
+
+                    }
+                });
+
     }
 
     void upload(final List<String> list, final String errMsg) {
@@ -253,82 +368,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 //                });
     }
 
-    private void ReportError(final String msg) {
-        showLoadDialog("正在上报错误信息...");
-        spiderService.upload(msg).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<String>() {
-            @Override
-            public void onCompleted() {
-                hideLoadDialog();
-                showDialog("错误信息上报成功");
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                hideLoadDialog();
-                showDialog("提示", "错误上报失败" + e.getMessage());
-            }
-
-            @Override
-            public void onNext(String String) {
-
-            }
-        });
-    }
-
-    private void Report(final String msg) {
-        showLoadDialog("正在上报数据...");
-        spiderService.upload(msg).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<String>() {
-            @Override
-            public void onCompleted() {
-                hideLoadDialog();
-                showDialog("提示", "爬取成功");
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                hideLoadDialog();
-                showDialog("上传数据失败" + e.getMessage());
-            }
-
-            @Override
-            public void onNext(String String) {
-
-            }
-        });
-
-//        showLoadDialog("正在上报错误信息...");
-//        spiderService.sycTaskStatus(0, null, email, null, 0, bank)
-//                .subscribeOn(Schedulers.io())
-//                .flatMap(new Func1<String, Observable<String>>() {
-//                    @Override
-//                    public Observable<String> call(String String) {
-//                        return spiderService.sycTaskStatus(3, String.bill_id, email, errmsg, 0, bank);
-//
-//                    }
-//                })
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new Subscriber<String>() {
-//                    @Override
-//                    public void onCompleted() {
-//                        hideLoadDialog();
-//                        showDialog("提示", "爬取失败［脚本错误］－错误上报成功");
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        hideLoadDialog();
-//                        showDialog("提示", "爬取失败[脚本错误]－上报失败（网络错误）" + e.getMessage());
-//                    }
-//
-//                    @Override
-//                    public void onNext(String String) {
-//
-//                    }
-//                });
-
-    }
 
 
 }
