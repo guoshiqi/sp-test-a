@@ -10,22 +10,20 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import wendu.common.base.BaseActivity;
 import wendu.common.utils.KvStorage;
-import wendu.spidersdk.ResultData;
+import wendu.spidersdk.DSpider;
 import wendu.spidersdk.SpiderActivity;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     TextView result;
+    TextView log;
     String billId = "";
     SwitchCompat debugSwitch;
     //private SpiderService spiderService = DataController.getUploadSerivce();
@@ -42,12 +40,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         findViewById(R.id.email).setOnClickListener(this);
         findViewById(R.id.am_tv_taobao).setOnClickListener(this);
         findViewById(R.id.jd).setOnClickListener(this);
-        findViewById(R.id.mobile_unicom).setOnClickListener(this);
+        findViewById(R.id.unicom).setOnClickListener(this);
+        getView(R.id.mobile).setOnClickListener(this);
+        getView(R.id.alipay).setOnClickListener(this);
         debugSwitch=getView(R.id.debug);
         isDebug=KvStorage.getInstance().getBoolean("debug",false);
         debugSwitch.setChecked(isDebug);
         result = getView(R.id.result);
         result.setOnClickListener(this);
+        log=getView(R.id.log);
+        log.setOnClickListener(this);
         setActivityTitle("Spider Demon");
         result = getView(R.id.result);
         hideBackImg();
@@ -62,6 +64,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     void openJd() {
         String startUrl="https://plogin.m.jd.com/user/login.action?appid=100";
+        //String startUrl="https://gd.189.cn/TS/login.htm";
         startDspider(startUrl,scriptUrl+"jd","京东信息爬取", "jd.js");
     }
 
@@ -75,12 +78,22 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         String baseUrl="http://wap.10010.com/t/query/getPhoneByDetailTip.htm";
         startDspider(baseUrl, scriptUrl+"unicom","联通通话详单爬去", "unicom.js");
     }
+    void openMobie(){
+        String baseUrl="https://login.10086.cn/login.html?channelID=12003&backUrl=http://shop.10086.cn/i/?f=billdetailqry";
+        startDspider(baseUrl, scriptUrl+"mobile","移动", "mobile.js");
+    }
+    void openAlipay(){
+        String baseUrl="https://custweb.alipay.com/account/index.htm";
+        startDspider(baseUrl, scriptUrl+"alipay","支付宝", "alipay.js");
+    }
 
     void openEmail() {
         String baseUrl="http://172.19.23.62/spider-script/emails/";
-        //String baseUrl="http://119.29.112.230:4832/emails/";
+       // String baseUrl="http://119.29.112.230:4832/emails/";
         startDspider(baseUrl+ "email.html?t=" + System.currentTimeMillis(),baseUrl+"inject.php?sid=email","邮箱爬取","",false);
     }
+
+
     void startDspider(String startUrl,String scriptUrl,String title,String debugSrcFileName) {
         startDspider(startUrl,scriptUrl,title,debugSrcFileName,true);
     }
@@ -114,6 +127,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         } else {
             result.setVisibility(View.GONE);
         }
+        if (DSpider.getLog(this).isEmpty()){
+          log.setVisibility(View.GONE);
+        }else {
+          log.setVisibility(View.VISIBLE);
+        }
         super.onResume();
     }
 
@@ -122,7 +140,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         if (requestCode == 1 ) {
             //获取爬取数据
             if(resultCode == RESULT_OK) {
-                ResultData resultData = ResultData.getResult(this);
+                DSpider.Result resultData = DSpider.getResult(this);
                 if (resultData != null) {
                     LatestResult.getInstance().getData().clear();
                     LatestResult.getInstance().getData().addAll(resultData.datas);
@@ -147,11 +165,23 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             case R.id.jd:
                 openJd();
                 break;
-            case R.id.mobile_unicom:
+            case R.id.unicom:
                 openUnicomCall();
+                break;
+            case R.id.mobile:
+                openMobie();
+                break;
+            case R.id.alipay:
+                openAlipay();
                 break;
             case R.id.result:
                 startActivity(ResultActivity.class);
+                break;
+            case R.id.log:
+                Intent intent=new Intent();
+                intent.putExtra("log",true);
+                intent.setClass(this,DataReadActivity.class);
+                startActivity(intent);
                 break;
         }
     }

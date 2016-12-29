@@ -6,8 +6,7 @@ dSpider("sessionkey", function(session,env,$){
    //session.upload([string|object])
    //session.finish() 结束爬取
 
-   log(session,env,$)
-
-
+   log(alert)
+   log(dSpider)
 
 })

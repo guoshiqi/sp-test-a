@@ -1,9 +1,8 @@
 package wendu.spidersdk;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Message;
 import android.text.TextUtils;
 
@@ -11,7 +10,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -25,13 +23,13 @@ import java.util.Map;
     private HashMap<String, List<String>> datas = new HashMap<>();
     private SharedPreferences sharedPreferences;
 
-
     public JavaScriptBridgeImp(Context mContxt) {
         this.mContxt = (SpiderActivity) mContxt;
         sharedPreferences=mContxt.getSharedPreferences("spider", Context.MODE_PRIVATE);
     }
 
     public void start(String sessionKey) {
+        save("_log","");
         if (datas.get(sessionKey) == null) {
             datas.put(sessionKey, new ArrayList<String>());
         }
@@ -61,7 +59,13 @@ import java.util.Map;
 
 
     public String getExtraData() {
-        return String.format("{\"webcore\":\"%s\"}",mContxt.getCurrentCore());
+        Map<String, String> info = new HashMap<String, String>();
+        info.put("os_version", Build.VERSION.SDK_INT+"" );
+        info.put("os", "android" );
+//        info.put("device_info",extra);
+        info.put("webcore",mContxt.getCurrentCore());
+        JSONObject jsonObject=new JSONObject(info);
+        return jsonObject.toString() ;
     }
 
 
@@ -102,14 +106,13 @@ import java.util.Map;
         if (datas.get(sessionKey)==null){
             return;
         }
-
         //网络错误
         if (reslut==1){
             mContxt.getHandler().sendEmptyMessage(6);
         }else {
             Message message = new Message();
             message.what = 7;
-            message.obj=new ResultData(sessionKey,datas.get(sessionKey),msg);
+            message.obj=new DSpider.Result(sessionKey,datas.get(sessionKey),msg);
             mContxt.getHandler().sendMessage(message);
         }
         datas.remove(sessionKey);
@@ -161,6 +164,15 @@ import java.util.Map;
 
     public void autoLoadImg(boolean load){
         mContxt.autoLoadImg(load);
+    }
+
+    public void log(String msg,int type){
+        String str=read("_log");
+        save("_log",str+"dSpider: "+msg+"\n\n");
+    }
+
+    public void setProgressMsg(String msg) {
+
     }
 
 }

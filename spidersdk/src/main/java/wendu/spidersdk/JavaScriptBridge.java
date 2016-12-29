@@ -104,4 +104,14 @@ import android.webkit.JavascriptInterface;
         jsbImp.autoLoadImg(load);
     }
 
+    @JavascriptInterface
+    public void log(String msg,int type) {
+        jsbImp.log(msg,type);
+    }
+
+    @JavascriptInterface
+    public void setProgressMsg(String msg) {
+        jsbImp.setProgressMsg(msg);
+    }
+
 }
