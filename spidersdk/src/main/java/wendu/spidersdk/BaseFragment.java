@@ -10,13 +10,6 @@ import java.util.Map;
  */
 public abstract class BaseFragment extends Fragment {
     public void errorReload() {}
-    public Boolean goBack(){
-        return false;
-    }
-    abstract void loadUrl(String url, Map<String, String> additionalHttpHeaders);
-    abstract void loadUrl(String url);
-    abstract void setUserAgent(String userAgent);
-    public void  autoLoadImg(boolean load){};
     public void showInput(boolean show){
        ViewGroup viewGroup= (ViewGroup) getView();
        if (viewGroup!=null)

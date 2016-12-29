@@ -1,2 +1,2 @@
 !function(){
-var _su="local script";
+var _su="local_script"

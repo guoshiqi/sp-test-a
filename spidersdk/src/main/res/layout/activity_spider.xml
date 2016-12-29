@@ -43,10 +43,17 @@
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <FrameLayout
-            android:id="@+id/fragment"
+        <RelativeLayout
+            android:id="@+id/webview_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            >
+            <wendu.spidersdk.DSWebview
+                android:id="@+id/webview"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+           </RelativeLayout>
         <RelativeLayout
             android:id="@+id/spider"
             android:layout_width="match_parent"
@@ -73,6 +80,16 @@
                 android:layout_marginTop="40dp"
                 android:layout_centerHorizontal="true"
                  />
+            <TextView
+                android:id="@+id/progress_msg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:textAlignment="center"
+                android:layout_marginTop="30dp"
+                android:layout_below="@id/work_progress"
+                android:text="正在初始化任务..."
+                />
             <TextView
                 android:id="@+id/percentage"
                 android:layout_width="wrap_content"
@@ -154,25 +171,6 @@
             android:text="首次加载初始化中..."
             android:textColor="@color/text_color_light"
            />
-
-
-
-        <TextView
-            android:id="@+id/webcore"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_margin="15dp"
-            android:background="@color/black_transparent_60"
-            android:paddingBottom="5dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingTop="5dp"
-            android:text="webcore:--"
-            android:textColor="@color/white"
-            android:textSize="13dp"
-            android:visibility="gone" />
 
     </RelativeLayout>
 </LinearLayout>

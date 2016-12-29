@@ -3,11 +3,12 @@ package wendu.spidersdk;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.json.JSONObject;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,19 +18,22 @@ import java.util.Map;
  * Created by du on 16/8/17.
  */
 
- class JavaScriptBridgeImp {
-    private SpiderActivity mContxt;
+class JavaScriptBridgeImp {
+
     private HashMap<String, String> session = new HashMap<>();
     private HashMap<String, List<String>> datas = new HashMap<>();
     private SharedPreferences sharedPreferences;
+    JavaScriptHandler mJavaScriptHandler;
+    DSWebview mWebview;
 
-    public JavaScriptBridgeImp(Context mContxt) {
-        this.mContxt = (SpiderActivity) mContxt;
-        sharedPreferences=mContxt.getSharedPreferences("spider", Context.MODE_PRIVATE);
+    public JavaScriptBridgeImp(DSWebview webview, JavaScriptHandler javaScriptHandler) {
+        mWebview = webview;
+        mJavaScriptHandler = javaScriptHandler;
+        sharedPreferences = webview.getContext().getSharedPreferences("spider", Context.MODE_PRIVATE);
     }
 
     public void start(String sessionKey) {
-        save("_log","");
+        save("_log", "");
         if (datas.get(sessionKey) == null) {
             datas.put(sessionKey, new ArrayList<String>());
         }
@@ -38,19 +42,23 @@ import java.util.Map;
     public void set(String sessionKey, String value) {
         session.put(sessionKey, value);
     }
+
+
     public String get(String sessionKey) {
         return session.get(sessionKey);
     }
+
+
     public void save(String key, String value) {
-        if(TextUtils.isEmpty(value)) {
-           sharedPreferences.edit().remove(key).commit();
-        }else {
+        if (TextUtils.isEmpty(value)) {
+            sharedPreferences.edit().remove(key).commit();
+        } else {
             sharedPreferences.edit().putString(key, value).commit();
         }
     }
 
-    public String read(String key){
-       return sharedPreferences.getString(key, "");
+    public String read(String key) {
+        return sharedPreferences.getString(key, "");
     }
 
     public String clear(String sessionKey) {
@@ -59,119 +67,133 @@ import java.util.Map;
 
 
     public String getExtraData() {
-        Map<String, String> info = new HashMap<String, String>();
-        info.put("os_version", Build.VERSION.SDK_INT+"" );
-        info.put("os", "android" );
-//        info.put("device_info",extra);
-        info.put("webcore",mContxt.getCurrentCore());
-        JSONObject jsonObject=new JSONObject(info);
-        return jsonObject.toString() ;
+        Map<String, Object> info = new HashMap<>();
+        info.put("os_version", Build.VERSION.RELEASE);
+        info.put("os", "android");
+        info.put("sdk_version", DSpider.SDK_VERSION);
+        JSONObject jsonObject = new JSONObject(info);
+        return jsonObject.toString();
+
+    }
+
+    public String getArguments() {
+        return mJavaScriptHandler.getArguments();
     }
 
 
-      public boolean push(String sessionKey, String value) {
-          List<String> list= datas.get(sessionKey);
-          if (list==null){
-              return false;
-          }
-          return list.add(value);
-      }
-
-
-
-    public void setProgress(int progress) {
-        Message message = new Message();
-        message.what = 1;
-        message.arg1 = progress;
-        mContxt.getHandler().sendMessage(message);
+    public boolean push(String sessionKey, String value) {
+        List<String> list = datas.get(sessionKey);
+        if (list == null) {
+            return false;
+        }
+        return list.add(value);
     }
 
 
-    public void setProgressMax(int progress) {
-        Message message = new Message();
-        message.what = 2;
-        message.arg1 = progress;
-        mContxt.getHandler().sendMessage(message);
+    public void setProgress(final int progress) {
+        mWebview.post(new Runnable() {
+            @Override
+            public void run() {
+                mJavaScriptHandler.setProgress(progress);
+            }
+        });
+
     }
 
 
-    public int getProgress() {
-        return mContxt.getProgress().getProgress();
+    public void setProgressMax(final int progress) {
+        mWebview.post(new Runnable() {
+            @Override
+            public void run() {
+                mJavaScriptHandler.setProgressMax(progress);
+            }
+        });
+
     }
 
 
-    public void finish(String sessionKey,int reslut,String msg) {
-
+    public void finish(final String sessionKey, final int code, final String msg) {
         //已经关闭
-        if (datas.get(sessionKey)==null){
+        if (datas.get(sessionKey) == null) {
             return;
         }
-        //网络错误
-        if (reslut==1){
-            mContxt.getHandler().sendEmptyMessage(6);
-        }else {
-            Message message = new Message();
-            message.what = 7;
-            message.obj=new DSpider.Result(sessionKey,datas.get(sessionKey),msg);
-            mContxt.getHandler().sendMessage(message);
+        if(!mWebview.isDebug()) {
+            reportState(code, msg);
         }
-        datas.remove(sessionKey);
+        mWebview.post(new Runnable() {
+            @Override
+            public void run() {
+                mJavaScriptHandler.finish(new DSpider.Result(sessionKey, datas.get(sessionKey), msg, code));
+                datas.remove(sessionKey);
+            }
+        });
+
+    }
+
+    public void reportState(final int result, final String msg) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String data = URLEncoder.encode(msg, "UTF-8");
+                    String s = Helper.post(mWebview.getReportUrl(), String.format("&state=%d&msg=%s", result, data));
+                    Log.d("dSpider sdk", s);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+
+    public void showProgress(final boolean show) {
+        mWebview.post(new Runnable() {
+            @Override
+            public void run() {
+                mJavaScriptHandler.showProgress(show);
+            }
+        });
 
     }
 
 
-    public void showProgress(boolean show) {
-        Message message = new Message();
-        message.what = 3;
-        message.obj = show;
-        mContxt.getHandler().sendMessage(message);
+    public void setProgressMsg(final String msg) {
+        mWebview.post(new Runnable() {
+            @Override
+            public void run() {
+                mJavaScriptHandler.setProgressMsg(msg);
+            }
+        });
+
     }
 
 
-    public void showLoading(String s) {
-        Message message = new Message();
-        message.what = 4;
-        message.obj = s;
-        mContxt.getHandler().sendMessage(message);
-    }
-
-    public void hideLoading() {
-        Message message = new Message();
-        message.what = 5;
-        mContxt.getHandler().sendMessage(message);
-    }
-
-    public void   openWithSpecifiedCore(String url, String webcore){
-        if (TextUtils.isEmpty(webcore)){
-            webcore="x5|sys|cs";
+    public void load(String url, String headers) {
+        if (!TextUtils.isEmpty(headers)) {
+            mWebview.loadUrl(url, Helper.getMapForJson(headers));
         }
-        if (webcore.startsWith(mContxt.getCurrentCore())){
-            mContxt.loadUrl(url);
-            return;
-        }
-        mContxt.open(url,webcore);
     }
 
-    public void load(String url, String headers){
-        if (!TextUtils.isEmpty(headers)){
-            mContxt.loadUrl(url,Helper.getMapForJson(headers));
-        }
-    }
 
     public void setUserAgent(String userAgent) {
-        mContxt.setUserAgent(userAgent);
+        mWebview.setUserAgent(userAgent);
     }
 
-    public void autoLoadImg(boolean load){
-        mContxt.autoLoadImg(load);
+
+    public void autoLoadImg(boolean load) {
+        mWebview.autoLoadImg(load);
     }
 
-    public void log(String msg,int type){
-        String str=read("_log");
-        save("_log",str+"dSpider: "+msg+"\n\n");
-    }
 
-    public void setProgressMsg(String msg) {
+    public void log(final String msg, final int type) {
+        String str = read("_log");
+        save("_log", str + "dSpider: " + msg + "\n\n");
+        mWebview.post(new Runnable() {
+            @Override
+            public void run() {
+                mJavaScriptHandler.log(msg, type);
+            }
+        });
 
     }
 

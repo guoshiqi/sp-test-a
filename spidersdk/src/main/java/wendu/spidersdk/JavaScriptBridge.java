@@ -9,8 +9,8 @@ import android.webkit.JavascriptInterface;
  class JavaScriptBridge {
 
     private JavaScriptBridgeImp jsbImp;
-    public JavaScriptBridge(Context mContext) {
-        jsbImp=new JavaScriptBridgeImp(mContext);
+    public JavaScriptBridge(DSWebview webview, JavaScriptHandler javaScriptHandler) {
+        jsbImp=new JavaScriptBridgeImp(webview,javaScriptHandler);
     }
 
     @JavascriptInterface
@@ -24,8 +24,8 @@ import android.webkit.JavascriptInterface;
     }
 
     @JavascriptInterface
-    public String get(String sessionKey) {
-        return jsbImp.get(sessionKey);
+    public String get(String key) {
+        return jsbImp.get(key);
     }
 
     @JavascriptInterface
@@ -61,10 +61,6 @@ import android.webkit.JavascriptInterface;
         jsbImp.setProgressMax(progress);
     }
 
-    @JavascriptInterface
-    public int getProgress() {
-        return jsbImp.getProgress();
-    }
 
     @JavascriptInterface
     public void finish(String name,int res,String msg) {
@@ -77,17 +73,7 @@ import android.webkit.JavascriptInterface;
     }
 
     @JavascriptInterface
-    public void showLoading(String s) {
-       jsbImp.showLoading(s);
-    }
-
-    @JavascriptInterface
-    public void hideLoading() {
-        jsbImp.hideLoading();
-    }
-
-    @JavascriptInterface
-    public void   openWithSpecifiedCore(String url, String webcore){jsbImp.openWithSpecifiedCore(url, webcore);}
+    public String getArguments(){return jsbImp.getArguments();}
 
     @JavascriptInterface
     public void load(String url, String headers){
