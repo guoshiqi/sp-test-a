@@ -8,17 +8,13 @@ dSpider("jd", function(session,env,$){
     var globalInfo;
 
     sid = session.get("sid");
-    session.onNavigate=function(url){
-       if(url.indexOf("://plogin.m.jd.com/user")!=-1){
-         session.showProgress(true);
-         session.setProgressMax(100);
-         session.setProgress(0);
-         session.autoLoadImg(false);
-       }
-     }
+
 
 
     if (location.href.indexOf("://m.jd.com") != -1 ) {
+        session.showProgress(true);
+        session.setProgressMax(100);
+        session.autoLoadImg(false);
         session.setProgress(5);
 
         if($(".jd-search-form-input")[0] != undefined){
