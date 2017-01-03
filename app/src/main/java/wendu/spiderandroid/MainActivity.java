@@ -41,6 +41,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         setActivityTitle("数据爬虫");
         setRightImg(R.drawable.setting, new View.OnClickListener() {

@@ -97,7 +97,8 @@ public class DSpider implements Serializable {
         Helper.init(ctx, sid, new InitStateListener() {
             @Override
             public void onSucceed(int script_id, String startUrl, String script) {
-                ctx.getSharedPreferences("spider", Context.MODE_PRIVATE).edit().putString(script_id + "", script);
+                ctx.getSharedPreferences("spider", Context.MODE_PRIVATE)
+                        .edit().putString(script_id + "", script).commit();
                 start_(sid, "", startUrl, script_id);
             }
 
@@ -136,7 +137,7 @@ public class DSpider implements Serializable {
         intent.putExtra("sid", sid);
         intent.putExtra("debugSrc", debugSrcFileName);
         intent.putExtra("startUrl", debugStartUrl);
-        intent.putExtra("taskId", taskId);
+        intent.putExtra("taskId", taskId + "");
         intent.putExtra("arguments", new JSONObject(arguments).toString());
         ctx.startActivityForResult(intent, REQUEST);
     }
