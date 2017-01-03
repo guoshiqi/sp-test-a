@@ -28,7 +28,8 @@
         <!-- <meta-data -->
         <!-- android:name="xwalk_apk_url" -->
         <!-- android:value="http://172.19.22.235/h5Test/dist/crosswalk.php" /> -->
-        <activity android:name=".SettingActivity"></activity>
+        <activity android:name=".SettingActivity" />
+        <activity android:name=".test.TestActivity"></activity>
     </application>
 
 </manifest>

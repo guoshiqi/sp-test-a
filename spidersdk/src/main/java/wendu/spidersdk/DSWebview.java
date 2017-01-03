@@ -24,6 +24,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
@@ -84,6 +85,7 @@ class DSWebview extends WebView {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             CookieManager.getInstance().setAcceptThirdPartyCookies(this, true);
         }
+        CookieManager.getInstance().removeAllCookie();
         settings.setAllowFileAccess(false);
         settings.setAppCacheEnabled(false);
         settings.setSavePassword(false);
@@ -330,6 +332,52 @@ class DSWebview extends WebView {
 
         }
     }
+
+    private static final String APP_CACAHE_DIRNAME = "/webcache";
+
+    public void clearCache() {
+        CookieManager.getInstance().removeAllCookie();
+        Context context = getContext();
+        //清理Webview缓存数据库
+        try {
+            context.deleteDatabase("webview.db");
+            context.deleteDatabase("webviewCache.db");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //WebView 缓存文件
+        File appCacheDir = new File(context.getFilesDir().getAbsolutePath() + APP_CACAHE_DIRNAME);
+        File webviewCacheDir = new File(context.getCacheDir().getAbsolutePath() + "/webviewCache");
+
+        //删除webview 缓存目录
+        if (webviewCacheDir.exists()) {
+            deleteFile(webviewCacheDir);
+        }
+        //删除webview 缓存 缓存目录
+        if (appCacheDir.exists()) {
+            deleteFile(appCacheDir);
+        }
+
+
+    }
+
+    public void deleteFile(File file) {
+        if (file.exists()) {
+            if (file.isFile()) {
+                file.delete();
+            } else if (file.isDirectory()) {
+                File files[] = file.listFiles();
+                for (int i = 0; i < files.length; i++) {
+                    deleteFile(files[i]);
+                }
+            }
+            file.delete();
+        } else {
+            Log.e("Webview", "delete file no exists " + file.getAbsolutePath());
+        }
+    }
+
 
 
 }

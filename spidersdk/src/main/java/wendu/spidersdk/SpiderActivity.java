@@ -7,13 +7,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -34,7 +31,6 @@ public class SpiderActivity extends AppCompatActivity {
     TextView initView;
     FragmentManager fm;
     BaseFragment fragment;
-    Handler handler;
     TextView titleTv;
     RelativeLayout errorLayout;
     RelativeLayout loading;
@@ -104,35 +100,6 @@ public class SpiderActivity extends AppCompatActivity {
             mWebView.setTaskId(taskId);
             mWebView.loadUrl(startUrl);
         }
-
-        handler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                switch (msg.what) {
-                    case 7:
-                        Intent intent = new Intent();
-                        try {
-                            String path = getCacheDir() + "/spider.dat";
-                            File file = new File(path);
-                            file.delete();
-                            file.createNewFile();
-                            FileOutputStream fileOutputStream = new FileOutputStream(file.toString());
-                            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-                            objectOutputStream.writeObject(msg.obj);
-                            intent.putExtra("result", path);
-                            setResult(Activity.RESULT_OK, intent);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            setResult(Activity.RESULT_CANCELED, intent);
-
-                        }
-                        finish();
-
-                }
-            }
-        };
-
 
         ImageView back=getView(R.id.back) ;
         back.setOnClickListener(new View.OnClickListener() {
@@ -276,7 +243,6 @@ public class SpiderActivity extends AppCompatActivity {
     }
 
     public void showProgress(boolean show) {
-
         if (show) {
             hideLoadView();
         }
@@ -288,57 +254,10 @@ public class SpiderActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        if (null != handler) {
-            handler.removeMessages(1);
-            handler.removeMessages(2);
-            handler.removeMessages(3);
-        }
-        clearWebViewCache();
+        mWebView.clearCache();
         super.onDestroy();
     }
 
-    private static final String APP_CACAHE_DIRNAME = "/webcache";
-    public void clearWebViewCache(){
-
-        //清理Webview缓存数据库
-        try {
-            deleteDatabase("webview.db");
-            deleteDatabase("webviewCache.db");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        //WebView 缓存文件
-        File appCacheDir = new File(getFilesDir().getAbsolutePath()+APP_CACAHE_DIRNAME);
-        File webviewCacheDir = new File(getCacheDir().getAbsolutePath()+"/webviewCache");
-
-        //删除webview 缓存目录
-        if(webviewCacheDir.exists()){
-            deleteFile(webviewCacheDir);
-        }
-        //删除webview 缓存 缓存目录
-        if(appCacheDir.exists()){
-            deleteFile(appCacheDir);
-        }
-
-
-    }
-
-    public void deleteFile(File file) {
-        if (file.exists()) {
-            if (file.isFile()) {
-                file.delete();
-            } else if (file.isDirectory()) {
-                File files[] = file.listFiles();
-                for (int i = 0; i < files.length; i++) {
-                    deleteFile(files[i]);
-                }
-            }
-            file.delete();
-        } else {
-            Log.e(TAG, "delete file no exists " + file.getAbsolutePath());
-        }
-    }
 
     @Override
     public void onBackPressed() {
