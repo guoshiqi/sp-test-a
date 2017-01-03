@@ -125,52 +125,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         category = new SpiderCategory();
         category.name = "通话详单";
         category.spiders = new ArrayList<SpiderItem>() {{
-            add(new SpiderItem(1, R.drawable.taobao, "淘宝"));
-            add(new SpiderItem(2, R.drawable.jd, "京东"));
-            add(new SpiderItem(1, R.drawable.taobao, "淘宝"));
+            add(new SpiderItem(4, R.mipmap.ic_launcher, "联通"));
+            add(new SpiderItem(5, R.mipmap.ic_launcher, "移动"));
         }};
         items.add(category);
-
-        category = new SpiderCategory();
-        category.name = "资产资质认证";
-        category.spiders = new ArrayList<SpiderItem>() {{
-            add(new SpiderItem(1, R.drawable.taobao, "淘宝"));
-            add(new SpiderItem(2, R.drawable.jd, "京东"));
-            add(new SpiderItem(1, R.drawable.taobao, "淘宝"));
-            add(new SpiderItem(2, R.drawable.jd, "京东"));
-        }};
-        items.add(category);
-
-        category = new SpiderCategory();
-        category.name = "身份信息认证";
-        category.spiders = new ArrayList<SpiderItem>() {{
-            add(new SpiderItem(1, R.drawable.taobao, "淘宝"));
-            add(new SpiderItem(2, R.drawable.jd, "京东"));
-            add(new SpiderItem(1, R.drawable.taobao, "淘宝"));
-            add(new SpiderItem(2, R.drawable.jd, "京东"));
-        }};
-        items.add(category);
-
-        category = new SpiderCategory();
-        category.name = "社交信息认证";
-        category.spiders = new ArrayList<SpiderItem>() {{
-            add(new SpiderItem(1, R.drawable.taobao, "淘宝"));
-            add(new SpiderItem(2, R.drawable.jd, "京东"));
-            add(new SpiderItem(1, R.drawable.taobao, "淘宝"));
-            add(new SpiderItem(2, R.drawable.jd, "京东"));
-        }};
-
-        category = new SpiderCategory();
-        category.name = "征信信息认证";
-        category.spiders = new ArrayList<SpiderItem>() {{
-            add(new SpiderItem(1, R.drawable.taobao, "淘宝"));
-            add(new SpiderItem(2, R.drawable.jd, "京东"));
-            add(new SpiderItem(1, R.drawable.taobao, "淘宝"));
-            add(new SpiderItem(2, R.drawable.jd, "京东"));
-        }};
-        items.add(category);
-
-
         parseCategories(items);
 
     }
