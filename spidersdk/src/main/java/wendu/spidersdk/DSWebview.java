@@ -182,7 +182,7 @@ class DSWebview extends WebView {
                 webEventListener.onReceivedError(
                         String.format("{\"url\":\"%s\",\"msg\":\"%s\",\"code\":%d}", failingUrl, description, errorCode));
             }
-            onReceivedError(view, errorCode, description, failingUrl);
+            super.onReceivedError(view, errorCode, description, failingUrl);
         }
 
         @TargetApi(Build.VERSION_CODES.M)
