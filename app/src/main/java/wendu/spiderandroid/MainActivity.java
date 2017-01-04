@@ -125,8 +125,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         category = new SpiderCategory();
         category.name = "通话详单";
         category.spiders = new ArrayList<SpiderItem>() {{
-            add(new SpiderItem(4, R.mipmap.ic_launcher, "联通"));
-            add(new SpiderItem(5, R.mipmap.ic_launcher, "移动"));
+            add(new SpiderItem(4, R.mipmap.ic_launcher, "联通", "http://wap.10010.com/t/query/getPhoneByDetailTip.htm", "unicom.js"));
+            add(new SpiderItem(5, R.mipmap.ic_launcher, "移动", "https://login.10086.cn/login.html?channelID=12003&backUrl=http://shop.10086.cn/i/?f=billdetailqry", "mobile.js"));
         }};
         items.add(category);
         parseCategories(items);
