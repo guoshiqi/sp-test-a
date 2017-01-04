@@ -50,8 +50,8 @@ dSpider("taobao", function(session,env,$){
                 var myInterval;
                 //循环调用获取订单的方法
                 function getOrder() {
-                    if(window.getComputedStyle($("div.order-more")[0], '::after') != null){
-                        if (window.getComputedStyle($("div.order-more")[0], '::after').getPropertyValue('content')||$(".order-list>li").length>=5) {//限制订单爬取的数量
+                    if(window.getComputedStyle($("div.order-more")[0], '::before') != null){
+                        if (window.getComputedStyle($("div.order-more")[0], '::before').getPropertyValue('content')||$(".order-list>li").length>=5) {//限制订单爬取的数量
                             var tempOllLength = $(".order-list>li").length;
                             var orderListArray = [];
                             for(var tol = 0 ; tol < tempOllLength ; tol ++){
@@ -69,7 +69,7 @@ dSpider("taobao", function(session,env,$){
                             log("正在获取订单");
                         }
                     }else{
-                        log("  ::after  is  null ! "+ window.getComputedStyle($("div.order-more")[0], '::after'));
+                        log("  ::before  is  null ! "+ window.getComputedStyle($("div.order-more")[0], '::before'));
                     }
                 }
                 myInterval = setInterval(getOrder, 3000);
