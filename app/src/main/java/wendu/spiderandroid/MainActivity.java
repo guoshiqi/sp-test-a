@@ -75,6 +75,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     void startDspider(int sid, String title, String debugSrcFileName, String debugStartUrl) {
+        if (sid == 0) {
+            showDialog("暂未上线，敬请期待！");
+            return;
+        }
         DSpider.build(this)
                 //.addArgument("test",7)
                 .setDebug(KvStorage.getInstance().getBoolean("debug", false))
@@ -124,17 +128,27 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         items.add(category);
 
         category = new SpiderCategory();
-        category.name = "通话详单";
+        category.name = "资产资质认证";
+        category.spiders = new ArrayList<SpiderItem>() {{
+            add(new SpiderItem(Util.EMAIL, R.mipmap.ic_launcher, "邮箱"));
+            add(new SpiderItem(0, R.mipmap.ic_launcher, "公积金"));
+        }};
+        items.add(category);
+
+        category = new SpiderCategory();
+        category.name = "身份信息认证";
         category.spiders = new ArrayList<SpiderItem>() {{
             add(new SpiderItem(4, R.mipmap.ic_launcher, "联通", "http://wap.10010.com/t/query/getPhoneByDetailTip.htm", "unicom.js"));
             add(new SpiderItem(5, R.mipmap.ic_launcher, "移动", "https://login.10086.cn/login.html?channelID=12003&backUrl=http://shop.10086.cn/i/?f=billdetailqry", "mobile.js"));
+            add(new SpiderItem(0, R.mipmap.ic_launcher, "社保"));
         }};
         items.add(category);
 
         category = new SpiderCategory();
         category.name = "征信信息认证";
         category.spiders = new ArrayList<SpiderItem>() {{
-            add(new SpiderItem(1000, R.mipmap.ic_launcher, "芝麻分"));
+            add(new SpiderItem(Util.ZHIMA, R.mipmap.ic_launcher, "芝麻分"));
+            add(new SpiderItem(0, R.mipmap.ic_launcher, "简版征信"));
         }};
         items.add(category);
         parseCategories(items);
@@ -153,10 +167,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     SpiderItem item = category.spiders.get(position);
-                    if (item.sid == 1000) {
-                        startActivity(ZmxyActivity.class);
-                    } else {
-                        startDspider(item.sid, item.title, item.debugSrc, item.startUrl);
+                    switch (item.sid) {
+                        case Util.ZHIMA:
+                            startActivity(ZmxyActivity.class);
+                            break;
+                        case Util.EMAIL:
+                            startActivity(EmailActivity.class);
+                            break;
+                        default:
+                            startDspider(item.sid, item.title, item.debugSrc, item.startUrl);
                     }
                 }
             });
