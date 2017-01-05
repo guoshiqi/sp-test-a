@@ -24,6 +24,12 @@
    }
 -keep class wendu.spidersdk.DSpider
 -keep class wendu.spidersdk.DSpider.Result
+
+
+-keep class com.alipayzhima.**{*;}
+-keep class com.android.moblie.zmxy.antgroup.creditsdk.**{*;}
+-keep class com.antgroup.zmxy.mobile.android.container.**{*;}
+-keep class org.json.alipayzhima.**{*;}
 ##xwalk
 #-keep class org.xwalk.core.** { *;}
 #-keep class org.chromium.** { *;}

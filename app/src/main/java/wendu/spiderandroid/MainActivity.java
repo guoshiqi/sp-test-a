@@ -25,6 +25,7 @@ import wendu.common.base.BaseActivity;
 import wendu.common.utils.DpiHelper;
 import wendu.common.utils.KvStorage;
 import wendu.spidersdk.DSpider;
+import wendu.spidersdk.third.ZmxyActivity;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
@@ -129,6 +130,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             add(new SpiderItem(5, R.mipmap.ic_launcher, "移动", "https://login.10086.cn/login.html?channelID=12003&backUrl=http://shop.10086.cn/i/?f=billdetailqry", "mobile.js"));
         }};
         items.add(category);
+
+        category = new SpiderCategory();
+        category.name = "征信信息认证";
+        category.spiders = new ArrayList<SpiderItem>() {{
+            add(new SpiderItem(1000, R.mipmap.ic_launcher, "芝麻分"));
+        }};
+        items.add(category);
         parseCategories(items);
 
     }
@@ -145,7 +153,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     SpiderItem item = category.spiders.get(position);
-                    startDspider(item.sid, item.title, item.debugSrc, item.startUrl);
+                    if (item.sid == 1000) {
+                        startActivity(ZmxyActivity.class);
+                    } else {
+                        startDspider(item.sid, item.title, item.debugSrc, item.startUrl);
+                    }
                 }
             });
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
