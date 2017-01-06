@@ -8,7 +8,6 @@ dSpider("alipay", function(session, env, $) {
         session.showProgress(true);
         session.setProgressMax(100);
         session.setProgress(0);
-
         fetchUserInfo();
         jumptoOrderListPage();
         session.setProgress(50);
@@ -120,7 +119,6 @@ dSpider("alipay", function(session, env, $) {
     function finish() {
         log("---------------spider end success------------------------");
         session.setProgress(100);
-        session.hideLoading();
         session.showProgress(false);
         session.finish();
     }

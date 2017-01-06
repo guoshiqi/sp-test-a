@@ -9,10 +9,9 @@ dSpider("jd", function(session,env,$){
     var globalInfo;
 
     sid = session.get("sid");
-    log("xxxxxx" + location.href);
 
     if (location.href.indexOf("://m.jd.com") != -1 ) {
-        //session.showProgress(true);
+        session.showProgress(true);
         session.setProgressMax(100);
         session.autoLoadImg(false);
         session.setProgress(5);
@@ -84,18 +83,18 @@ dSpider("jd", function(session,env,$){
                         }
                         task.push($.each(d.orderList,function(i,e){
                                            $.get("https://home.m.jd.com/newAllOrders/queryOrderDetailInfo.action?orderId="+ d.orderList[i].orderId+"&from=newUserAllOrderList&passKey="+d.passKeyList[i]+"&sid="+sid,
-                                                                                             function(response,status){
-                                                                                                   var addr = $("<div>").append($(response)).find(".step2-in-con").text();
-                                                                                                   var orderitem = new order(d.orderList[i].orderId,d.orderList[i].dataSubmit,d.orderList[i].price,addr);
+                                                   function(response,status){
+                                                        var addr = $("<div>").append($(response)).find(".step2-in-con").text();
+                                                        var orderitem = new order(d.orderList[i].orderId,d.orderList[i].dataSubmit,d.orderList[i].price,addr);
 
-                                                                                                   orderitem.products = [];
-                                                                                                   var products = $("<div>").append($(response)).find(".pdiv");
-                                                                                                   $.each(products,function(k, e){
+                                                        orderitem.products = [];
+                                                        var products = $("<div>").append($(response)).find(".pdiv");
+                                                        $.each(products,function(k, e){
                                                                                                        var name = $("<div>").append(products[k]).find(".sitem-m-txt").text();
                                                                                                        var price = $("<div>").append(products[k]).find(".sitem-r").text();
                                                                                                        var num = $("<div>").append(products[k]).find(".s3-num").text();
                                                                                                        orderitem.products.push(new product(name,  num ,price));
-                                                                                                   });
+                                                         });
                                                                                                    if(Date.parse(new Date()) < ((new Date(orderitem.time.split(" ")[0])).getTime() + max_order_date * 24 * 60 * 60 * 1000)){
                                                                                                            if(globalInfo.order_info.order_detail.length < max_order_num){
                                                                                                                  globalInfo.order_info.order_detail.push(orderitem);
@@ -134,7 +133,6 @@ dSpider("jd", function(session,env,$){
            location.href = "http://home.m.jd.com/user/accountCenter.action";
     }
     if (location.href.indexOf("://home.m.jd.com/user/accountCenter.action") != -1 && location.href.indexOf("loginpage") == -1) {
-        log("xxxxxxxxxxxxx1");
         session.setProgress(70);
         if($('#shimingrenzheng')[0] != undefined){
            $('#shimingrenzheng')[0].click();
@@ -167,17 +165,16 @@ dSpider("jd", function(session,env,$){
     }
     //快捷卡实名用户
     if (location.href.indexOf("msc.jd.com/auth/loginpage/wcoo/toAuthPage") != -1 ) {
-            log("xxxxxxxxxxxxx2");
         session.setProgress(90);
         globalInfo = session.get(infokey);
         if($("#username")[0] !=undefined){
-            globalInfo.base_info.name  = $("#username")[0].value;
+            globalInfo.base_info.name  = $("#username")[0].innerHTML;
         }
         if($(".info-user-name")[0] !=undefined){
-                    globalInfo.base_info.name  = $("#info-user-name")[0].value;
+                    globalInfo.base_info.name  = $(".info-user-name")[0].innerHTML;
         }
         if($("#idcard")[0] !=undefined){
-            globalInfo.base_info.idcard_no  = $("#idcard")[0].value;
+            globalInfo.base_info.idcard_no  = $("#idcard")[0].innerHTML;
         }
         if($(".pos-ab[data-cardno]") !=undefined){
                     globalInfo.base_info.idcard_no  = $(".pos-ab[data-cardno]").attr("data-cardno");

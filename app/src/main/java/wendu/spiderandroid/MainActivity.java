@@ -98,7 +98,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         LatestResult.getInstance().getData().clear();
                         LatestResult.getInstance().getData().addAll(resultData.datas);
                         startActivity(ResultActivity.class);
-                        upload(resultData.datas, resultData.errorMsg);
+                        //upload(resultData.datas, resultData.errorMsg);
                     }
                 }
             } else {
@@ -274,7 +274,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         final int size = list.size();
         if (size == 0) {
             if (TextUtils.isEmpty(errMsg)) {
-                showDialog("提示", "没有符合条件的邮件");
+                showDialog("提示", "没有");
             } else {
                 ReportError(errMsg);
             }
