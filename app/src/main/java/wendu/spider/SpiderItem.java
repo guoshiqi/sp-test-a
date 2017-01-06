@@ -1,4 +1,4 @@
-package wendu.spiderandroid;
+package wendu.spider;
 
 import java.io.Serializable;
 

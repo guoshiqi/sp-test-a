@@ -1,4 +1,4 @@
-package wendu.spiderandroid;
+package wendu.spider;
 
 import android.content.Intent;
 import android.graphics.Color;

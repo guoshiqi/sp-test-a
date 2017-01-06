@@ -1,4 +1,4 @@
-package wendu.spiderandroid;
+package wendu.spider;
 
 /**
  * Created by du on 16/8/30.

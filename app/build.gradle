@@ -14,7 +14,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "wendu.commonlib"
+        applicationId "wendu.spider"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -45,7 +45,7 @@ android {
 
     productFlavors {
         mdm{
-            applicationId "wendu.test.spider"
+            applicationId "wendu.spider"
             buildConfigField "int" ,"channel","3"
         }
     }

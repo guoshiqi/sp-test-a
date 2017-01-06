@@ -1,4 +1,4 @@
-package wendu.spiderandroid;
+package wendu.spider;
 
 import android.os.Bundle;
 import android.view.View;
