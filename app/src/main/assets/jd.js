@@ -42,8 +42,8 @@ dSpider("jd", function(session,env,$){
                                     var node = $("<div>").append($(response))
                                     var name = node.find("#uersNameId")[0].value;
                                     var phone = node.find("#mobilePhoneId")[0].value;
-                                    var addr = node.find("#addressLabelId")[0].innerHTML;
-                                    var detail = node.find("#address_where")[0].innerHTML;
+                                    var addr =$.trim(node.find("#addressLabelId")[0].innerHTML);
+                                    var detail = $.trim(node.find("#address_where")[0].innerHTML);
 
                                     global_contact_info.contact_detail.push(new contact(name,addr,detail,phone, ""));
                                     }) );
