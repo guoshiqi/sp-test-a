@@ -60,7 +60,6 @@ class DSWebview extends WebView {
         this.script = script;
     }
 
-    private String lastInjectUrl = "";
 
     public void setDebugSrc(String debugSrc) {
         this.debugSrc = debugSrc;
@@ -111,7 +110,7 @@ class DSWebview extends WebView {
         post(new Runnable() {
             @Override
             public void run() {
-                if (webEventListener != null) {
+                if (webEventListener != null && url.startsWith("http")) {
                     webEventListener.onPageStart(url);
                 }
                 DSWebview.super.loadUrl(url);
@@ -251,7 +250,6 @@ class DSWebview extends WebView {
         @Override
         public void onReceivedTitle(WebView view, String title) {
             super.onReceivedTitle(view, title);
-            injectJs();
             if (webEventListener != null) {
                 webEventListener.onReceivedTitle(title);
             }
@@ -297,12 +295,8 @@ class DSWebview extends WebView {
         post(new Runnable() {
             @Override
             public void run() {
-                String url = getUrl();
-                if (!lastInjectUrl.equals(url)) {
-                    lastInjectUrl = url;
-                    String js = Helper.getFromAssets(getContext(), "injector.js");
-                    loadUrl("javascript:" + js);
-                }
+                String js = Helper.getFromAssets(getContext(), "injector.js");
+                loadUrl("javascript:" + js);
             }
         });
     }
@@ -378,7 +372,6 @@ class DSWebview extends WebView {
             Log.e("Webview", "delete file no exists " + file.getAbsolutePath());
         }
     }
-
 
 
 }
