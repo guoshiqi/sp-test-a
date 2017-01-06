@@ -130,25 +130,25 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         category = new SpiderCategory();
         category.name = "资产资质认证";
         category.spiders = new ArrayList<SpiderItem>() {{
-            add(new SpiderItem(Util.EMAIL, R.mipmap.ic_launcher, "邮箱"));
-            add(new SpiderItem(0, R.mipmap.ic_launcher, "公积金"));
+            add(new SpiderItem(Util.EMAIL, R.drawable.email, "邮箱"));
+            add(new SpiderItem(0, R.drawable.gjj, "公积金"));
         }};
         items.add(category);
 
         category = new SpiderCategory();
         category.name = "身份信息认证";
         category.spiders = new ArrayList<SpiderItem>() {{
-            add(new SpiderItem(4, R.mipmap.ic_launcher, "联通", "http://wap.10010.com/t/query/getPhoneByDetailTip.htm", "unicom.js"));
-            add(new SpiderItem(5, R.mipmap.ic_launcher, "移动", "https://login.10086.cn/login.html?channelID=12003&backUrl=http://shop.10086.cn/i/?f=billdetailqry", "mobile.js"));
-            add(new SpiderItem(0, R.mipmap.ic_launcher, "社保"));
+            add(new SpiderItem(4, R.drawable.unicom, "联通", "http://wap.10010.com/t/query/getPhoneByDetailTip.htm", "unicom.js"));
+            add(new SpiderItem(5, R.drawable.mobile, "移动", "https://login.10086.cn/login.html?channelID=12003&backUrl=http://shop.10086.cn/i/?f=billdetailqry", "mobile.js"));
+            add(new SpiderItem(0, R.drawable.shebao, "社保"));
         }};
         items.add(category);
 
         category = new SpiderCategory();
         category.name = "征信信息认证";
         category.spiders = new ArrayList<SpiderItem>() {{
-            add(new SpiderItem(Util.ZHIMA, R.mipmap.ic_launcher, "芝麻分"));
-            add(new SpiderItem(0, R.mipmap.ic_launcher, "简版征信"));
+            add(new SpiderItem(Util.ZHIMA, R.drawable.zmf, "芝麻分"));
+            add(new SpiderItem(0, R.drawable.zx, "简版征信"));
         }};
         items.add(category);
         parseCategories(items);

@@ -100,6 +100,9 @@ public class ResultActivity extends BaseActivity {
             } else {
                 menuItemView.showArrow(true);
                 menuItemView.setTag(jsonElement.toString());
+                if (jsonElement.isJsonArray()) {
+                    menuItemView.setText("[数组 " + jsonElement.getAsJsonArray().size() + "条记录]");
+                }
             }
             group.addView(menuItemView);
         }
@@ -140,7 +143,7 @@ public class ResultActivity extends BaseActivity {
                     menuItemView.setEnabled(false);
                     menuItemView.showArrow(false);
                 } else {
-                    menuItemView.setText(count + "条记录");
+                    menuItemView.setText("[" + count + "条记录]");
                     menuItemView.setTag(jsonElement.toString());
                     menuItemView.setOnClickListener(onJsonMenuItemClickListener);
 

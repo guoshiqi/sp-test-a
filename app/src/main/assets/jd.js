@@ -11,7 +11,7 @@ dSpider("jd", function(session,env,$){
 
 
     if (location.href.indexOf("://m.jd.com") != -1 ) {
-        session.showProgress(false);
+        session.showProgress(true);
         session.setProgressMax(100);
         session.autoLoadImg(false);
         session.setProgress(5);
