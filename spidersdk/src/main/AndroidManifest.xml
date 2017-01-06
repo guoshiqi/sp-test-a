@@ -1,13 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="wendu.spidersdk">
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:label="@string/app_name"
         android:supportsRtl="true">
-        <activity android:name=".SpiderActivity"   android:theme="@style/ColorTranslucentTheme" />
+        <activity
+            android:name=".SpiderActivity"
+            android:theme="@style/ColorTranslucentTheme" />
+        <activity
+            android:name=".third.ZmxyActivity"
+            android:label="芝麻信用"
+            android:theme="@style/ColorTranslucentTheme"></activity>
+        <activity
+            android:name="com.android.moblie.zmxy.antgroup.creditsdk.app.SDKActivity"
+            android:label="芝麻信用"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

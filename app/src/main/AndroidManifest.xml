@@ -29,7 +29,8 @@
         <!-- android:name="xwalk_apk_url" -->
         <!-- android:value="http://172.19.22.235/h5Test/dist/crosswalk.php" /> -->
         <activity android:name=".SettingActivity" />
-        <activity android:name=".test.TestActivity"></activity>
+        <activity android:name=".test.TestActivity" />
+        <activity android:name=".EmailActivity"></activity>
     </application>
 
 </manifest>

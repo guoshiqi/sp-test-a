@@ -37,7 +37,9 @@ import java.util.UUID;
 /**
  * Created by du on 16/4/15.
  */
-class Helper {
+public class Helper {
+
+    public static final String TAG = "spider";
 
     public static int getColor(Context ctx, int resId) {
         int color = -1;
