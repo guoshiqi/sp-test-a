@@ -149,7 +149,7 @@ class DSWebview extends WebView {
     private WebViewClient mWebViewClient = new WebViewClient() {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            Log.e("xy log", "shouldOverrideUrlLoading: " + url);
+
             if (webEventListener != null) {
                 webEventListener.onPageStart(url);
             }
@@ -163,6 +163,7 @@ class DSWebview extends WebView {
 
         @Override
         public void onPageFinished(final WebView view, String url) {
+            Log.e("xy log", "shouldOverrideUrlLoadingxxx: " + url);
             super.onPageFinished(view, url);
             if (!TextUtils.isEmpty(userAgent)) {
                 setUserAgent(userAgent);
