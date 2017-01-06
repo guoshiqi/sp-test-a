@@ -140,7 +140,7 @@ public class SpiderActivity extends AppCompatActivity {
             @Override
             void onReceivedError(String msg) {
                 super.onReceivedError(msg);
-                errorBack(msg, DSpider.Result.STATE_WEB_ERROR);
+                //errorBack(msg, DSpider.Result.STATE_WEB_ERROR);
             }
 
             @Override
