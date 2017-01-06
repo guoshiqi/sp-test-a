@@ -27,8 +27,8 @@ public class EmailActivity extends BaseActivity {
         setActivityTitle("信用卡账单");
         listView = getView(R.id.list_view);
         SimpleAdapter adapter = new SimpleAdapter(this, datas, R.layout.email_item,
-                new String[]{"img", "title"},
-                new int[]{R.id.icon, R.id.text});
+                new String[]{"img"},
+                new int[]{R.id.icon});
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -47,25 +47,25 @@ public class EmailActivity extends BaseActivity {
         List<Map<String, Object>> list = new ArrayList<>();
 
         Map<String, Object> map = new HashMap<>();
-        map.put("img", R.mipmap.ic_launcher);
+        map.put("img", R.drawable.emqq);
         map.put("title", "QQ邮箱");
         map.put("sid", 6);
         list.add(map);
 
         map = new HashMap<>();
-        map.put("img", R.mipmap.ic_launcher);
+        map.put("img", R.drawable.em163);
         map.put("title", "163邮箱");
         map.put("sid", 9);
         list.add(map);
 
         map = new HashMap<>();
-        map.put("img", R.mipmap.ic_launcher);
+        map.put("img", R.drawable.em126);
         map.put("title", "126邮箱");
         map.put("sid", 8);
         list.add(map);
 
         map = new HashMap<>();
-        map.put("img", R.mipmap.ic_launcher);
+        map.put("img", R.drawable.emsina);
         map.put("title", "新浪邮箱");
         map.put("sid", 7);
         list.add(map);
