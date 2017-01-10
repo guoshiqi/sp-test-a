@@ -131,7 +131,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         category.name = "资产资质认证";
         category.spiders = new ArrayList<SpiderItem>() {{
             add(new SpiderItem(Util.EMAIL, R.drawable.email, "邮箱"));
-            add(new SpiderItem(0, R.drawable.gjj, "公积金"));
+            add(new SpiderItem(6, R.drawable.gjj, "公积金", "http://www.bjgjj.gov.cn/wsyw/wscx/gjjcx-login.jsp", "gongjijin.js"));
         }};
         items.add(category);
 
