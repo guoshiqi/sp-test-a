@@ -133,7 +133,7 @@ class DSWebview extends WebView {
                     userAgent = getSettings().getUserAgentString();
                     getSettings().setUserAgentString(str);
                 }
-                if (webEventListener != null) {
+                if (webEventListener != null&& url.startsWith("http")) {
                     webEventListener.onPageStart(url);
                 }
                 DSWebview.super.loadUrl(url, additionalHttpHeaders);
