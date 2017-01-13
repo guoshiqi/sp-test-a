@@ -116,12 +116,14 @@ class JavaScriptBridgeImp {
         if (datas.get(sessionKey) == null) {
             return;
         }
+
         if (!mWebview.isDebug()) {
             reportState(code, msg);
         }
         mWebview.post(new Runnable() {
             @Override
             public void run() {
+                mWebview.getSettings().setJavaScriptEnabled(false);
                 mJavaScriptHandler.finish(new DSpider.Result(sessionKey, datas.get(sessionKey), msg, code));
                 datas.remove(sessionKey);
             }
@@ -155,7 +157,6 @@ class JavaScriptBridgeImp {
                 mJavaScriptHandler.showProgress(show);
             }
         });
-
     }
 
 

@@ -2,6 +2,8 @@ package wendu.spidersdk;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
+import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
@@ -18,7 +20,12 @@ public class DSpiderView extends LinearLayout {
     private DSWebview webview;
     private SpiderEventListener spiderEventListener;
     private int max = 100;
-    Map<String, Object> arguments;
+    private int sid=0;
+    private int retry=1;
+    private int mScriptCount=1;
+    private String startUrl="";
+
+    private String arguments;
 
     public DSpiderView(Context context) {
         super(context);
@@ -33,6 +40,9 @@ public class DSpiderView extends LinearLayout {
         webview.setWebEventListener(new DSWebview.WebEventListener() {
             @Override
             void onPageStart(String url) {
+                if(!(webview.isDebug()||url.equals(startUrl))){
+                   spiderEventListener.onProgressShow(true);
+                }
                 super.onPageStart(url);
             }
 
@@ -80,34 +90,85 @@ public class DSpiderView extends LinearLayout {
 
             @Override
             public String getArguments() {
-                try {
-                    return new JSONObject(arguments).toString();
-                } catch (Exception e) {
-                    return "{}";
+                return arguments;
+            }
+
+            @Override
+            public void setProgressMsg(String msg) {
+                if (spiderEventListener != null) {
+                    spiderEventListener.onProgressMsg(msg);
+                }
+            }
+
+            @Override
+            public void log(String log, int type) {
+                super.log(log, type);
+            }
+
+            @Override
+            public void showProgress(boolean show) {
+                if (spiderEventListener != null) {
+                    spiderEventListener.onProgressShow(show);
                 }
             }
         }));
 
     }
 
-    public void startDebug(String startUrl, String debugSrc) {
+    public boolean canRetry(){
+      return retry<mScriptCount;
+    }
+
+    public void retry(){
+        if(canRetry()) {
+           start();
+        }
+    }
+
+    public void startDebug(String startUrl, String debugSrc, @NonNull  SpiderEventListener spiderEventListener) {
+        this.spiderEventListener=spiderEventListener;
         webview.setDebug(true);
         webview.setDebugSrc(debugSrc);
+        webview.getSettings().setJavaScriptEnabled(true);
+        this.startUrl=startUrl;
         webview.loadUrl(startUrl);
     }
 
-    public void start(final int sid, Map<String, Object> arguments, @NonNull final SpiderEventListener spiderEventListener) {
+    public  void setArguments(Map<String, Object> arguments){
+        try {
+            this.arguments=new JSONObject(arguments).toString();
+        } catch (Exception e) {
+            this.arguments="{}";
+        }
+    }
 
-        this.arguments = arguments;
+    public  void setArguments(String  argumentsJson){
+        this.arguments=arguments;
+    }
+
+    public void start( int sid, @NonNull  SpiderEventListener spiderEventListener) {
+        this.sid=sid;
+        this.retry=1;
         this.spiderEventListener = spiderEventListener;
+        start();
+    }
+
+    public DSWebview getWebview(){
+        return  webview;
+    }
+
+    private void start(){
         final Context ctx = getContext();
-        Helper.init((Activity) ctx, sid, new InitStateListener() {
+        Helper.init((Activity) ctx, sid,retry++, new InitStateListener() {
             @Override
-            public void onSucceed(int taskId, String startUrl, String script) {
+            public void onSucceed(int taskId, String url, String script,int scriptCount) {
+                mScriptCount=scriptCount;
+                webview.getSettings().setJavaScriptEnabled(true);
                 webview.setDebug(false);
                 webview.setTaskId(taskId + "");
                 webview.setInjectScript(script);
-                webview.loadUrl(startUrl);
+                startUrl=url;
+                webview.loadUrl(url);
             }
 
             @Override

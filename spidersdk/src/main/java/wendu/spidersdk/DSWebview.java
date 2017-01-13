@@ -65,6 +65,7 @@ class DSWebview extends WebView {
         this.debugSrc = debugSrc;
     }
 
+
     private String debugSrc = "";
     private final String contentType = "application/javascript";
 

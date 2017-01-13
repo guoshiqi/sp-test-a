@@ -264,12 +264,13 @@ public class Helper {
     }
 
 
-    public static void init(final Activity ctx, final int sid, @NonNull final InitStateListener initStateListener) {
+    public static void init(final Activity ctx, final int sid,final int retryCount, @NonNull final InitStateListener initStateListener) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 HashMap<String, String> param = new HashMap<>();
                 param.put("sid", sid + "");
+                param.put("retry",retryCount+"");
                 try {
                     final String response = Helper.post(DSpider.BASE_URL + "script", param);
                     ctx.runOnUiThread(new Runnable() {
@@ -285,7 +286,7 @@ public class Helper {
                                 } else {
                                     ret = ret.getJSONObject("data");
                                     initStateListener.onSucceed(ret.getInt("script_id"),
-                                            ret.getString("login_url"), ret.getString("script"));
+                                            ret.getString("login_url"), ret.getString("script"),ret.getInt("script_count"));
                                 }
 
                             } catch (Exception e) {

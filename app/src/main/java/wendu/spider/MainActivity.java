@@ -82,7 +82,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         DSpider.build(this)
                 //.addArgument("test",7)
                 .setDebug(KvStorage.getInstance().getBoolean("debug", false))
-                .start(sid, debugSrcFileName, debugStartUrl);
+                .start(sid,title, debugSrcFileName, debugStartUrl);
     }
 
     @Override
@@ -149,6 +149,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         category.spiders = new ArrayList<SpiderItem>() {{
             add(new SpiderItem(Util.ZHIMA, R.drawable.zmf, "芝麻分"));
             add(new SpiderItem(0, R.drawable.zx, "简版征信"));
+            add(new SpiderItem(1, R.mipmap.ic_launcher, "测试", "https://www.baidu.com", "test.js"));
+
         }};
         items.add(category);
         parseCategories(items);
@@ -175,7 +177,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                             startActivity(EmailActivity.class);
                             break;
                         default:
-                            startDspider(item.sid, item.title, item.debugSrc, item.startUrl);
+                            startDspider(item.sid, item.name, item.debugSrc, item.startUrl);
                     }
                 }
             });

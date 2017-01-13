@@ -38,7 +38,7 @@ public class EmailActivity extends BaseActivity {
                 DSpider.build(EmailActivity.this)
                         //.addArgument("test",7)
                         .setDebug(KvStorage.getInstance().getBoolean("debug", false))
-                        .start(sid);
+                        .start(sid,map.get("title").toString());
             }
         });
     }
