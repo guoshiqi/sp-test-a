@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
+import android.webkit.CookieManager;
 
 import org.json.JSONObject;
 
@@ -124,6 +125,7 @@ class JavaScriptBridgeImp {
             @Override
             public void run() {
                 mWebview.removeJavascriptInterface();
+                CookieManager.getInstance().removeAllCookie();
                 mJavaScriptHandler.finish(new DSpider.Result(sessionKey, datas.get(sessionKey), msg, code));
                 datas.remove(sessionKey);
             }

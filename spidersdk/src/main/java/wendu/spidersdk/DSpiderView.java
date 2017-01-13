@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
+import android.webkit.CookieManager;
 import android.widget.LinearLayout;
 
 import org.json.JSONObject;
@@ -133,9 +134,9 @@ public class DSpiderView extends LinearLayout {
     public void startDebug(String startUrl, String debugSrc, @NonNull  SpiderEventListener spiderEventListener) {
         this.spiderEventListener=spiderEventListener;
         addJavaScriptApi();
+        CookieManager.getInstance().removeAllCookie();
         webview.setDebug(true);
         webview.setDebugSrc(debugSrc);
-        webview.getSettings().setJavaScriptEnabled(true);
         this.startUrl=startUrl;
         webview.loadUrl(startUrl);
     }
@@ -169,6 +170,7 @@ public class DSpiderView extends LinearLayout {
             @Override
             public void onSucceed(int taskId, String url, String script,int scriptCount) {
                 mScriptCount=scriptCount;
+                CookieManager.getInstance().removeAllCookie();
                 addJavaScriptApi();
                 webview.setDebug(false);
                 webview.setTaskId(taskId + "");

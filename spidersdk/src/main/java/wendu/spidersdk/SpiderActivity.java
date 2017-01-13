@@ -135,6 +135,7 @@ public class SpiderActivity extends AppCompatActivity {
 
         @Override
         public void onProgress(int progress, int max) {
+            workProgress.setMax(max);
             workProgress.setProgress(progress);
             percentage.setText((int) (progress / (float) max * 100) + "%");
         }
