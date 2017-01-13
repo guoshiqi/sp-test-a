@@ -29,15 +29,9 @@ import wendu.spidersdk.third.ZmxyActivity;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
-    TextView result;
-    TextView log;
-    String billId = "";
-    SwitchCompat debugSwitch;
-    //private SpiderService spiderService = DataController.getUploadSerivce();
-    private SpiderServiceTest spiderService=DataController.getUploadSerivceTest();
+
     private String scriptUrl="http://119.29.112.230:4832/?sid=";
     LinearLayout root;
-    //private String scriptUrl="http://172.19.22.235/spider-script/?sid=";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -225,142 +219,5 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             return convertView;
         }
     }
-
-    private void ReportError(final String msg) {
-        showLoadDialog("正在上报错误信息...");
-        spiderService.upload(msg).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<String>() {
-                    @Override
-                    public void onCompleted() {
-                        hideLoadDialog();
-                        showDialog("错误信息上报成功");
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        hideLoadDialog();
-                        showDialog("提示", "错误上报失败" + e.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(String String) {
-
-                    }
-                });
-    }
-
-    private void Report(final String msg) {
-        showLoadDialog("正在上报数据...");
-        spiderService.upload(msg).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<String>() {
-                    @Override
-                    public void onCompleted() {
-                        hideLoadDialog();
-                        showDialog("提示", "爬取成功");
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        hideLoadDialog();
-                        showDialog("上传数据失败" + e.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(String String) {
-
-                    }
-                });
-
-    }
-
-    void upload(final List<String> list, final String errMsg) {
-        final int size = list.size();
-        if (size == 0) {
-            if (TextUtils.isEmpty(errMsg)) {
-                showDialog("提示", "没有");
-            } else {
-                ReportError(errMsg);
-            }
-            return;
-        }
-        Gson gson=new Gson();
-        Report(gson.toJson(list));
-
-        //// TODO: 16/10/20 测试环境不上传数据
-//        if(true) return;
-//
-//        final Gson gson = new Gson();
-//        showLoadDialog("正在上传数据...");
-//        spiderService.sycTaskStatus(0, null, email, null, size, bank)
-//                .subscribeOn(Schedulers.io())
-//                .flatMap(new Func1<String, Observable<List<String>>>() {
-//                    @Override
-//                    public Observable<List<String>> call(String String) {
-//                        billId = String.bill_id;
-//                        List<List<String>> ll = new ArrayList<List<String>>();
-//                        //分组上传，10条一组
-//                        int x = size % 10;
-//                        if (x != 0) {
-//                            ll.add(list.subList(0, x));
-//                        }
-//                        for (int i = x; i < size; ) {
-//                            ll.add(list.subList(i, i + 10));
-//                            i += 10;
-//                        }
-//                        return Observable.from(ll);
-//                    }
-//                })
-//                .flatMap(new Func1<List<String>, Observable<String>>() {
-//                    @Override
-//                    public Observable<String> call(List<String> list) {
-//                        return spiderService.upload(billId, bank, email, gson.toJson(list));
-//                    }
-//                })
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new Subscriber<String>() {
-//                    @Override
-//                    public void onCompleted() {
-//                        int status = 2;//成功
-//                        if (!TextUtils.isEmpty(errMsg)) {
-//                            status = 3;//失败
-//                        }
-//                        spiderService.sycTaskStatus(status, billId, email, errMsg, size, bank)
-//                                .observeOn(AndroidSchedulers.mainThread())
-//                                .subscribeOn(Schedulers.io())
-//                                .subscribe(new Subscriber<String>() {
-//                                    @Override
-//                                    public void onCompleted() {
-//                                        hideLoadDialog();
-//                                        showDialog("提示", "爬取结束");
-//                                    }
-//
-//                                    @Override
-//                                    public void onError(Throwable e) {
-//                                        hideLoadDialog();
-//                                        showDialog("爬取失败", e.getMessage());
-//                                    }
-//
-//                                    @Override
-//                                    public void onNext(String String) {
-//
-//                                    }
-//                                });
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        hideLoadDialog();
-//                        showDialog("失败", e.getMessage());
-//                        e.printStackTrace();
-//                    }
-//
-//                    @Override
-//                    public void onNext(String String) {
-//
-//                    }
-//                });
-    }
-
-
 
 }
