@@ -64,6 +64,12 @@ public class DSpiderView extends LinearLayout {
 
         });
 
+        addJavaScriptApi();
+
+    }
+
+    private void addJavaScriptApi() {
+        webview.removeJavascriptInterface();
         webview.addJavascriptInterface(new JavaScriptBridge(webview, new JavaScriptHandler() {
             @Override
             public void setProgress(int progress) {
@@ -112,7 +118,6 @@ public class DSpiderView extends LinearLayout {
                 }
             }
         }));
-
     }
 
     public boolean canRetry(){
@@ -127,6 +132,7 @@ public class DSpiderView extends LinearLayout {
 
     public void startDebug(String startUrl, String debugSrc, @NonNull  SpiderEventListener spiderEventListener) {
         this.spiderEventListener=spiderEventListener;
+        addJavaScriptApi();
         webview.setDebug(true);
         webview.setDebugSrc(debugSrc);
         webview.getSettings().setJavaScriptEnabled(true);
@@ -163,7 +169,7 @@ public class DSpiderView extends LinearLayout {
             @Override
             public void onSucceed(int taskId, String url, String script,int scriptCount) {
                 mScriptCount=scriptCount;
-                webview.getSettings().setJavaScriptEnabled(true);
+                addJavaScriptApi();
                 webview.setDebug(false);
                 webview.setTaskId(taskId + "");
                 webview.setInjectScript(script);

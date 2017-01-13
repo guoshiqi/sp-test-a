@@ -124,6 +124,10 @@ class DSWebview extends WebView {
         super.addJavascriptInterface(object, "_xy");
     }
 
+    public void removeJavascriptInterface() {
+        super.removeJavascriptInterface("_xy");
+    }
+
     @Override
     public void loadUrl(final String url, final Map<String, String> additionalHttpHeaders) {
         post(new Runnable() {

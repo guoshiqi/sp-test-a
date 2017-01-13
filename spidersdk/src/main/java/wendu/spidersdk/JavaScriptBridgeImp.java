@@ -29,10 +29,10 @@ class JavaScriptBridgeImp {
         mWebview = webview;
         mJavaScriptHandler = javaScriptHandler;
         sharedPreferences = webview.getContext().getSharedPreferences("spider", Context.MODE_PRIVATE);
+        save("_log", "");
     }
 
     public void start(String sessionKey) {
-        save("_log", "");
         if (datas.get(sessionKey) == null) {
             datas.put(sessionKey, new ArrayList<String>());
         }
@@ -123,7 +123,7 @@ class JavaScriptBridgeImp {
         mWebview.post(new Runnable() {
             @Override
             public void run() {
-                mWebview.getSettings().setJavaScriptEnabled(false);
+                mWebview.removeJavascriptInterface();
                 mJavaScriptHandler.finish(new DSpider.Result(sessionKey, datas.get(sessionKey), msg, code));
                 datas.remove(sessionKey);
             }
@@ -140,7 +140,7 @@ class JavaScriptBridgeImp {
                     map.put("state", result + "");
                     map.put("script_id", mWebview.getTaskId());
                     map.put("msg", msg);
-                    String s = Helper.post(DSpider.REPORT_URL, map);
+                    String s = Helper.post(DSpider.BASE_URL+DSpider.REPORT_URL, map);
                     Log.d("dspider finish!", s);
                 } catch (Exception e) {
                     e.printStackTrace();
