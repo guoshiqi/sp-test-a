@@ -90,9 +90,8 @@ public class DSpider implements Serializable {
                 showDialog("缺少调试参数");
                 return this;
             }
-            start_(sid, title,debugSrcFileName, debugStartUrl, 0);
-            return this;
         }
+        start_(sid, title,debugSrcFileName, debugStartUrl, 0);
         return this;
     }
 

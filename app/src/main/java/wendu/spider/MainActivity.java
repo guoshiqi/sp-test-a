@@ -2,8 +2,6 @@ package wendu.spider;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.SwitchCompat;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,14 +11,9 @@ import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import wendu.common.base.BaseActivity;
 import wendu.common.utils.DpiHelper;
 import wendu.common.utils.KvStorage;
@@ -29,8 +22,6 @@ import wendu.spidersdk.third.ZmxyActivity;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
-
-    private String scriptUrl="http://119.29.112.230:4832/?sid=";
     LinearLayout root;
 
     @Override
@@ -68,46 +59,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 //        });
     }
 
-    void startDspider(int sid, String title, String debugSrcFileName, String debugStartUrl) {
-        if (sid == 0) {
-            showDialog("暂未上线，敬请期待！");
-            return;
-        }
-        DSpider.build(this)
-                //.addArgument("test",7)
-                .setDebug(KvStorage.getInstance().getBoolean("debug", false))
-                .start(sid,title, debugSrcFileName, debugStartUrl);
-    }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == DSpider.REQUEST) {
-            //获取爬取数据
-            if (resultCode == RESULT_OK) {
-                DSpider.Result resultData = DSpider.getLastResult(this);
-                if (resultData != null) {
-                    if (resultData.code != resultData.STATE_SUCCEED) {
-                        showDialog("失败了，" + resultData.errorMsg);
-                    } else {
-                        LatestResult.getInstance().getData().clear();
-                        LatestResult.getInstance().getData().addAll(resultData.datas);
-                        startActivity(ResultActivity.class);
-                        //upload(resultData.datas, resultData.errorMsg);
-                    }
-                }
-            } else {
-                showBottomToast("爬取任务取消");
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-
-        }
-    }
 
 
     public void initFromLocal() {
@@ -134,8 +86,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         category.spiders = new ArrayList<SpiderItem>() {{
             add(new SpiderItem(4, R.drawable.unicom, "联通", "http://wap.10010.com/t/query/getPhoneByDetailTip.htm", "unicom.js"));
             add(new SpiderItem(5, R.drawable.mobile, "移动", "https://login.10086.cn/login.html?channelID=12003&backUrl=http://shop.10086.cn/i/?f=billdetailqry", "mobile.js"));
-            add(new SpiderItem(6, R.mipmap.ic_launcher, "广东电信", "https://gd.189.cn/TS/login.htm", "telecom_gd.js"));
-            add(new SpiderItem(0, R.drawable.shebao, "社保"));
+            add(new SpiderItem(10, R.mipmap.ic_launcher, "广东电信", "https://gd.189.cn/TS/login.htm", "telecom_gd.js"));
+            add(new SpiderItem(11, R.drawable.shebao, "社保"));
         }};
         items.add(category);
 
@@ -183,6 +135,46 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
+    void startDspider(int sid, String title, String debugSrcFileName, String debugStartUrl) {
+        if (sid == 0) {
+            showDialog("暂未上线，敬请期待！");
+            return;
+        }
+        DSpider.build(this)
+                //.addArgument("test",7)
+                .setDebug(KvStorage.getInstance().getBoolean("debug", false))
+                .start(sid,title, debugSrcFileName, debugStartUrl);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == DSpider.REQUEST) {
+            //获取爬取数据
+            if (resultCode == RESULT_OK) {
+                DSpider.Result resultData = DSpider.getLastResult(this);
+                if (resultData != null) {
+                    if (resultData.code != resultData.STATE_SUCCEED) {
+                        showDialog("失败了，" + resultData.errorMsg);
+                    } else {
+                        LatestResult.getInstance().getData().clear();
+                        LatestResult.getInstance().getData().addAll(resultData.datas);
+                        startActivity(ResultActivity.class);
+                        //upload(resultData.datas, resultData.errorMsg);
+                    }
+                }
+            } else {
+                showBottomToast("爬取任务取消");
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+
+        }
+    }
 
     public class GridViewAdapter extends BaseAdapter {
 
