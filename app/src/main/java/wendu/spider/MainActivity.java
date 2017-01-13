@@ -131,7 +131,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         category.name = "资产资质认证";
         category.spiders = new ArrayList<SpiderItem>() {{
             add(new SpiderItem(Util.EMAIL, R.drawable.email, "邮箱"));
-            add(new SpiderItem(0, R.drawable.gjj, "公积金"));
+            add(new SpiderItem(6, R.drawable.gjj, "公积金", "http://www.bjgjj.gov.cn/wsyw/wscx/gjjcx-login.jsp", "gongjijin.js"));
         }};
         items.add(category);
 
@@ -140,6 +140,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         category.spiders = new ArrayList<SpiderItem>() {{
             add(new SpiderItem(4, R.drawable.unicom, "联通", "http://wap.10010.com/t/query/getPhoneByDetailTip.htm", "unicom.js"));
             add(new SpiderItem(5, R.drawable.mobile, "移动", "https://login.10086.cn/login.html?channelID=12003&backUrl=http://shop.10086.cn/i/?f=billdetailqry", "mobile.js"));
+            add(new SpiderItem(6, R.mipmap.ic_launcher, "广东电信", "https://gd.189.cn/TS/login.htm", "telecom_gd.js"));
             add(new SpiderItem(0, R.drawable.shebao, "社保"));
         }};
         items.add(category);
