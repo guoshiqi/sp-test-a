@@ -2,10 +2,10 @@ package wendu.spidersdk;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
-import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.widget.LinearLayout;
 
@@ -18,33 +18,48 @@ import java.util.Map;
  */
 public class DSpiderView extends LinearLayout {
 
-    private DSWebview webview;
+    private DSWebView webview;
+    private ViewGroup loading;
     private SpiderEventListener spiderEventListener;
     private int max = 100;
     private int sid=0;
     private int retry=1;
     private int mScriptCount=1;
     private String startUrl="";
+    private boolean customProgressShow=false;
 
     private String arguments;
 
+
+
     public DSpiderView(Context context) {
         super(context);
+        init();
     }
 
     public DSpiderView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        webview = new DSWebview(context);
-        this.addView(webview, new LinearLayout.LayoutParams(
-                LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        init();
+    }
 
-        webview.setWebEventListener(new DSWebview.WebEventListener() {
+    private void init(){
+        LayoutInflater.from(getContext()).inflate(R.layout.dspider_view, this);
+        webview= (DSWebView) findViewById(R.id.ds_webview);
+        loading= (ViewGroup) findViewById(R.id.ds_loading);
+        webview.setWebEventListener(new DSWebView.WebEventListener() {
             @Override
             void onPageStart(String url) {
-                if(!(webview.isDebug()||url.equals(startUrl))){
-                   spiderEventListener.onProgressShow(true);
+                if(!(customProgressShow||webview.isDebug())) {
+                    loading.setVisibility(VISIBLE);
                 }
-                super.onPageStart(url);
+            }
+
+            @Override
+            void onPageFinished(String url) {
+                super.onPageFinished(url);
+                if(url.equals(startUrl)) {
+                    loading.setVisibility(GONE);
+                }
             }
 
             @Override
@@ -64,10 +79,9 @@ public class DSpiderView extends LinearLayout {
             }
 
         });
-
         addJavaScriptApi();
-
     }
+
 
     private void addJavaScriptApi() {
         webview.removeJavascriptInterface();
@@ -117,6 +131,15 @@ public class DSpiderView extends LinearLayout {
                 if (spiderEventListener != null) {
                     spiderEventListener.onProgressShow(show);
                 }
+                customProgressShow=show;
+                //无论show还是false,loading都应该隐藏
+                postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        loading.setVisibility(GONE);
+                    }
+                },200);
+
             }
         }));
     }
@@ -160,7 +183,7 @@ public class DSpiderView extends LinearLayout {
         start();
     }
 
-    public DSWebview getWebview(){
+    public DSWebView getWebview(){
         return  webview;
     }
 

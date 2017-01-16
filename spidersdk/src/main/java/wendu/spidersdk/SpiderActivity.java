@@ -123,7 +123,6 @@ public class SpiderActivity extends AppCompatActivity {
                 fragment.errorReload();
             }
         });
-        //showLoadView();
 
     }
 
@@ -142,7 +141,6 @@ public class SpiderActivity extends AppCompatActivity {
 
         @Override
         public void onProgressShow(boolean isShow) {
-             hideLoadView();
             isProgressShow = isShow;
             SpiderActivity.this.showProgress(isShow);
         }
