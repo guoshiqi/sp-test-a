@@ -33,7 +33,7 @@ import java.util.Map;
  * Created by du on 16/12/23.
  */
 
-class DSWebview extends WebView {
+class DSWebView extends WebView {
 
     private String userAgent;
     private boolean debug = false;
@@ -69,12 +69,12 @@ class DSWebview extends WebView {
     private String debugSrc = "";
     private final String contentType = "application/javascript";
 
-    public DSWebview(Context context) {
+    public DSWebView(Context context) {
         super(context);
         init(context);
     }
 
-    public DSWebview(Context context, AttributeSet attrs) {
+    public DSWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
@@ -114,7 +114,7 @@ class DSWebview extends WebView {
                 if (webEventListener != null && url.startsWith("http")) {
                     webEventListener.onPageStart(url);
                 }
-                DSWebview.super.loadUrl(url);
+                DSWebView.super.loadUrl(url);
             }
         });
     }
@@ -141,7 +141,7 @@ class DSWebview extends WebView {
                 if (webEventListener != null&& url.startsWith("http")) {
                     webEventListener.onPageStart(url);
                 }
-                DSWebview.super.loadUrl(url, additionalHttpHeaders);
+                DSWebView.super.loadUrl(url, additionalHttpHeaders);
             }
         });
 
@@ -168,15 +168,12 @@ class DSWebview extends WebView {
         @Override
         public void onPageFinished(final WebView view, String url) {
             super.onPageFinished(view, url);
+
             if (!TextUtils.isEmpty(userAgent)) {
                 setUserAgent(userAgent);
                 userAgent = null;
             }
             injectJs();
-            if (webEventListener != null) {
-                webEventListener.onPageFinished(url);
-            }
-
         }
 
         @SuppressWarnings("deprecation")
@@ -229,11 +226,27 @@ class DSWebview extends WebView {
                     } catch (final Exception e) {
                         e.printStackTrace();
                         if (webEventListener != null) {
-                            webEventListener.onSdkServerError(e);
+                            post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    webEventListener.onSdkServerError(e);
+                                }
+                            });
+
                         }
                     }
                 }
+
+                if (webEventListener != null) {
+                    postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            webEventListener.onPageFinished(view.getOriginalUrl());
+                        }
+                    },200);
+                }
             }
+
             return response;
         }
     };

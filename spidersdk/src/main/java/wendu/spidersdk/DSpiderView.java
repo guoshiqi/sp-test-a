@@ -138,7 +138,7 @@ public class DSpiderView extends LinearLayout {
                     public void run() {
                         loading.setVisibility(GONE);
                     }
-                },200);
+                },100);
 
             }
         }));

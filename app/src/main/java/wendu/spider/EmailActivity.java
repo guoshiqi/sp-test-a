@@ -39,6 +39,7 @@ public class EmailActivity extends BaseActivity {
                         //.addArgument("test",7)
                         .setDebug(KvStorage.getInstance().getBoolean("debug", false))
                         .start(sid,map.get("title").toString());
+                finish();
             }
         });
     }
