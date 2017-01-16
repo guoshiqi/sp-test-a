@@ -266,6 +266,9 @@ DataSession.prototype = {
     hideLoading: function () {
         _xy.hideLoading()
     },
+    setStartUrl:function(){
+           this.set('__loginUrl',location.href);
+    },
     finish: function (errmsg, content, code, stack) {
         this.finished = true;
         if (errmsg) {
