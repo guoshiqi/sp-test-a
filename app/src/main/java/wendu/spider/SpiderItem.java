@@ -1,4 +1,4 @@
-package wendu.spiderandroid;
+package wendu.spider;
 
 import java.io.Serializable;
 
@@ -10,7 +10,6 @@ public class SpiderItem implements Serializable {
     public int sid;
     public int icon;
     public String name;
-    public String title = "";
     public String startUrl = "";
     public String debugSrc = "";
 

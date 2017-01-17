@@ -12,5 +12,5 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:id="@+id/root"
-        tools:context="wendu.spiderandroid.ResultActivity"></LinearLayout>
+        tools:context="wendu.spider.ResultActivity"></LinearLayout>
 </wendu.common.widget.BounceScrollView>

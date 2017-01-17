@@ -1,4 +1,4 @@
-package wendu.spiderandroid;
+package wendu.spider;
 
 import android.os.Bundle;
 import android.view.View;
@@ -38,7 +38,8 @@ public class EmailActivity extends BaseActivity {
                 DSpider.build(EmailActivity.this)
                         //.addArgument("test",7)
                         .setDebug(KvStorage.getInstance().getBoolean("debug", false))
-                        .start(sid);
+                        .start(sid,map.get("title").toString());
+                finish();
             }
         });
     }

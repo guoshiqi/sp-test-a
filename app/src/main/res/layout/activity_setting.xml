@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="wendu.spiderandroid.SettingActivity">
+    tools:context="wendu.spider.SettingActivity">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -32,6 +32,19 @@
             android:gravity="right|center_vertical"
             android:paddingLeft="15dp" />
     </LinearLayout>
+
+    <wendu.common.widget.SectionVerticalLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        android:background="@color/white">
+
+        <wendu.common.widget.MenuItemView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:tag=".LogActivity"
+            app:m_title="上次爬取日志" />
+    </wendu.common.widget.SectionVerticalLayout>
 
 
     <wendu.common.widget.SectionVerticalLayout

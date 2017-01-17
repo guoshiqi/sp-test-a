@@ -18,9 +18,12 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
+import java.util.List;
 
 public class SpiderActivity extends AppCompatActivity {
 
@@ -41,9 +44,8 @@ public class SpiderActivity extends AppCompatActivity {
     ViewGroup toobar;
 
     private boolean isProgressShow = false;
-    private DSWebview mWebView;
+    private DSpiderView spiderView;
     public String arguments = "";
-    private int max = 100;
     private boolean showProgress = false;
     private static final String TAG = "SpiderActivity";
     public <T extends View> T getView(int viewId) {
@@ -71,6 +73,7 @@ public class SpiderActivity extends AppCompatActivity {
                 waveProgress.setWaveColor(waveColor2, waveColor);
             }
         }
+        spiderView=getView(R.id.dspider_view);
         toobar=getView(R.id.toolbar);
         spider = getView(R.id.spider);
         workProgress = getView(R.id.work_progress);
@@ -88,18 +91,15 @@ public class SpiderActivity extends AppCompatActivity {
         titleTv.setText(TextUtils.isEmpty(title) ? "爬取" : title);
         boolean isDebug = getIntent().getBooleanExtra("debug", false);
         String startUrl = getIntent().getStringExtra("startUrl");
-        init();
+        if (TextUtils.isEmpty(arguments)) {
+            arguments = "{}";
+        }
+        spiderView.setArguments(arguments);
         if (isDebug) {
-            mWebView.setDebugSrc(getIntent().getStringExtra("debugSrc"));
-            mWebView.setDebug(true);
-            mWebView.loadUrl(startUrl);
+            spiderView.startDebug(startUrl,getIntent().getStringExtra("debugSrc"),spiderEventListener);
         } else {
-            String taskId = getIntent().getStringExtra("taskId");
-            String script = getSharedPreferences("spider", Context.MODE_PRIVATE).getString(taskId, "");
-            getSharedPreferences("spider", Context.MODE_PRIVATE).edit().remove(taskId);
-            mWebView.setInjectScript(script);
-            mWebView.setTaskId(taskId);
-            mWebView.loadUrl(startUrl);
+            int  sid = getIntent().getIntExtra("sid",-1);
+            spiderView.start(sid,spiderEventListener);
         }
 
         ImageView back=getView(R.id.back) ;
@@ -127,83 +127,56 @@ public class SpiderActivity extends AppCompatActivity {
 
     }
 
-    public void init() {
-        mWebView = (DSWebview) findViewById(R.id.webview);
-        mWebView.setWebEventListener(new DSWebview.WebEventListener() {
-            @Override
-            void onPageStart(String url) {
-                if (!isProgressShow) {
-                    showLoadView();
-                }
-                super.onPageStart(url);
-            }
+    SpiderEventListener spiderEventListener=new SpiderEventListener() {
+        @Override
+        public void onResult(String sessionKey, List<String> data) {
+            backResult(new DSpider.Result(sessionKey,data,"",0));
+        }
 
-            @Override
-            void onReceivedError(String msg) {
-                super.onReceivedError(msg);
-                //errorBack(msg, DSpider.Result.STATE_WEB_ERROR);
-            }
+        @Override
+        public void onProgress(int progress, int max) {
+            workProgress.setMax(max);
+            workProgress.setProgress(progress);
+            percentage.setText((int) (progress / (float) max * 100) + "%");
+        }
 
-            @Override
-            void onPageFinished(String url) {
-                hideLoadView();
-                super.onPageFinished(url);
-            }
-
-            @Override
-            void onSdkServerError(Exception e) {
-                errorBack(e.getMessage(), DSpider.Result.STATE_ERROR_MSG);
-                super.onSdkServerError(e);
-            }
-        });
-
-        mWebView.addJavascriptInterface(new JavaScriptBridge(mWebView, new JavaScriptHandler() {
-            @Override
-            public void setProgress(int progress) {
-                workProgress.setProgress(progress);
-                percentage.setText((int) (progress / (float) max * 100) + "%");
-            }
-
-            @Override
-            public void setProgressMax(int maxProgress) {
-                workProgress.setMax(maxProgress);
-                max = maxProgress;
-
-            }
-
-            @Override
-            public void setProgressMsg(String msg) {
-                progressMsg.setText(msg);
-                super.setProgressMsg(msg);
-            }
-
-            @Override
-            public void showProgress(boolean show) {
-                isProgressShow = show;
-                SpiderActivity.this.showProgress(show);
-            }
-
-            @Override
-            public void finish(DSpider.Result result) {
-                backResult(result);
-            }
-
-            @Override
-            public String getArguments() {
-                if (TextUtils.isEmpty(arguments)) {
-                    arguments = "{}";
-                }
-                return arguments;
-            }
-        }));
-
-    }
+        @Override
+        public void onProgressShow(boolean isShow) {
+            isProgressShow = isShow;
+            SpiderActivity.this.showProgress(isShow);
+        }
 
 
-    private void errorBack(String msg, int code) {
-        DSpider.Result result = new DSpider.Result("", null, msg, code);
-        backResult(result);
-    }
+        @Override
+        public void onProgressMsg(String msg) {
+            progressMsg.setText(msg);
+        }
+
+        @Override
+        public void onError(final int code, final String msg) {
+           if(spiderView.canRetry()){
+               Dialog alertDialog = new AlertDialog.Builder(SpiderActivity.this).
+                       setTitle("提示").
+                       setMessage("遇到点问题，检测到新的方案，是否重试？").
+                       setPositiveButton("重试", new DialogInterface.OnClickListener() {
+                           @Override
+                           public void onClick(DialogInterface dialog, int which) {
+                               spiderView.retry();
+                           }
+                       })
+                       .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                           @Override
+                           public void onClick(DialogInterface dialog, int which) {
+                               backResult(new DSpider.Result(code, msg));
+                           }
+                       })
+                       .create();
+               alertDialog.show();
+           } else{
+               backResult(new DSpider.Result(code, msg));
+           }
+        }
+    };
 
     private void backResult(DSpider.Result result) {
         Intent intent = new Intent();
@@ -240,7 +213,7 @@ public class SpiderActivity extends AppCompatActivity {
     }
 
     public void showInput(boolean show) {
-        mWebView.setDescendantFocusability(show ? ViewGroup.FOCUS_AFTER_DESCENDANTS : ViewGroup.FOCUS_BLOCK_DESCENDANTS);
+        spiderView.getWebview().setDescendantFocusability(show ? ViewGroup.FOCUS_AFTER_DESCENDANTS : ViewGroup.FOCUS_BLOCK_DESCENDANTS);
     }
 
     public void showProgress(boolean show) {
@@ -255,7 +228,7 @@ public class SpiderActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        mWebView.clearCache();
+        spiderView.getWebview().clearCache();
         super.onDestroy();
     }
 

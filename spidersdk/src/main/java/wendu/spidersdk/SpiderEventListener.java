@@ -15,6 +15,14 @@ public abstract class SpiderEventListener {
 
     }
 
+    public void onProgressShow(boolean isShow) {
+
+    }
+
+    public void onProgressMsg(String msg) {
+
+    }
+
     public void onError(int code, String msg) {
 
     }

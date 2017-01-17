@@ -10,7 +10,7 @@ import android.webkit.JavascriptInterface;
 
     private JavaScriptBridgeImp jsbImp;
 
-    public JavaScriptBridge(DSWebview webview, JavaScriptHandler javaScriptHandler) {
+    public JavaScriptBridge(DSWebView webview, JavaScriptHandler javaScriptHandler) {
         jsbImp = new JavaScriptBridgeImp(webview, javaScriptHandler);
     }
 

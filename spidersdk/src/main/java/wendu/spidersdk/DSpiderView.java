@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+import android.webkit.CookieManager;
 import android.widget.LinearLayout;
 
 import org.json.JSONObject;
@@ -15,25 +18,48 @@ import java.util.Map;
  */
 public class DSpiderView extends LinearLayout {
 
-    private DSWebview webview;
+    private DSWebView webview;
+    private ViewGroup loading;
     private SpiderEventListener spiderEventListener;
     private int max = 100;
-    Map<String, Object> arguments;
+    private int sid=0;
+    private int retry=1;
+    private int mScriptCount=1;
+    private String startUrl="";
+    private boolean customProgressShow=false;
+
+    private String arguments;
+
+
 
     public DSpiderView(Context context) {
         super(context);
+        init();
     }
 
     public DSpiderView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        webview = new DSWebview(context);
-        this.addView(webview, new LinearLayout.LayoutParams(
-                LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        init();
+    }
 
-        webview.setWebEventListener(new DSWebview.WebEventListener() {
+    private void init(){
+        LayoutInflater.from(getContext()).inflate(R.layout.dspider_view, this);
+        webview= (DSWebView) findViewById(R.id.ds_webview);
+        loading= (ViewGroup) findViewById(R.id.ds_loading);
+        webview.setWebEventListener(new DSWebView.WebEventListener() {
             @Override
             void onPageStart(String url) {
-                super.onPageStart(url);
+                if(!(customProgressShow||webview.isDebug())) {
+                    loading.setVisibility(VISIBLE);
+                }
+            }
+
+            @Override
+            void onPageFinished(String url) {
+                super.onPageFinished(url);
+                if(url.equals(startUrl)) {
+                    loading.setVisibility(GONE);
+                }
             }
 
             @Override
@@ -53,7 +79,12 @@ public class DSpiderView extends LinearLayout {
             }
 
         });
+        addJavaScriptApi();
+    }
 
+
+    private void addJavaScriptApi() {
+        webview.removeJavascriptInterface();
         webview.addJavascriptInterface(new JavaScriptBridge(webview, new JavaScriptHandler() {
             @Override
             public void setProgress(int progress) {
@@ -80,34 +111,95 @@ public class DSpiderView extends LinearLayout {
 
             @Override
             public String getArguments() {
-                try {
-                    return new JSONObject(arguments).toString();
-                } catch (Exception e) {
-                    return "{}";
+                return arguments;
+            }
+
+            @Override
+            public void setProgressMsg(String msg) {
+                if (spiderEventListener != null) {
+                    spiderEventListener.onProgressMsg(msg);
                 }
             }
-        }));
 
+            @Override
+            public void log(String log, int type) {
+                super.log(log, type);
+            }
+
+            @Override
+            public void showProgress(boolean show) {
+                if (spiderEventListener != null) {
+                    spiderEventListener.onProgressShow(show);
+                }
+                customProgressShow=show;
+                //无论show还是false,loading都应该隐藏
+                postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        loading.setVisibility(GONE);
+                    }
+                },100);
+
+            }
+        }));
     }
 
-    public void startDebug(String startUrl, String debugSrc) {
+    public boolean canRetry(){
+      return retry<mScriptCount;
+    }
+
+    public void retry(){
+        if(canRetry()) {
+           start();
+        }
+    }
+
+    public void startDebug(String startUrl, String debugSrc, @NonNull  SpiderEventListener spiderEventListener) {
+        this.spiderEventListener=spiderEventListener;
+        addJavaScriptApi();
+        CookieManager.getInstance().removeAllCookie();
         webview.setDebug(true);
         webview.setDebugSrc(debugSrc);
+        this.startUrl=startUrl;
         webview.loadUrl(startUrl);
     }
 
-    public void start(final int sid, Map<String, Object> arguments, @NonNull final SpiderEventListener spiderEventListener) {
+    public  void setArguments(Map<String, Object> arguments){
+        try {
+            this.arguments=new JSONObject(arguments).toString();
+        } catch (Exception e) {
+            this.arguments="{}";
+        }
+    }
 
-        this.arguments = arguments;
+    public  void setArguments(String  argumentsJson){
+        this.arguments=arguments;
+    }
+
+    public void start( int sid, @NonNull  SpiderEventListener spiderEventListener) {
+        this.sid=sid;
+        this.retry=1;
         this.spiderEventListener = spiderEventListener;
+        start();
+    }
+
+    public DSWebView getWebview(){
+        return  webview;
+    }
+
+    private void start(){
         final Context ctx = getContext();
-        Helper.init((Activity) ctx, sid, new InitStateListener() {
+        Helper.init((Activity) ctx, sid,retry++, new InitStateListener() {
             @Override
-            public void onSucceed(int taskId, String startUrl, String script) {
+            public void onSucceed(int taskId, String url, String script,int scriptCount) {
+                mScriptCount=scriptCount;
+                CookieManager.getInstance().removeAllCookie();
+                addJavaScriptApi();
                 webview.setDebug(false);
                 webview.setTaskId(taskId + "");
                 webview.setInjectScript(script);
-                webview.loadUrl(startUrl);
+                startUrl=url;
+                webview.loadUrl(url);
             }
 
             @Override

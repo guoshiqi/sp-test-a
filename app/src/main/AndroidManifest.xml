@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="wendu.spiderandroid">
+    package="wendu.spider">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -16,21 +16,20 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name="wendu.spider.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ResultActivity" />
-        <activity android:name=".DataReadActivity" />
+        <activity android:name="wendu.spider.ResultActivity" />
+        <activity android:name="wendu.spider.LogActivity" />
         <!-- <meta-data -->
         <!-- android:name="xwalk_apk_url" -->
         <!-- android:value="http://172.19.22.235/h5Test/dist/crosswalk.php" /> -->
-        <activity android:name=".SettingActivity" />
-        <activity android:name=".test.TestActivity" />
-        <activity android:name=".EmailActivity"></activity>
+        <activity android:name="wendu.spider.SettingActivity" />
+        <activity android:name="wendu.spider.EmailActivity"></activity>
     </application>
 
 </manifest>

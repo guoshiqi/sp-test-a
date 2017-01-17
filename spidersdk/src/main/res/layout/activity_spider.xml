@@ -49,8 +49,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <wendu.spidersdk.DSWebview
-                android:id="@+id/webview"
+            <wendu.spidersdk.DSpiderView
+                android:id="@+id/dspider_view"
                 android:layout_weight="1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />

@@ -1,4 +1,4 @@
-package wendu.spiderandroid;
+package wendu.spider;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

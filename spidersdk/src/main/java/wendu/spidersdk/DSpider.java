@@ -80,35 +80,21 @@ public class DSpider implements Serializable {
         return this;
     }
 
-    public void start(int sid) {
-        start(sid, "", "");
+    public void start(int sid,String title) {
+        start(sid,title, "", "");
     }
 
-
-    public void start(final int sid, final String debugSrcFileName, final String debugStartUrl) {
+    public DSpider start(final int sid, String title, final String debugSrcFileName, final String debugStartUrl) {
         if (isDebug) {
             if (TextUtils.isEmpty(debugSrcFileName) || TextUtils.isEmpty(debugStartUrl)) {
                 showDialog("缺少调试参数");
-                return;
+                return this;
             }
-            start_(sid, debugSrcFileName, debugStartUrl, 0);
-            return;
         }
-        Helper.init(ctx, sid, new InitStateListener() {
-            @Override
-            public void onSucceed(int script_id, String startUrl, String script) {
-                ctx.getSharedPreferences("spider", Context.MODE_PRIVATE)
-                        .edit().putString(script_id + "", script).commit();
-                start_(sid, "", startUrl, script_id);
-            }
-
-            @Override
-            public void onFail(String msg, int code) {
-                showDialog(msg);
-            }
-        });
-
+        start_(sid, title,debugSrcFileName, debugStartUrl, 0);
+        return this;
     }
+
 
     private void showDialog(final String msg) {
         ctx.runOnUiThread(new Runnable() {
@@ -128,16 +114,15 @@ public class DSpider implements Serializable {
 
     }
 
-    private void start_(int sid, String debugSrcFileName, String debugStartUrl, int taskId) {
+    private void start_(int sid, String title, String debugSrcFileName, String debugStartUrl, int taskId) {
 
         Intent intent = new Intent();
         intent.setClass(ctx, SpiderActivity.class);
-        //intent.putExtra("title", title);
         intent.putExtra("debug", isDebug);
         intent.putExtra("sid", sid);
         intent.putExtra("debugSrc", debugSrcFileName);
         intent.putExtra("startUrl", debugStartUrl);
-        intent.putExtra("taskId", taskId + "");
+        intent.putExtra("title",title);
         intent.putExtra("arguments", new JSONObject(arguments).toString());
         ctx.startActivityForResult(intent, REQUEST);
     }
@@ -148,13 +133,18 @@ public class DSpider implements Serializable {
         public static final int STATE_WEB_ERROR = 1;
         public static final int STATE_SCRIPT_ERROR = 2;
         public static final int STATE_PAGE_CHANGED = 3;
-        public static final int STATE_DSPIDER_SERVER_ERROR = 4;
-        public static final int STATE_ERROR_MSG = 5;
+        public static final int STATE_TIMEOUT=4;
+        public static final int STATE_DSPIDER_SERVER_ERROR = 5;
+        public static final int STATE_ERROR_MSG = 6;
         public List<String> datas;
         public String sessionKey;
         public String errorMsg;
         public int code;
 
+        public Result(int errorCode,String msg){
+            this.code=errorCode;
+            this.errorMsg=msg;
+        }
         public Result(String sessionKey, List<String> datas, String errorMsg, int code) {
             this.sessionKey = sessionKey;
             this.datas = datas;

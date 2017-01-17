@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
+import android.webkit.CookieManager;
 
 import org.json.JSONObject;
 
@@ -23,16 +24,16 @@ class JavaScriptBridgeImp {
     private HashMap<String, List<String>> datas = new HashMap<>();
     private SharedPreferences sharedPreferences;
     JavaScriptHandler mJavaScriptHandler;
-    DSWebview mWebview;
+    DSWebView mWebview;
 
-    public JavaScriptBridgeImp(DSWebview webview, JavaScriptHandler javaScriptHandler) {
+    public JavaScriptBridgeImp(DSWebView webview, JavaScriptHandler javaScriptHandler) {
         mWebview = webview;
         mJavaScriptHandler = javaScriptHandler;
         sharedPreferences = webview.getContext().getSharedPreferences("spider", Context.MODE_PRIVATE);
+        save("_log", "");
     }
 
     public void start(String sessionKey) {
-        save("_log", "");
         if (datas.get(sessionKey) == null) {
             datas.put(sessionKey, new ArrayList<String>());
         }
@@ -116,12 +117,15 @@ class JavaScriptBridgeImp {
         if (datas.get(sessionKey) == null) {
             return;
         }
+
         if (!mWebview.isDebug()) {
             reportState(code, msg);
         }
         mWebview.post(new Runnable() {
             @Override
             public void run() {
+                mWebview.removeJavascriptInterface();
+                CookieManager.getInstance().removeAllCookie();
                 mJavaScriptHandler.finish(new DSpider.Result(sessionKey, datas.get(sessionKey), msg, code));
                 datas.remove(sessionKey);
             }
@@ -138,7 +142,7 @@ class JavaScriptBridgeImp {
                     map.put("state", result + "");
                     map.put("script_id", mWebview.getTaskId());
                     map.put("msg", msg);
-                    String s = Helper.post(DSpider.REPORT_URL, map);
+                    String s = Helper.post(DSpider.BASE_URL+DSpider.REPORT_URL, map);
                     Log.d("dspider finish!", s);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -155,7 +159,6 @@ class JavaScriptBridgeImp {
                 mJavaScriptHandler.showProgress(show);
             }
         });
-
     }
 
 
