@@ -1,5 +1,5 @@
 
-dSpider("taobao", function(session,env,$){
+dSpider("taobao", 60*10 , function(session,env,$){
     //禁止加载图片
     session.autoLoadImg(false)
     log(location.href)
@@ -8,6 +8,15 @@ dSpider("taobao", function(session,env,$){
     if(location.pathname.indexOf("mtb/mtb.htm")!=-1){
         location="https://h5.m.taobao.com/mlapp/mytaobao.html";
     }
+
+    if(location.href.indexOf("intent://") != -1){
+        location="https://h5.m.taobao.com/mlapp/mytaobao.html";
+    }
+
+    if(location.href.indexOf("https://login.m.taobao.com/login.htm")){
+        session.setStartUrl();
+    }
+
     if (window.location.pathname.indexOf("mlapp/mytaobao") != -1) {
         //taobaoState    0:爬账单  1:爬地址   2:爬个人信息   3:结束
         var count = session.get("taobaoState");
