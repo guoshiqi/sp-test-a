@@ -179,17 +179,11 @@ class DSWebView extends WebView {
         @SuppressWarnings("deprecation")
         @Override
         public void onReceivedError(WebView view, int errorCode, String description, final String failingUrl) {
-            if (webEventListener != null) {
+            if (webEventListener != null&&failingUrl.startsWith("http")) {
                 webEventListener.onReceivedError(
                         String.format("{\"url\":\"%s\",\"msg\":\"%s\",\"code\":%d}", failingUrl, description, errorCode));
             }
             super.onReceivedError(view, errorCode, description, failingUrl);
-        }
-
-        @TargetApi(Build.VERSION_CODES.M)
-        @Override
-        public void onReceivedError(final WebView view, WebResourceRequest req, WebResourceError rerr) {
-            onReceivedError(view, rerr.getErrorCode(), rerr.getDescription().toString(), req.getUrl().toString());
         }
 
         @Override
