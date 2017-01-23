@@ -243,8 +243,6 @@ dSpider("taobao", 60*10 , function(session,env,$){
                 function getOrderDetail() {
                     //当前订单需要爬取的数据的对象
                     var tbOrderDetailInfo = {};
-                    //存放多个商品的数组
-                    var totalProductArray = [];
                     //创建订单详情的列表
                     var orderInfoList = [];
                     //拿到页面列表中所有的div
@@ -349,17 +347,15 @@ dSpider("taobao", 60*10 , function(session,env,$){
                                                 myproducts.number = orderInfoList[oil].number;
                                                 tbOrderDetailInfo.products.push(myproducts);
                                             }
-                                            totalProductArray.push(tbOrderDetailInfo);
                                         } else if (orderInfoList.length == 1) {//此订单中只有一个商品
                                             var myproducts = {};
                                             myproducts.name = orderInfoList[0].name;
                                             myproducts.price = orderInfoList[0].price;
                                             myproducts.number = orderInfoList[0].number;
                                             tbOrderDetailInfo.products.push(myproducts);
-                                            totalProductArray.push(tbOrderDetailInfo);
                                         }
                                         //存放数据
-                                        currentOrderData.push(totalProductArray);
+                                        currentOrderData.push(tbOrderDetailInfo);
                                         //保存数据
                                         session.set("orderArray",currentOrderData);
                                         //更新position
@@ -411,7 +407,6 @@ dSpider("taobao", 60*10 , function(session,env,$){
     else if(state == 1){
 
             if (window.location.hostname.indexOf("m.taobao.com") != -1) {
-                $(".my").click();//点击我的
                 location.href="//www.taobao.com/index.php?from=wap";
             }
             /**
