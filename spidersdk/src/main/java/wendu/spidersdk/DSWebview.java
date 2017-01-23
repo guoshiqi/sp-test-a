@@ -274,7 +274,6 @@ class DSWebView extends WebView {
 
         @Override
         public boolean onJsAlert(WebView view, String url, final String message, JsResult result) {
-            Log.e("dspider sdk:", "alert called");
             result.confirm();
             post(new Runnable() {
                 @Override
