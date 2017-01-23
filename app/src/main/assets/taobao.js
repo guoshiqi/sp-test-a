@@ -407,6 +407,7 @@ dSpider("taobao", 60*10 , function(session,env,$){
     else if(state == 1){
 
             if (window.location.hostname.indexOf("m.taobao.com") != -1) {
+                $(".my").click();//点击我的
                 location.href="//www.taobao.com/index.php?from=wap";
             }
             /**
