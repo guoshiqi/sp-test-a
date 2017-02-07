@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class DSpiderView extends LinearLayout {
 
-    private DSWebView webview;
+    private DSWebview webview;
     private ViewGroup loading;
     private SpiderEventListener spiderEventListener;
     private int max = 100;
@@ -44,9 +44,9 @@ public class DSpiderView extends LinearLayout {
 
     private void init(){
         LayoutInflater.from(getContext()).inflate(R.layout.dspider_view, this);
-        webview= (DSWebView) findViewById(R.id.ds_webview);
+        webview= (DSWebview) findViewById(R.id.ds_webview);
         loading= (ViewGroup) findViewById(R.id.ds_loading);
-        webview.setWebEventListener(new DSWebView.WebEventListener() {
+        webview.setWebEventListener(new DSWebview.WebEventListener() {
             @Override
             void onPageStart(String url) {
                 if(!(customProgressShow||webview.isDebug())) {
@@ -183,7 +183,7 @@ public class DSpiderView extends LinearLayout {
         start();
     }
 
-    public DSWebView getWebview(){
+    public DSWebview getWebview(){
         return  webview;
     }
 

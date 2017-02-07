@@ -1,30 +1,19 @@
 package wendu.spidersdk;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.net.http.SslError;
-import android.os.Build;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.webkit.CookieManager;
-import android.webkit.JsResult;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceError;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
@@ -35,7 +24,7 @@ import wendu.spidersdk.third.DWebView;
  * Created by du on 16/12/23.
  */
 
-class DSWebView extends DWebView {
+class DSWebview extends DWebView {
 
     private String userAgent;
     private boolean debug = false;
@@ -81,12 +70,12 @@ class DSWebView extends DWebView {
     private String debugSrc = "";
     private final String contentType = "application/javascript";
 
-    public DSWebView(Context context) {
+    public DSWebview(Context context) {
         super(context);
         init(context);
     }
 
-    public DSWebView(Context context, AttributeSet attrs) {
+    public DSWebview(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
@@ -106,7 +95,7 @@ class DSWebView extends DWebView {
         if (webEventListener != null && url.startsWith("http")) {
             webEventListener.onPageStart(url);
         }
-        DSWebView.super.loadUrl(url);
+        DSWebview.super.loadUrl(url);
 
 
     }
@@ -131,7 +120,7 @@ class DSWebView extends DWebView {
         if (webEventListener != null && url.startsWith("http")) {
             webEventListener.onPageStart(url);
         }
-        DSWebView.super.loadUrl(url, additionalHttpHeaders);
+        DSWebview.super.loadUrl(url, additionalHttpHeaders);
 
     }
 

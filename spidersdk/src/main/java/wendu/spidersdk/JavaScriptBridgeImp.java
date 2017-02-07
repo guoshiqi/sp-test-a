@@ -24,9 +24,9 @@ class JavaScriptBridgeImp {
     private HashMap<String, List<String>> datas = new HashMap<>();
     private SharedPreferences sharedPreferences;
     JavaScriptHandler mJavaScriptHandler;
-    DSWebView mWebview;
+    DSWebview mWebview;
 
-    public JavaScriptBridgeImp(DSWebView webview, JavaScriptHandler javaScriptHandler) {
+    public JavaScriptBridgeImp(DSWebview webview, JavaScriptHandler javaScriptHandler) {
         mWebview = webview;
         mJavaScriptHandler = javaScriptHandler;
         sharedPreferences = webview.getContext().getSharedPreferences("spider", Context.MODE_PRIVATE);
