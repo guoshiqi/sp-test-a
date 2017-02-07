@@ -196,11 +196,6 @@ class DSWebView extends WebView {
             super.onReceivedError(view, errorCode, description, failingUrl);
         }
 
-        @TargetApi(Build.VERSION_CODES.M)
-        @Override
-        public void onReceivedError(final WebView view, WebResourceRequest req, WebResourceError rerr) {
-            onReceivedError(view, rerr.getErrorCode(), rerr.getDescription().toString(), req.getUrl().toString());
-        }
 
         @Override
         public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
