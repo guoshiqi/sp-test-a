@@ -28,11 +28,12 @@ public class DSpider implements Serializable {
     public static int REQUEST = 2000;
     public static final String SDK_VERSION = "1.0.0";
     public static Context APP_CONTEXT;
-    //public static final String  BASE_URL="http://172.19.23.62/dSpider-web/1.0/";
+    public static final String  BASE_URL="http://172.19.23.62/dSpider-web/1.0/";
     //public static final String  BASE_URL="http://192.168.1.24/dSpider-web/1.0/";
+    public static final String REPORT_URL = "report";
 
-    public static final String BASE_URL = "http://119.29.112.230:8589/partner/crawl/";
-    public static final String REPORT_URL = "scriptReport";
+//    public static final String BASE_URL = "http://119.29.112.230:8589/partner/crawl/";
+//    public static final String REPORT_URL = "scriptReport";
 
 
     private DSpider(Activity ctx) {

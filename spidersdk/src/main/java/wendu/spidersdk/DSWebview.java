@@ -38,6 +38,16 @@ class DSWebView extends WebView {
     private String userAgent;
     private boolean debug = false;
     private String taskId;
+
+    public String getScriptId() {
+        return scriptId;
+    }
+
+    public void setScriptId(String scriptId) {
+        this.scriptId = scriptId;
+    }
+
+    private String scriptId;
     private String script;
 
     public String getTaskId() {

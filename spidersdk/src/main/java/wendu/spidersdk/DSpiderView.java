@@ -191,11 +191,12 @@ public class DSpiderView extends LinearLayout {
         final Context ctx = getContext();
         Helper.init((Activity) ctx, sid,retry++, new InitStateListener() {
             @Override
-            public void onSucceed(int taskId, String url, String script,int scriptCount) {
+            public void onSucceed(int scriptId, String url, String script,int scriptCount,int taskId) {
                 mScriptCount=scriptCount;
                 CookieManager.getInstance().removeAllCookie();
                 addJavaScriptApi();
                 webview.setDebug(false);
+                webview.setScriptId(scriptId+"");
                 webview.setTaskId(taskId + "");
                 webview.setInjectScript(script);
                 startUrl=url;

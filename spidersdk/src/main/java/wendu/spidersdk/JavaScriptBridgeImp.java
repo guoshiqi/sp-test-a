@@ -140,7 +140,8 @@ class JavaScriptBridgeImp {
                 try {
                     Map<String, String> map = new HashMap<String, String>();
                     map.put("state", result + "");
-                    map.put("script_id", mWebview.getTaskId());
+                    map.put("script_id", mWebview.getScriptId());
+                    map.put("task_id",mWebview.getTaskId());
                     map.put("msg", msg);
                     String s = Helper.post(DSpider.BASE_URL+DSpider.REPORT_URL, map);
                     Log.d("dspider finish!", s);
