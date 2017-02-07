@@ -232,7 +232,6 @@ DataSession.getExtraData = function (f) {
 DataSession.prototype = {
     _save: function () {
         _xy.set(this.key, JSON.stringify(this.data));
-        _xy.save(this.key,JSON.stringify(this.local))
     },
     _init: function (f) {
         this.data = JSON.parse(_xy.get(this.key) || "{}");
@@ -320,6 +319,8 @@ DataSession.prototype = {
     },
     setLocal: function (k, v) {
         this.local[k]=v
+        _xy.save(this.key,JSON.stringify(this.local))
+
     },
     getLocal: function (k) {
         return this.local[k];

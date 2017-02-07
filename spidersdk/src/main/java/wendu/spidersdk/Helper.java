@@ -280,9 +280,9 @@ public class Helper {
                         public void run() {
                             try {
                                 JSONObject ret = new JSONObject(response);
-                                int code = ret.getInt("errcode");
+                                int code = ret.getInt("code");
                                 if (code != 0) {
-                                    initStateListener.onFail(ret.getString("errmsg"),
+                                    initStateListener.onFail(ret.getString("msg"),
                                             DSpider.Result.STATE_ERROR_MSG);
 
                                 } else {
