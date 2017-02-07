@@ -28,7 +28,7 @@ public class DSpiderView extends LinearLayout {
     private String startUrl="";
     private boolean customProgressShow=false;
 
-    private String arguments;
+    private String arguments="{}";
 
 
 
@@ -173,12 +173,12 @@ public class DSpiderView extends LinearLayout {
     }
 
     public  void setArguments(String  argumentsJson){
-        this.arguments=arguments;
+        this.arguments=argumentsJson;
     }
 
     public void start( int sid, @NonNull  SpiderEventListener spiderEventListener) {
         this.sid=sid;
-        this.retry=1;
+        this.retry=0;
         this.spiderEventListener = spiderEventListener;
         start();
     }
@@ -189,7 +189,7 @@ public class DSpiderView extends LinearLayout {
 
     private void start(){
         final Context ctx = getContext();
-        Helper.init((Activity) ctx, sid,retry++, new InitStateListener() {
+        Helper.init((Activity) ctx, sid,++retry, new InitStateListener() {
             @Override
             public void onSucceed(int scriptId, String url, String script,int scriptCount,int taskId) {
                 mScriptCount=scriptCount;

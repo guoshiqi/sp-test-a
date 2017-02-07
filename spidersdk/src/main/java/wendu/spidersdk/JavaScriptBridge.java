@@ -2,11 +2,14 @@ package wendu.spidersdk;
 
 import android.webkit.JavascriptInterface;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by du on 16/8/17.
  */
 
- class JavaScriptBridge {
+class JavaScriptBridge {
 
     private JavaScriptBridgeImp jsbImp;
 
@@ -15,92 +18,94 @@ import android.webkit.JavascriptInterface;
     }
 
     @JavascriptInterface
-    public void start(String sessionKey) {
-        jsbImp.start(sessionKey);
+    public void start(JSONObject jsonObject) throws JSONException {
+        jsbImp.start(jsonObject.getString("sessionKey"));
     }
 
     @JavascriptInterface
-    public void set(String sessionKey, String value) {
-        jsbImp.set(sessionKey, value);
+    public void set(JSONObject jsonObject) throws JSONException {
+        jsbImp.set(jsonObject.getString("key"), jsonObject.getString("value"));
     }
 
     @JavascriptInterface
-    public String get(String key) {
-        return jsbImp.get(key);
+    public String get(JSONObject jsonObject) throws JSONException {
+        return jsbImp.get(jsonObject.getString("key"));
     }
 
     @JavascriptInterface
-    public void save(String key, String value) {
-        jsbImp.save(key, value);
+    public void save(JSONObject jsonObject) throws JSONException {
+        jsbImp.save(jsonObject.getString("key"), jsonObject.getString("value"));
     }
     @JavascriptInterface
-    public String read(String key){
-        return jsbImp.read(key);
-    }
-    @JavascriptInterface
-    public String clear(String sessionKey) {
-        return jsbImp.clear(sessionKey);
+    public String read(JSONObject jsonObject) throws JSONException {
+        return jsbImp.read(jsonObject.getString("key"));
     }
 
     @JavascriptInterface
-    public String getExtraData() {
-       return jsbImp.getExtraData();
+    public String clear(JSONObject jsonObject) throws JSONException {
+        return jsbImp.clear(jsonObject.getString("sessionKey"));
     }
 
     @JavascriptInterface
-      public boolean push(String sessionKey, String value) {
-        return jsbImp.push(sessionKey, value);
+    public String getExtraData(JSONObject jsonObject) {
+        return jsbImp.getExtraData();
     }
 
     @JavascriptInterface
-    public void setProgress(int progress) {
-       jsbImp.setProgress(progress);
+    public void push(JSONObject jsonObject) throws JSONException {
+        jsbImp.push(jsonObject.getString("sessionKey"), jsonObject.getString("value"));
     }
 
     @JavascriptInterface
-    public void setProgressMax(int progress) {
-        jsbImp.setProgressMax(progress);
+    public void setProgress(JSONObject jsonObject) throws JSONException {
+        jsbImp.setProgress(jsonObject.getInt("progress"));
+    }
+
+    @JavascriptInterface
+    public void setProgressMax(JSONObject jsonObject) throws JSONException {
+        jsbImp.setProgressMax(jsonObject.getInt("progress"));
     }
 
 
     @JavascriptInterface
-    public void finish(String name,int res,String msg) {
-        jsbImp.finish(name,res,msg);
+    public void finish(JSONObject jsonObject) throws JSONException {
+        jsbImp.finish(jsonObject.getString("sessionKey"), jsonObject.getInt("result"), jsonObject.getString("msg"));
     }
 
     @JavascriptInterface
-    public void showProgress(boolean show) {
-        jsbImp.showProgress(show);
+    public void showProgress(JSONObject jsonObject) throws JSONException {
+        jsbImp.showProgress(jsonObject.getBoolean("show"));
     }
 
     @JavascriptInterface
-    public String getArguments() {
+    public String getArguments(JSONObject jsonObject) {
         return jsbImp.getArguments();
     }
 
     @JavascriptInterface
-    public void load(String url, String headers){
-       jsbImp.load(url,headers);
+    public void load(JSONObject jsonObject) throws JSONException {
+        jsbImp.load(jsonObject.getString("url"), jsonObject.getString("headers"));
     }
 
     @JavascriptInterface
-    public void setUserAgent(String userAgent) {
-        jsbImp.setUserAgent(userAgent);
+    public void setUserAgent(JSONObject jsonObject) throws JSONException {
+        jsbImp.setUserAgent(jsonObject.getString("userAgent"));
     }
 
     @JavascriptInterface
-    public void autoLoadImg(boolean load) {
-        jsbImp.autoLoadImg(load);
+    public void autoLoadImg(JSONObject jsonObject) throws JSONException {
+        jsbImp.autoLoadImg(jsonObject.getBoolean("load"));
     }
 
     @JavascriptInterface
-    public void log(String msg,int type) {
-        jsbImp.log(msg,type);
+    public void log(JSONObject jsonObject) throws JSONException {
+
+        jsbImp.log(jsonObject.getString("msg"), jsonObject.getInt("type"));
     }
 
     @JavascriptInterface
-    public void setProgressMsg(String msg) {
-        jsbImp.setProgressMsg(msg);
+    public void setProgressMsg(JSONObject jsonObject) throws JSONException {
+        jsbImp.setProgressMsg(jsonObject.getString("msg"));
     }
 
 }
