@@ -137,7 +137,7 @@ public class Helper {
                 put("mac_id", getDeviceId(DSpider.APP_CONTEXT));
                 put("bundle_id", DSpider.APP_CONTEXT.getPackageName());
                 put("sdk_version", DSpider.SDK_VERSION);
-                put("model", Build.MODEL);
+               // put("model", Build.MODEL);
             }
         };
         try {
@@ -282,7 +282,7 @@ public class Helper {
                                 JSONObject ret = new JSONObject(response);
                                 int code = ret.getInt("errcode");
                                 if (code != 0) {
-                                    initStateListener.onFail(ret.getString("errmsg"),
+                                    initStateListener.onFail(ret.getString("errstr"),
                                             DSpider.Result.STATE_ERROR_MSG);
 
                                 } else {

@@ -173,7 +173,7 @@ public class DSpiderView extends LinearLayout {
     }
 
     public  void setArguments(String  argumentsJson){
-        this.arguments=arguments;
+        this.arguments=argumentsJson;
     }
 
     public void start( int sid, @NonNull  SpiderEventListener spiderEventListener) {
