@@ -29,11 +29,13 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
+import wendu.spidersdk.third.DWebView;
+
 /**
  * Created by du on 16/12/23.
  */
 
-class DSWebView extends WebView {
+class DSWebView extends DWebView {
 
     private String userAgent;
     private boolean debug = false;
@@ -90,24 +92,6 @@ class DSWebView extends WebView {
     }
 
     private void init(Context context) {
-        WebSettings settings = getSettings();
-        settings.setDomStorageEnabled(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            CookieManager.getInstance().setAcceptThirdPartyCookies(this, true);
-        }
-        CookieManager.getInstance().removeAllCookie();
-        settings.setAllowFileAccess(false);
-        settings.setAppCacheEnabled(false);
-        settings.setSavePassword(false);
-        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        settings.setJavaScriptEnabled(true);
-        settings.setLoadWithOverviewMode(true);
-        settings.setSupportMultipleWindows(true);
-        if (Build.VERSION.SDK_INT >= 21) {
-            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-        }
-        settings.setUseWideViewPort(true);
-        userAgent = settings.getUserAgentString();
         setWebChromeClient(mWebChromeClient);
         setWebViewClient(mWebViewClient);
     }
@@ -118,42 +102,36 @@ class DSWebView extends WebView {
 
     @Override
     public void loadUrl(final String url) {
-        post(new Runnable() {
-            @Override
-            public void run() {
-                if (webEventListener != null && url.startsWith("http")) {
-                    webEventListener.onPageStart(url);
-                }
-                DSWebView.super.loadUrl(url);
-            }
-        });
+
+        if (webEventListener != null && url.startsWith("http")) {
+            webEventListener.onPageStart(url);
+        }
+        DSWebView.super.loadUrl(url);
+
+
     }
 
     @SuppressLint("JavascriptInterface")
     public void addJavascriptInterface(JavaScriptBridge object) {
-        super.addJavascriptInterface(object, "_xy");
+        super.setJavascriptInterface(object);
     }
 
     public void removeJavascriptInterface() {
-        super.removeJavascriptInterface("_xy");
+        super.setJavascriptInterface(null);
     }
 
     @Override
     public void loadUrl(final String url, final Map<String, String> additionalHttpHeaders) {
-        post(new Runnable() {
-            @Override
-            public void run() {
-                String str = additionalHttpHeaders.get("User-Agent");
-                if (!TextUtils.isEmpty(str)) {
-                    userAgent = getSettings().getUserAgentString();
-                    getSettings().setUserAgentString(str);
-                }
-                if (webEventListener != null&& url.startsWith("http")) {
-                    webEventListener.onPageStart(url);
-                }
-                DSWebView.super.loadUrl(url, additionalHttpHeaders);
-            }
-        });
+
+        String str = additionalHttpHeaders.get("User-Agent");
+        if (!TextUtils.isEmpty(str)) {
+            userAgent = getSettings().getUserAgentString();
+            getSettings().setUserAgentString(str);
+        }
+        if (webEventListener != null && url.startsWith("http")) {
+            webEventListener.onPageStart(url);
+        }
+        DSWebView.super.loadUrl(url, additionalHttpHeaders);
 
     }
 
@@ -164,7 +142,7 @@ class DSWebView extends WebView {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             Log.e("xy log", "shouldOverrideUrlLoading: " + url);
-            if (webEventListener != null&&url.startsWith("http")) {
+            if (webEventListener != null && url.startsWith("http")) {
                 webEventListener.onPageStart(url);
             }
             return false;
@@ -178,7 +156,6 @@ class DSWebView extends WebView {
         @Override
         public void onPageFinished(final WebView view, String url) {
             super.onPageFinished(view, url);
-
             if (!TextUtils.isEmpty(userAgent)) {
                 setUserAgent(userAgent);
                 userAgent = null;
@@ -189,7 +166,7 @@ class DSWebView extends WebView {
         @SuppressWarnings("deprecation")
         @Override
         public void onReceivedError(WebView view, int errorCode, String description, final String failingUrl) {
-            if (webEventListener != null&&failingUrl.startsWith("http")) {
+            if (webEventListener != null && failingUrl.startsWith("http")) {
                 webEventListener.onReceivedError(
                         String.format("{\"url\":\"%s\",\"msg\":\"%s\",\"code\":%d}", failingUrl, description, errorCode));
             }
@@ -248,17 +225,13 @@ class DSWebView extends WebView {
                         public void run() {
                             webEventListener.onPageFinished(view.getOriginalUrl());
                         }
-                    },200);
+                    }, 200);
                 }
             }
-
             return response;
         }
     };
 
-    public void clear() {
-
-    }
 
     private WebChromeClient mWebChromeClient = new WebChromeClient() {
 
@@ -277,28 +250,6 @@ class DSWebView extends WebView {
             }
         }
 
-        @Override
-        public boolean onJsAlert(WebView view, String url, final String message, JsResult result) {
-            result.confirm();
-            post(new Runnable() {
-                @Override
-                public void run() {
-                    Dialog alertDialog = new AlertDialog.Builder(getContext()).
-                            setTitle("提示").
-                            setMessage(message).
-                            setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            })
-                            .create();
-                    alertDialog.show();
-                }
-            });
-            return true;
-        }
-
     };
 
 
@@ -313,13 +264,8 @@ class DSWebView extends WebView {
     }
 
     private void injectJs() {
-        post(new Runnable() {
-            @Override
-            public void run() {
-                String js = Helper.getFromAssets(getContext(), "injector.js");
-                loadUrl("javascript:" + js);
-            }
-        });
+        String js = Helper.getFromAssets(getContext(), "injector.js");
+        loadUrl("javascript:" + js);
     }
 
 
@@ -346,51 +292,6 @@ class DSWebView extends WebView {
 
         void onReceivedTitle(String title) {
 
-        }
-    }
-
-    private static final String APP_CACAHE_DIRNAME = "/webcache";
-
-    public void clearCache() {
-        CookieManager.getInstance().removeAllCookie();
-        Context context = getContext();
-        //清理Webview缓存数据库
-        try {
-            context.deleteDatabase("webview.db");
-            context.deleteDatabase("webviewCache.db");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        //WebView 缓存文件
-        File appCacheDir = new File(context.getFilesDir().getAbsolutePath() + APP_CACAHE_DIRNAME);
-        File webviewCacheDir = new File(context.getCacheDir().getAbsolutePath() + "/webviewCache");
-
-        //删除webview 缓存目录
-        if (webviewCacheDir.exists()) {
-            deleteFile(webviewCacheDir);
-        }
-        //删除webview 缓存 缓存目录
-        if (appCacheDir.exists()) {
-            deleteFile(appCacheDir);
-        }
-
-
-    }
-
-    public void deleteFile(File file) {
-        if (file.exists()) {
-            if (file.isFile()) {
-                file.delete();
-            } else if (file.isDirectory()) {
-                File files[] = file.listFiles();
-                for (int i = 0; i < files.length; i++) {
-                    deleteFile(files[i]);
-                }
-            }
-            file.delete();
-        } else {
-            Log.e("Webview", "delete file no exists " + file.getAbsolutePath());
         }
     }
 
