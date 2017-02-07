@@ -1,7 +1,6 @@
 package wendu.spidersdk;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,8 +15,6 @@ import android.webkit.CookieManager;
 import android.webkit.JsResult;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceError;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -33,7 +30,7 @@ import java.util.Map;
  * Created by du on 16/12/23.
  */
 
-class DSWebView extends WebView {
+class DSWebview extends WebView {
 
     private String userAgent;
     private boolean debug = false;
@@ -79,12 +76,12 @@ class DSWebView extends WebView {
     private String debugSrc = "";
     private final String contentType = "application/javascript";
 
-    public DSWebView(Context context) {
+    public DSWebview(Context context) {
         super(context);
         init(context);
     }
 
-    public DSWebView(Context context, AttributeSet attrs) {
+    public DSWebview(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
@@ -124,7 +121,7 @@ class DSWebView extends WebView {
                 if (webEventListener != null && url.startsWith("http")) {
                     webEventListener.onPageStart(url);
                 }
-                DSWebView.super.loadUrl(url);
+                DSWebview.super.loadUrl(url);
             }
         });
     }
@@ -151,7 +148,7 @@ class DSWebView extends WebView {
                 if (webEventListener != null&& url.startsWith("http")) {
                     webEventListener.onPageStart(url);
                 }
-                DSWebView.super.loadUrl(url, additionalHttpHeaders);
+                DSWebview.super.loadUrl(url, additionalHttpHeaders);
             }
         });
 
