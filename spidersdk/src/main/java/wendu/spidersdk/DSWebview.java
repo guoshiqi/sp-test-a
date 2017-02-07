@@ -161,7 +161,7 @@ class DSWebview extends WebView {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             Log.e("xy log", "shouldOverrideUrlLoading: " + url);
-            if (webEventListener != null&&url.startsWith("http")) {
+            if (webEventListener != null && url.startsWith("http")) {
                 webEventListener.onPageStart(url);
             }
             return false;
@@ -186,7 +186,7 @@ class DSWebview extends WebView {
         @SuppressWarnings("deprecation")
         @Override
         public void onReceivedError(WebView view, int errorCode, String description, final String failingUrl) {
-            if (webEventListener != null&&failingUrl.startsWith("http")) {
+            if (webEventListener != null && failingUrl.startsWith("http")) {
                 webEventListener.onReceivedError(
                         String.format("{\"url\":\"%s\",\"msg\":\"%s\",\"code\":%d}", failingUrl, description, errorCode));
             }
