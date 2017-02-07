@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class DSpiderView extends LinearLayout {
 
-    private DSWebView webview;
+    private DSWebview webview;
     private ViewGroup loading;
     private SpiderEventListener spiderEventListener;
     private int max = 100;
@@ -44,9 +44,9 @@ public class DSpiderView extends LinearLayout {
 
     private void init(){
         LayoutInflater.from(getContext()).inflate(R.layout.dspider_view, this);
-        webview= (DSWebView) findViewById(R.id.ds_webview);
+        webview= (DSWebview) findViewById(R.id.ds_webview);
         loading= (ViewGroup) findViewById(R.id.ds_loading);
-        webview.setWebEventListener(new DSWebView.WebEventListener() {
+        webview.setWebEventListener(new DSWebview.WebEventListener() {
             @Override
             void onPageStart(String url) {
                 if(!(customProgressShow||webview.isDebug())) {
@@ -173,29 +173,30 @@ public class DSpiderView extends LinearLayout {
     }
 
     public  void setArguments(String  argumentsJson){
-        this.arguments=arguments;
+        this.arguments=argumentsJson;
     }
 
     public void start( int sid, @NonNull  SpiderEventListener spiderEventListener) {
         this.sid=sid;
-        this.retry=1;
+        this.retry=0;
         this.spiderEventListener = spiderEventListener;
         start();
     }
 
-    public DSWebView getWebview(){
+    public DSWebview getWebview(){
         return  webview;
     }
 
     private void start(){
         final Context ctx = getContext();
-        Helper.init((Activity) ctx, sid,retry++, new InitStateListener() {
+        Helper.init((Activity) ctx, sid,++retry, new InitStateListener() {
             @Override
-            public void onSucceed(int taskId, String url, String script,int scriptCount) {
+            public void onSucceed(int scriptId, String url, String script,int scriptCount,int taskId) {
                 mScriptCount=scriptCount;
                 CookieManager.getInstance().removeAllCookie();
                 addJavaScriptApi();
                 webview.setDebug(false);
+                webview.setScriptId(scriptId+"");
                 webview.setTaskId(taskId + "");
                 webview.setInjectScript(script);
                 startUrl=url;

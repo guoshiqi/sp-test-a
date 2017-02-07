@@ -5,6 +5,6 @@ package wendu.spidersdk;
  */
 
 public interface InitStateListener {
-    void onSucceed(int taskId, String startUrl, String script,int scriptCount);
+    void onSucceed(int scriptId, String startUrl, String script,int scriptCount,int taskId);
     void onFail(String msg, int code);
 }

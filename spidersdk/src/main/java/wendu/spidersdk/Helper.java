@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
@@ -136,6 +137,7 @@ public class Helper {
                 put("mac_id", getDeviceId(DSpider.APP_CONTEXT));
                 put("bundle_id", DSpider.APP_CONTEXT.getPackageName());
                 put("sdk_version", DSpider.SDK_VERSION);
+               // put("model", Build.MODEL);
             }
         };
         try {
@@ -280,13 +282,13 @@ public class Helper {
                                 JSONObject ret = new JSONObject(response);
                                 int code = ret.getInt("errcode");
                                 if (code != 0) {
-                                    initStateListener.onFail(ret.getString("errmsg"),
+                                    initStateListener.onFail(ret.getString("errstr"),
                                             DSpider.Result.STATE_ERROR_MSG);
 
                                 } else {
                                     ret = ret.getJSONObject("data");
-                                    initStateListener.onSucceed(ret.getInt("script_id"),
-                                            ret.getString("login_url"), ret.getString("script"),ret.getInt("script_count"));
+                                    initStateListener.onSucceed(ret.getInt("script_id"), ret.getString("login_url"),
+                                            ret.getString("script"),ret.getInt("script_count"),ret.has("id")?ret.getInt("id"):0);
                                 }
 
                             } catch (Exception e) {
