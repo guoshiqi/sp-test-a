@@ -4,7 +4,7 @@ dSpider("jd", function(session,env,$){
     var infokey = "infokey";
     var sid = "";
     var max_order_num = 30;
-    var max_order_date = 1000;
+    var max_order_date = 100;
     var globalInfo;
 
     sid = session.get("sid");
@@ -25,7 +25,7 @@ dSpider("jd", function(session,env,$){
         globalInfo.base_info.username  = $("[report-eventid$='MCommonHTail_Account']").text().replace(/\n/g,"").replace(/\t/g,"");
         saveInfo();
         session.setProgress(10);
-        location.href="http://home.m.jd.com/maddress/address.action?";
+        location.href="https://home.m.jd.com/maddress/address.action?";
     }
 
     if (location.href.indexOf("://home.m.jd.com/maddress") != -1) {
@@ -158,7 +158,7 @@ dSpider("jd", function(session,env,$){
     }
 
     function getUserInfo(){
-           location.href = "http://home.m.jd.com/user/accountCenter.action";
+           location.href = "https://home.m.jd.com/user/accountCenter.action";
     }
     if (location.href.indexOf("://home.m.jd.com/user/accountCenter.action") !== -1 && location.href.indexOf("loginpage") == -1) {
         session.setProgress(70);
