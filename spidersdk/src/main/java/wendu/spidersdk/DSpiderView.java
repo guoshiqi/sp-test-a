@@ -23,7 +23,7 @@ public class DSpiderView extends LinearLayout {
     private SpiderEventListener spiderEventListener;
     private int max = 100;
     private int sid=0;
-    private int retry=1;
+    private int retry = 0;
     private int mScriptCount=1;
     private String startUrl="";
     private boolean customProgressShow=false;
@@ -57,9 +57,7 @@ public class DSpiderView extends LinearLayout {
             @Override
             void onPageFinished(String url) {
                 super.onPageFinished(url);
-                if(url.equals(startUrl)) {
-                    loading.setVisibility(GONE);
-                }
+                loading.setVisibility(GONE);
             }
 
             @Override
@@ -107,6 +105,11 @@ public class DSpiderView extends LinearLayout {
                         spiderEventListener.onError(result.code, result.errorMsg);
                     }
                 }
+            }
+
+            @Override
+            public void setArguments(String json) {
+                arguments = json;
             }
 
             @Override

@@ -13,6 +13,8 @@ public abstract class JavaScriptHandler {
 
     public abstract String getArguments();
 
+    public abstract void setArguments(String json);
+
     public void log(String log, int type) {
 
     }

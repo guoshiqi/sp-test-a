@@ -80,6 +80,10 @@ class JavaScriptBridgeImp {
         return mJavaScriptHandler.getArguments();
     }
 
+    public void setArguments(String json) {
+        mJavaScriptHandler.setArguments(json);
+    }
+
 
     public boolean push(String sessionKey, String value) {
         List<String> list = datas.get(sessionKey);

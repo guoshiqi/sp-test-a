@@ -1,5 +1,6 @@
 package wendu.spider;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -39,7 +40,6 @@ public class EmailActivity extends BaseActivity {
                         //.addArgument("test",7)
                         .setDebug(KvStorage.getInstance().getBoolean("debug", false))
                         .start(sid,map.get("title").toString());
-                finish();
             }
         });
     }
@@ -50,13 +50,13 @@ public class EmailActivity extends BaseActivity {
         Map<String, Object> map = new HashMap<>();
         map.put("img", R.drawable.emqq);
         map.put("title", "QQ邮箱");
-        map.put("sid", 6);
+        map.put("sid", 5);
         list.add(map);
 
         map = new HashMap<>();
         map.put("img", R.drawable.em163);
         map.put("title", "163邮箱");
-        map.put("sid", 9);
+        map.put("sid", 6);
         list.add(map);
 
         map = new HashMap<>();
@@ -71,5 +71,27 @@ public class EmailActivity extends BaseActivity {
         map.put("sid", 7);
         list.add(map);
         return list;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == DSpider.REQUEST) {
+            //获取爬取数据
+            if (resultCode == RESULT_OK) {
+                DSpider.Result resultData = DSpider.getLastResult(this);
+                if (resultData != null) {
+                    if (resultData.code != resultData.STATE_SUCCEED) {
+                        showDialog("失败了，" + resultData.errorMsg);
+                    } else {
+                        LatestResult.getInstance().getData().clear();
+                        LatestResult.getInstance().getData().addAll(resultData.datas);
+                        startActivity(ResultActivity.class);
+                    }
+                }
+            } else {
+                showBottomToast("爬取任务取消");
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

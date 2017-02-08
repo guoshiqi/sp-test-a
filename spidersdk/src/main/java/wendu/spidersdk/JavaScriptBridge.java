@@ -83,6 +83,11 @@ class JavaScriptBridge {
     }
 
     @JavascriptInterface
+    public void setArguments(JSONObject jsonObject) throws JSONException {
+        jsbImp.setArguments(jsonObject.getString("args"));
+    }
+
+    @JavascriptInterface
     public void load(JSONObject jsonObject) throws JSONException {
         jsbImp.load(jsonObject.getString("url"), jsonObject.getString("headers"));
     }
