@@ -57,9 +57,9 @@ public class DSpiderView extends LinearLayout {
             @Override
             void onPageFinished(String url) {
                 super.onPageFinished(url);
-                if(url.equals(startUrl)) {
+                // if(url.equals(startUrl)) {
                     loading.setVisibility(GONE);
-                }
+                // }
             }
 
             @Override
