@@ -129,7 +129,6 @@ dSpider("unicom", 60*5, function(session,env,$){
     }
 
     if(window.location.href.indexOf("/uac.10010.com/oauth2/new_auth") != -1) {
-        session.setStartUrl();
         var footer = $("div.footer:eq(0)");
         if (footer) {
             footer.css("visibility", "hidden");
@@ -161,6 +160,7 @@ dSpider("unicom", 60*5, function(session,env,$){
         $("input#userName:eq(0)").val(session.getLocal("userName"));
         $("input#userPwd:eq(0)").val(session.getLocal("password"));
 
+        session.setStartUrl();
         session.showProgress(false);
     } if(window.location.href.indexOf('query/getPhoneByDetailTip.htm') != -1){
         //显示loading
