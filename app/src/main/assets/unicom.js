@@ -135,7 +135,7 @@ dSpider("unicom", 60*5, function(session,env,$){
         }
         var header = $("div.header");
         if(header) {
-            header.css("visibility", "hidden");
+            header.css("display", "none");
         }
         var passFind = $("div.interval2:eq(0)");
         if(passFind) {
