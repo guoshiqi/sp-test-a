@@ -167,6 +167,7 @@ class DSWebView extends WebView {
 
         @Override
         public void onPageFinished(final WebView view, String url) {
+            Log.e("xy log", "shouldOverrideUrlLoadingxxx: " + url);
             super.onPageFinished(view, url);
 
             if (!TextUtils.isEmpty(userAgent)) {
