@@ -1,35 +1,28 @@
 dSpider("test", function(session,env,$) {
 
- log(env)
-// session.upload("Hi, I am the test data!")
-// session.finish()
+    //保存对象key值,字段已mG开头
+    var mG = "gjj";  //上传的数据
+    var mG_userInfo = "gjj_user_info";  //个人信息
+    var mG_accessList = "gjj_access_list";  //每月缴存列表
+    var mG_companyNum = "gjj_company_number";   //缴存公司总数
+    var mG_companyList = "gjj_company_list";    //公司列表
+    var mG_companyIndex = "gjj_get_company_info_index"; //以获取缴存单位下标位置(从0开始)
+    var mG_hasUserInfo = "gjj_has_get_userinfo";    //是否获取到用户信息
 
-    var companyNum = "pay_company_number";//缴存公司数量
-    var companyList = "pay_company_list";//缴存公司列表
-    var hasUserInfo = "has_user_info"; //1表示已获取个人信息
-    var user_key = "user_info";
-    var hasGrabIndex = "has_grab_pay_company_index"; //已爬取缴存单位下标
-    var recordList = "record_list"; //明细列表
+    //方法在前,逻辑在后
 
-    //登录页面
-    if (location.href.indexOf('gjjcx-login.jsp') != -1) {
-        setUser();  //自动填充账号
-     }
-
-     //①登录成功页获取缴纳列表
-     if(location.href.indexOf("gjjcx-choice.jsp") != -1) {
-        session.showProgress()
-        session.setProgressMax(100);
-        savePayCompanies(); //保存缴纳公司列表
-     }
+    //获取标签中的文本
+    function getTrimText(view) {
+        return $.trim($(view).text().replace(/[\n|\s]/g, ""));
+    }
 
 
-     function savePayCompanies() {
+    //①获取缴存公司列表
+    function getPayCompanies() {
         var companytrs = $('#new-mytable tbody').find('tr');
         if (companytrs && companytrs.length > 0) {
-            session.set(companyNum, (companytrs.length - 1));
+            session.set(mG_companyNum, (companytrs.length - 1));
         }
-
         var companies = []; //单位列表
         for (var i = 0; i < companytrs.length; i++) {
             if (i == 0) {
@@ -51,44 +44,16 @@ dSpider("test", function(session,env,$) {
         }
 
         //保存缴存单位列表
-        session.set(companyList, companies);
+        session.set(mG_companyList, companies);
 
         //获取用户信息
         if (companies.length > 0) {
             location.href = companies[companies.length - 1].link;
         }
-     }
+    }
 
-     //②获取用户信息
-     if (location.href.indexOf("gjj_cx.jsp") != -1) {
-         var has = session.get(hasUserInfo);
-         if (has == 1) {
-            var num = session.get(companyNum);
-            if (num >= 1) {
-                var index = session.get(hasGrabIndex);
-                if (index == undefined) {
-                    index = 0;
-                }  else if (index < num) {
-                    session.setProgress(Math.max(1, index) / num * 100);
-                }  else if (index >= num) {
-//                     session.setProgress(100);
-//                     session.showProgress(false);
-//                     session.finish();
-                     return;
-                }
-
-                document.getElementById('t3').click();
-                getRecordList();
-            }
-
-         } else {
-            getUserInfo();
-         }
-     }
-
-
-     //解析用户信息
-     function getUserInfo() {
+    //②获取用户个人信息
+    function getUserInfo() {
          var name, sex, ID, cardNo, companyName, companyId, balance, lastDate, status;
          var trs = $('#tabContents').first().find('div').eq(1).find('table').first().find('tbody').first().find('tr');
          trs.each(function(i){
@@ -97,39 +62,52 @@ dSpider("test", function(session,env,$) {
                 tds.each(function(j){
                     if (j == 1) {
                         //姓名
-                        name = $.trim($(this).text());
+                        name = getTrimText(this);
                     } else if (j == 3) {
                         //个人登记号
-                        cardNo = $.trim($(this).text());
+                        cardNo = getTrimText(this);
                     }
                 });
             } else if (i == 1) {
                 tds.each(function(j){
                     if (j == 3) {
                         //身份证号
-                        ID = $.trim($(this).text());
+                        ID = getTrimText(this);
                         //判断性别
-                        sex = "男";
+                        var b = -1;
+                        if(ID.length == 18) {
+                            b = ID.substring(16, 17);
+                        } else if (ID.length == 15) {
+                            b = ID.substring(14, 15);
+                        }
+
+                        if (b == -1) {
+                            sex = "未知";
+                        } else if (b / 2 == 0){
+                            sex = "女";
+                        } else {
+                            sex = "男";
+                        }
                     }
                 });
             } else if (i == 2) {
                 tds.each(function(j){
                     if (j == 1) {
                         //单位登记号
-                        companyId = $.trim($(this).text());
+                        companyId = getTrimText(this);
                     } else if (j == 3) {
                         //单位名
-                        companyName = $.trim($(this).text());
+                        companyName = getTrimText(this);
                     }
                 });
             } else if (i == 4) {
                 tds.each(function(j){
                     if (j == 1) {
                         //当前余额
-                        balance = $.trim($(this).text());
+                        balance = getTrimText(this);
                     } else if (j == 3) {
                         //账户状态
-                        status = $.trim($(this).text());
+                        status = getTrimText(this);
                     }
                 });
             } else if (i == 5) {
@@ -140,37 +118,44 @@ dSpider("test", function(session,env,$) {
                 tds.each(function(j){
                     if (j == 3) {
                         //最后操作日期
-                        lastDate = $.trim($(this).text());
+                        lastDate = getTrimText(this);
                     }
                 });
             }
          });
 
          var user = new User(name, sex, ID, cardNo, companyName, companyId, balance, lastDate, status);
-         session.set(user_key, user);
-         session.set(hasUserInfo, 1);
+         var data = session.get(mG);
+         if (!data) {
+            data = {};
+            data["list"] = [];
+         }
+         data["info"] = user;
+         session.set(mG, data);
+         session.set(mG_userInfo, user);
+         session.set(mG_hasUserInfo, 1);
          session.setProgress(10);
 
          //获取完个人信息去获取明细
-         var companies = session.get(companyList);
+         var companies = session.get(mG_companyList);
          location.href = companies[0].link;
-     }
+    }
 
-     //获取个人明细账信息
-     function getRecordList() {
-        var records = session.get(recordList);
-        if (records == undefined) {
+    //③获取缴纳明细列表
+    function getAccessList() {
+        var records = session.get(mG_accessList);
+        if (records == undefined || !records) {
             records = [];
         }
 
-        var index = session.get(hasGrabIndex);
+        var index = session.get(mG_companyIndex);
 
         if (index == undefined) {
             index = 0;
         } else {
             index = index + 1;
         }
-        var companies = session.get(companyList);
+        var companies = session.get(mG_companyList);
         var companyName = companies[index].name;
 
         var trs = $('#tab-style').find('tbody').first().find('tr');
@@ -182,15 +167,15 @@ dSpider("test", function(session,env,$) {
                 var record = new Record();
                 var tds = $(this).find('td');
                 tds.each(function(j){
-                    var value = $.trim($(this).text());
+                    var value = getTrimText(this);
                     if (value.length == 0) {
                         return;
                     }
 
                     if (j == 0) {
-                        record.date = value;
+                        record.date = value.replace(/(\d{4})(\d{2})/,"$1-$2-");
                     } else if (j == 1) {
-                        record.month = value;
+                        record.month = value.replace(/(\d{4})/,"$1-");
                     } else if (j == 2) {
                         record.describe = value;
                     } else if (j == 3) {
@@ -203,26 +188,33 @@ dSpider("test", function(session,env,$) {
                 });
 
                 record.companyName = companyName;
-
                 records.push(record);
             });
 
-            session.set(recordList, records);
+             var data = session.get(mG);
+                 if (!data) {
+                    data = {};
+                    data["list"] = [];
+                 }
+                 data["list"] = records;
+
+             session.set(mG, data);
+            session.set(mG_accessList, records);
 
             //打印数据
             $.each(records,function(i, item){
                 log("业务类型:" + item.describe + "---" + "时间:" + item.date + "---" + "入账:" + item.takeIn + "---" + "出账:" + item.takeOut + "---" + "余额:" + item.balance + "----" + "公司:" + item.companyName);
             });
 
-            session.set(hasGrabIndex, index);
+            session.set(mG_companyIndex, index);
 
-            var num = session.get(companyNum);
+            var num = session.get(mG_companyNum);
             if (num > 0 && (index <= (num - 2))) {
                 location.href = companies[index + 1].link;
             } else {
                 session.setProgress(100);
                 session.showProgress(false);
-                session.upload(session.get(user_key))
+                session.upload(session.get(mG))
                 session.finish();
             }
         } else {
@@ -233,26 +225,66 @@ dSpider("test", function(session,env,$) {
             var link = clicktxt.substring((start + 1), end)
             location.href = link;   //TODO 跳转到历史明细页
         }
+    }
 
 
 
+
+
+
+
+    //登录页面
+    if (location.href.indexOf('gjjcx-login.jsp') != -1) {
+        setUser();  //自动填充账号
      }
+
+     //①登录成功页获取缴纳列表
+     if(location.href.indexOf("gjjcx-choice.jsp") != -1) {
+        session.showProgress()
+        session.setProgressMax(100);
+        getPayCompanies(); //获取缴纳公司列表
+     }
+
+     //②获取用户信息
+     if (location.href.indexOf("gjj_cx.jsp") != -1) {
+         var has = session.get(mG_hasUserInfo);
+         if (has == 1) {
+            var num = session.get(mG_companyNum);
+            if (num >= 1) {
+                var index = session.get(mG_companyIndex);
+                if (index == undefined) {
+                    index = 0;
+                }  else if (index < num) {
+                    session.setProgress(Math.max(1, index) / num * 100);
+                }  else if (index >= num) {
+                     return;
+                }
+
+                document.getElementById('t3').click();
+                getAccessList();
+            }
+
+         } else {
+            getUserInfo();
+         }
+     }
+
 
     //③获取历史缴存明细
     if (location.href.indexOf("gjj_cxls.jsp") != -1) {
-        var records = session.get(recordList);
-        if (records == undefined) {
+        var records = session.get(mG_accessList);
+        if (records == undefined || !records) {
             records = [];
         }
 
-        var index = session.get(hasGrabIndex);
+        var index = session.get(mG_companyIndex);
         if (index == undefined) {
             index = 0;
         } else {
             index = index + 1;
         }
 
-        var companies = session.get(companyList);
+        var companies = session.get(mG_companyList);
         var companyName = companies[index].name;
 
 
@@ -271,9 +303,9 @@ dSpider("test", function(session,env,$) {
                         }
 
                         if (j == 0) {
-                            record.date = value;
+                            record.date = value.replace(/(\d{4})(\d{2})/,"$1-$2-");
                         } else if (j == 1) {
-                            record.month = value;
+                            record.month = value.replace(/(\d{4})/,"$1-");
                         } else if (j == 2) {
                             record.describe = value;
                         } else if (j == 3) {
@@ -290,11 +322,11 @@ dSpider("test", function(session,env,$) {
                     records.push(record);
                 });
 
-                session.set(recordList, records);
+                session.set(mG_accessList, records);
         }
 
-        session.set(hasGrabIndex, index);
-        var num = session.get(companyNum);
+        session.set(mG_companyIndex, index);
+        var num = session.get(mG_companyNum);
         if (num > 0 && (index <= (num - 2))) {
             location.href = companies[index + 1].link;
         } else {
@@ -307,8 +339,8 @@ dSpider("test", function(session,env,$) {
 
     //自动填充账号*****************
     function setUser() {
-        $('#bh1').attr('value', '1111');//填充内容
-        $('#mm1').attr('value', '1111');//填充内容
+        $('#bh1').attr('value', '111111');//填充内容
+        $('#mm1').attr('value', '222222');//填充内容
 
     }
 
