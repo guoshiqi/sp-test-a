@@ -1,7 +1,9 @@
 package wendu.spider;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,8 @@ import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +27,7 @@ import wendu.spidersdk.third.ZmxyActivity;
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     LinearLayout root;
+    SpiderCategory spiderCategory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +73,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         category.name = "消费信息认证";
         category.spiders = new ArrayList<SpiderItem>() {{
             add(new SpiderItem(2, R.drawable.taobao, "淘宝", "https://login.m.taobao.com/login.htm", "taobao.js"));
-            add(new SpiderItem(3, R.drawable.alipay, "支付宝", "https://custweb.alipay.com/account/index.htm", "alipay.js"));
-            add(new SpiderItem(1, R.drawable.jd, "京东", "https://plogin.m.jd.com/user/login.action?appid=100", "jd.js"));
+            add(new SpiderItem(4, R.drawable.alipay, "支付宝", "https://custweb.alipay.com/account/index.htm", "alipay.js"));
+            add(new SpiderItem(3, R.drawable.jd, "京东", "https://plogin.m.jd.com/user/login.action?appid=100", "jd.js"));
         }};
         items.add(category);
 
@@ -84,20 +89,25 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         category = new SpiderCategory();
         category.name = "身份信息认证";
         category.spiders = new ArrayList<SpiderItem>() {{
-            add(new SpiderItem(4, R.drawable.unicom, "联通", "http://wap.10010.com/t/query/getPhoneByDetailTip.htm", "unicom.js"));
-            add(new SpiderItem(5, R.drawable.mobile, "移动", "https://login.10086.cn/login.html?channelID=12003&backUrl=http://shop.10086.cn/i/?f=billdetailqry", "mobile.js"));
-            add(new SpiderItem(10, R.drawable.telecom, "广东电信", "https://gd.189.cn/TS/login.htm", "telecom_gd.js"));
-            add(new SpiderItem(11, R.drawable.shebao, "社保"));
+            add(new SpiderItem(9, R.drawable.unicom, "联通", "http://wap.10010.com/t/query/getPhoneByDetailTip.htm", "unicom.js"));
+            add(new SpiderItem(10, R.drawable.mobile, "移动", "https://login.10086.cn/login.html?channelID=12003&backUrl=http://shop.10086.cn/i/?f=billdetailqry", "mobile.js"));
+            add(new SpiderItem(11, R.drawable.telecom, "广东电信", "https://gd.189.cn/TS/login.htm", "telecom_gd.js"));
+            add(new SpiderItem(0, R.drawable.shebao, "社保"));
         }};
         items.add(category);
 
         category = new SpiderCategory();
         category.name = "征信信息认证";
         category.spiders = new ArrayList<SpiderItem>() {{
-            add(new SpiderItem(Util.ZHIMA, R.drawable.zmf, "芝麻分"));
             add(new SpiderItem(0, R.drawable.zx, "简版征信"));
-            add(new SpiderItem(1, R.mipmap.ic_launcher, "测试", "https://www.baidu.com", "test.js"));
 
+        }};
+        items.add(category);
+
+        category = new SpiderCategory();
+        category.name = "小说";
+        category.spiders = new ArrayList<SpiderItem>() {{
+            add(new SpiderItem(12, R.mipmap.ic_launcher, "顶点小说", "http://m.23us.com/", "dingdian.js"));
         }};
         items.add(category);
         parseCategories(items);
@@ -115,6 +125,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    spiderCategory = category;
                     SpiderItem item = category.spiders.get(position);
                     switch (item.sid) {
                         case Util.ZHIMA:
@@ -140,10 +151,26 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             showDialog("暂未上线，敬请期待！");
             return;
         }
-        DSpider.build(this)
+        DSpider dSpider = DSpider.build(this);
                 //.addArgument("test",7)
-                .setDebug(KvStorage.getInstance().getBoolean("debug", false))
-                .start(sid,title, debugSrcFileName, debugStartUrl);
+        if (KvStorage.getInstance().getBoolean("debug", false)) {
+            dSpider.startDebug(sid, title, debugSrcFileName, debugStartUrl);
+        } else {
+            dSpider.start(sid, title);
+        }
+    }
+
+    public String saveToSDCard(String filename, String filecontent) throws Exception {
+        String dir = Environment.getExternalStorageDirectory() + "/dspider";
+        File file = new File(dir);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        file = new File(dir, filename);
+        FileOutputStream outStream = new FileOutputStream(file);
+        outStream.write(filecontent.getBytes());
+        outStream.close();
+        return file.getPath();
     }
 
     @Override
@@ -156,9 +183,29 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     if (resultData.code != resultData.STATE_SUCCEED) {
                         showDialog("失败了，" + resultData.errorMsg);
                     } else {
-                        LatestResult.getInstance().getData().clear();
-                        LatestResult.getInstance().getData().addAll(resultData.datas);
-                        startActivity(ResultActivity.class);
+                        if (spiderCategory.name.equals("小说")) {
+                            StringBuilder stringBuilder = new StringBuilder();
+                            for (String str : resultData.datas) {
+                                stringBuilder.append(str);
+                                stringBuilder.append("\r\n");
+                            }
+                            try {
+                                String path = saveToSDCard(resultData.sessionKey + ".txt", stringBuilder.toString());
+                                Intent intent = new Intent();
+                                intent.setAction(Intent.ACTION_VIEW);
+                                File file = new File(path);
+                                intent.setDataAndType(Uri.fromFile(file), "text/*");
+                                startActivity(intent);
+                            } catch (Exception e) {
+                                showDialog("存储卡保存失败，请检查是否已授权。\r\n" + e.getMessage());
+                                e.printStackTrace();
+                            }
+
+                        } else {
+                            LatestResult.getInstance().getData().clear();
+                            LatestResult.getInstance().getData().addAll(resultData.datas);
+                            startActivity(ResultActivity.class);
+                        }
                         //upload(resultData.datas, resultData.errorMsg);
                     }
                 }

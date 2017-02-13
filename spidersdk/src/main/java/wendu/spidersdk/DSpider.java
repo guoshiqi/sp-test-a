@@ -28,9 +28,13 @@ public class DSpider implements Serializable {
     public static int REQUEST = 2000;
     public static final String SDK_VERSION = "1.0.0";
     public static Context APP_CONTEXT;
-    public static final String  BASE_URL="http://172.19.23.62/dSpider-web/1.0/";
-    //public static final String  BASE_URL="http://192.168.1.24/dSpider-web/1.0/";
+
+    //public static final String  BASE_URL="http://172.19.23.62/dSpider-web/1.0/";
+    public static final String BASE_URL = "https://api.dtworkroom.com/1.0/";
     public static final String REPORT_URL = "report";
+
+    private String debugSrcFileName;
+    private String debugStartUrl;
 
 //    public static final String BASE_URL = "http://119.29.112.230:8589/partner/crawl/";
 //    public static final String REPORT_URL = "scriptReport";
@@ -76,26 +80,21 @@ public class DSpider implements Serializable {
         return this;
     }
 
-    public DSpider setDebug(boolean debug) {
-        isDebug = debug;
-        return this;
-    }
-
     public void start(int sid,String title) {
-        start(sid,title, "", "");
+        start(sid, title, "");
     }
 
-    public DSpider start(final int sid, String title, final String debugSrcFileName, final String debugStartUrl) {
-        if (isDebug) {
-            if (TextUtils.isEmpty(debugSrcFileName) || TextUtils.isEmpty(debugStartUrl)) {
-                showDialog("缺少调试参数");
-                return this;
-            }
-        }
-        start_(sid, title,debugSrcFileName, debugStartUrl, 0);
+    public DSpider start(int sid, String title, String startUrl) {
+        start_(sid, title, startUrl);
         return this;
     }
 
+    public void startDebug(int sid, String title, String debugSrcFileName, String debugStartUrl) {
+        isDebug = true;
+        this.debugSrcFileName = debugSrcFileName;
+        this.debugStartUrl = debugStartUrl;
+        start(sid, title, "");
+    }
 
     private void showDialog(final String msg) {
         ctx.runOnUiThread(new Runnable() {
@@ -115,14 +114,20 @@ public class DSpider implements Serializable {
 
     }
 
-    private void start_(int sid, String title, String debugSrcFileName, String debugStartUrl, int taskId) {
-
+    private void start_(int sid, String title, String startUrl) {
+        if (isDebug) {
+            if (TextUtils.isEmpty(debugSrcFileName) || TextUtils.isEmpty(debugStartUrl)) {
+                showDialog("缺少调试参数");
+                return;
+            }
+        }
         Intent intent = new Intent();
         intent.setClass(ctx, SpiderActivity.class);
         intent.putExtra("debug", isDebug);
         intent.putExtra("sid", sid);
         intent.putExtra("debugSrc", debugSrcFileName);
-        intent.putExtra("startUrl", debugStartUrl);
+        intent.putExtra("startUrl", startUrl);
+        intent.putExtra("debugStartUrl", debugStartUrl);
         intent.putExtra("title",title);
         intent.putExtra("arguments", new JSONObject(arguments).toString());
         ctx.startActivityForResult(intent, REQUEST);

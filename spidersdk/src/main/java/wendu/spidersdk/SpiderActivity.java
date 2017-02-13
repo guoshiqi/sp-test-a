@@ -2,7 +2,6 @@ package wendu.spidersdk;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -16,8 +15,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -89,18 +86,17 @@ public class SpiderActivity extends AppCompatActivity {
         arguments = getIntent().getStringExtra("arguments");
         titleTv.setText(TextUtils.isEmpty(title) ? "爬取" : title);
         boolean isDebug = getIntent().getBooleanExtra("debug", false);
-        String startUrl = getIntent().getStringExtra("startUrl");
         if (TextUtils.isEmpty(arguments)) {
             arguments = "{}";
         }
         spiderView.setArguments(arguments);
         if (isDebug) {
-            spiderView.startDebug(startUrl,getIntent().getStringExtra("debugSrc"),spiderEventListener);
+            spiderView.startDebug(getIntent().getStringExtra("debugStartUrl"),
+                    getIntent().getStringExtra("debugSrc"), spiderEventListener);
         } else {
             int  sid = getIntent().getIntExtra("sid",-1);
-            spiderView.start(sid,spiderEventListener);
+            spiderView.start(sid, getIntent().getStringExtra("startUrl"), spiderEventListener);
         }
-
         ImageView back=getView(R.id.back) ;
         back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,7 +138,7 @@ public class SpiderActivity extends AppCompatActivity {
         @Override
         public void onProgressShow(boolean isShow) {
             isProgressShow = isShow;
-            SpiderActivity.this.showProgress(isShow);
+            showProgress(isShow);
         }
 
 
@@ -227,7 +223,8 @@ public class SpiderActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        spiderView.getWebview().clearCache(true);
+        spiderView.clearCache();
+        spiderView.stop();
         super.onDestroy();
     }
 

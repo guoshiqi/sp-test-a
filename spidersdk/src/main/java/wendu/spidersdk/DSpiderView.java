@@ -3,6 +3,7 @@ package wendu.spidersdk;
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -25,7 +26,7 @@ public class DSpiderView extends LinearLayout {
     private int sid=0;
     private int retry = 0;
     private int mScriptCount=1;
-    private String startUrl="";
+    private String startUrl;
     private boolean customProgressShow=false;
 
     private String arguments="{}";
@@ -186,9 +187,24 @@ public class DSpiderView extends LinearLayout {
         start();
     }
 
+    public void start(int sid, String startUrl, @NonNull SpiderEventListener spiderEventListener) {
+        this.startUrl = startUrl;
+        start(sid, spiderEventListener);
+    }
+
     public DSWebview getWebview(){
         return  webview;
     }
+
+    public void stop() {
+        webview.removeJavascriptInterface();
+        webview.destroy();
+    }
+
+    public void clearCache() {
+        webview.clearCache(true);
+    }
+
 
     private void start(){
         final Context ctx = getContext();
@@ -202,8 +218,10 @@ public class DSpiderView extends LinearLayout {
                 webview.setScriptId(scriptId+"");
                 webview.setTaskId(taskId + "");
                 webview.setInjectScript(script);
-                startUrl=url;
-                webview.loadUrl(url);
+                if (TextUtils.isEmpty(startUrl)) {
+                    startUrl = url;
+                }
+                webview.loadUrl(startUrl);
             }
 
             @Override

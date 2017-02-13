@@ -1,9 +1,15 @@
 package wendu.spider;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
@@ -34,12 +40,40 @@ public class EmailActivity extends BaseActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Map<String, Object> map = datas.get(position);
-                int sid = (int) map.get("sid");
-                DSpider.build(EmailActivity.this)
-                        //.addArgument("test",7)
-                        .setDebug(KvStorage.getInstance().getBoolean("debug", false))
-                        .start(sid,map.get("title").toString());
+                final Map<String, Object> map = datas.get(position);
+                final int sid = (int) map.get("sid");
+                final EditText editText = new EditText(EmailActivity.this);
+                float dpi = getResources().getDisplayMetrics().density;
+                new AlertDialog.Builder(EmailActivity.this)
+                        .setTitle("请输入关键字")
+                        .setView(editText)
+                        .setCancelable(true)
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                DSpider dSpider = DSpider.build(EmailActivity.this)
+                                        .addArgument("wd", editText.getText().toString());
+
+                                if (KvStorage.getInstance().getBoolean("debug", false)) {
+                                    dSpider.startDebug(sid, map.get("title").toString(), "", "");
+                                } else {
+                                    dSpider.start(sid, map.get("title").toString());
+                                }
+
+                            }
+                        })
+                        .show();
+
+                FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                int t = (int) (dpi * 16);
+                layoutParams.setMargins(t, 0, t, 0);
+                layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
+                editText.setLayoutParams(layoutParams);
+                int padding = (int) (15 * dpi);
+                editText.setPadding(padding - (int) (5 * dpi), padding, padding, padding);
+
             }
         });
     }
@@ -62,13 +96,13 @@ public class EmailActivity extends BaseActivity {
         map = new HashMap<>();
         map.put("img", R.drawable.em126);
         map.put("title", "126邮箱");
-        map.put("sid", 8);
+        map.put("sid", 7);
         list.add(map);
 
         map = new HashMap<>();
         map.put("img", R.drawable.emsina);
         map.put("title", "新浪邮箱");
-        map.put("sid", 7);
+        map.put("sid", 8);
         list.add(map);
         return list;
     }
