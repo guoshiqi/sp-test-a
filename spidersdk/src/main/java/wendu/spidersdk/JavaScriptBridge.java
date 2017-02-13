@@ -30,6 +30,11 @@ import android.webkit.JavascriptInterface;
     }
 
     @JavascriptInterface
+    public void setStartUrl(String url) {
+        jsbImp.setStartUrl(url);
+    }
+
+    @JavascriptInterface
     public void save(String key, String value) {
         jsbImp.save(key, value);
     }
