@@ -49,6 +49,10 @@ class JavaScriptBridgeImp {
     }
 
 
+    public void setStartUrl(String url) {
+
+    }
+
     public void save(String key, String value) {
         if (TextUtils.isEmpty(value)) {
             sharedPreferences.edit().remove(key).commit();
