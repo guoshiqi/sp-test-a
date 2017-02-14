@@ -68,7 +68,6 @@ class DSWebview extends WebView {
         this.script = script;
     }
 
-
     public void setDebugSrc(String debugSrc) {
         this.debugSrc = debugSrc;
     }
