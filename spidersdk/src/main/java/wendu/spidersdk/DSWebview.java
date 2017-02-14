@@ -44,7 +44,6 @@ class DSWebview extends WebView {
     public void setScriptId(String scriptId) {
         this.scriptId = scriptId;
     }
-
     private String scriptId;
     private String script;
 
