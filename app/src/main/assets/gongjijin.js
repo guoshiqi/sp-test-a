@@ -27,9 +27,9 @@ dSpider("test", function(session,env,$) {
         for (var i = 0; i < companytrs.length; i++) {
             if (i == 0) {
                 var ths = companytrs.eq(i).find('th');
-                ths.each(function(){
-                    log($(this).find('div').first().text());
-                });
+//                ths.each(function(){
+//                    log($(this).find('div').first().text());
+//                });
             } else {
                 var tds = companytrs.eq(i).find('td');
                 var id = tds.eq(0).find('div').text();
@@ -202,9 +202,9 @@ dSpider("test", function(session,env,$) {
             session.set(mG_accessList, records);
 
             //打印数据
-            $.each(records,function(i, item){
-                log("业务类型:" + item.describe + "---" + "时间:" + item.date + "---" + "入账:" + item.takeIn + "---" + "出账:" + item.takeOut + "---" + "余额:" + item.balance + "----" + "公司:" + item.companyName);
-            });
+//            $.each(records,function(i, item){
+//                log("业务类型:" + item.describe + "---" + "时间:" + item.date + "---" + "入账:" + item.takeIn + "---" + "出账:" + item.takeOut + "---" + "余额:" + item.balance + "----" + "公司:" + item.companyName);
+//            });
 
             session.set(mG_companyIndex, index);
 
