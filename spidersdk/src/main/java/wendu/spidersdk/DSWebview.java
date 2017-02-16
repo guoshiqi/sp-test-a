@@ -1,6 +1,7 @@
 package wendu.spidersdk;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,6 +16,8 @@ import android.webkit.CookieManager;
 import android.webkit.JsResult;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -30,22 +33,11 @@ import java.util.Map;
  * Created by du on 16/12/23.
  */
 
-class DSWebview extends WebView {
+class DSWebView extends WebView {
 
     private String userAgent;
     private boolean debug = false;
     private String taskId;
-
-
-    public String getScriptId() {
-        return scriptId;
-    }
-
-    public void setScriptId(String scriptId) {
-        this.scriptId = scriptId;
-    }
-
-    private String scriptId;
     private String script;
 
     public String getTaskId() {
@@ -77,12 +69,12 @@ class DSWebview extends WebView {
     private String debugSrc = "";
     private final String contentType = "application/javascript";
 
-    public DSWebview(Context context) {
+    public DSWebView(Context context) {
         super(context);
         init(context);
     }
 
-    public DSWebview(Context context, AttributeSet attrs) {
+    public DSWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
@@ -122,7 +114,7 @@ class DSWebview extends WebView {
                 if (webEventListener != null && url.startsWith("http")) {
                     webEventListener.onPageStart(url);
                 }
-                DSWebview.super.loadUrl(url);
+                DSWebView.super.loadUrl(url);
             }
         });
     }
@@ -149,7 +141,7 @@ class DSWebview extends WebView {
                 if (webEventListener != null&& url.startsWith("http")) {
                     webEventListener.onPageStart(url);
                 }
-                DSWebview.super.loadUrl(url, additionalHttpHeaders);
+                DSWebView.super.loadUrl(url, additionalHttpHeaders);
             }
         });
 
@@ -162,7 +154,7 @@ class DSWebview extends WebView {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             Log.e("xy log", "shouldOverrideUrlLoading: " + url);
-            if (webEventListener != null && url.startsWith("http")) {
+            if (webEventListener != null) {
                 webEventListener.onPageStart(url);
             }
             return false;
@@ -175,7 +167,6 @@ class DSWebview extends WebView {
 
         @Override
         public void onPageFinished(final WebView view, String url) {
-            Log.e("xy log", "shouldOverrideUrlLoadingxxx: " + url);
             super.onPageFinished(view, url);
 
             if (!TextUtils.isEmpty(userAgent)) {
@@ -188,13 +179,18 @@ class DSWebview extends WebView {
         @SuppressWarnings("deprecation")
         @Override
         public void onReceivedError(WebView view, int errorCode, String description, final String failingUrl) {
-            if (webEventListener != null && failingUrl.startsWith("http")) {
+            if (webEventListener != null) {
                 webEventListener.onReceivedError(
                         String.format("{\"url\":\"%s\",\"msg\":\"%s\",\"code\":%d}", failingUrl, description, errorCode));
             }
             super.onReceivedError(view, errorCode, description, failingUrl);
         }
 
+        @TargetApi(Build.VERSION_CODES.M)
+        @Override
+        public void onReceivedError(final WebView view, WebResourceRequest req, WebResourceError rerr) {
+            onReceivedError(view, rerr.getErrorCode(), rerr.getDescription().toString(), req.getUrl().toString());
+        }
 
         @Override
         public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
@@ -278,6 +274,7 @@ class DSWebview extends WebView {
 
         @Override
         public boolean onJsAlert(WebView view, String url, final String message, JsResult result) {
+            Log.e("dspider sdk:", "alert called");
             result.confirm();
             post(new Runnable() {
                 @Override
