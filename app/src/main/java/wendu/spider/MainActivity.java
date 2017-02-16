@@ -11,6 +11,9 @@ import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -154,7 +157,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 DSpider.Result resultData = DSpider.getLastResult(this);
                 if (resultData != null) {
                     if (resultData.code != resultData.STATE_SUCCEED) {
-                        showDialog("失败了，" + resultData.errorMsg);
+                        String errmsg = resultData.errorMsg;
+                        try {
+                            JSONObject jsonObject = new JSONObject(resultData.errorMsg);
+                            if (jsonObject.has("content")) {
+                                jsonObject.remove("content");
+                            }
+                            errmsg = jsonObject.toString();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        showDialog("失败了，" + errmsg);
                     } else {
                         LatestResult.getInstance().getData().clear();
                         LatestResult.getInstance().getData().addAll(resultData.datas);
