@@ -128,7 +128,6 @@ public class DSpider implements Serializable {
         ctx.startActivityForResult(intent, REQUEST);
     }
 
-
     public static class Result implements Serializable {
         public static final int STATE_SUCCEED = 0;
         public static final int STATE_WEB_ERROR = 1;
