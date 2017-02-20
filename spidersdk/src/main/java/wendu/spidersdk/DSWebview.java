@@ -37,6 +37,16 @@ class DSWebview extends WebView {
     private String taskId;
     private int  descendantFocusability;
 
+    public String getExceptUrl() {
+        return exceptUrl;
+    }
+
+    public void setExceptUrl(String exceptUrl) {
+        this.exceptUrl = exceptUrl;
+    }
+
+    private String exceptUrl="";
+
 
     public String getScriptId() {
         return scriptId;

@@ -50,7 +50,7 @@ class JavaScriptBridgeImp {
 
 
     public void setStartUrl(String url) {
-
+       mWebview.setExceptUrl(url);
     }
 
     public void save(String key, String value) {

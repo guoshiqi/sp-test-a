@@ -3,11 +3,13 @@ package wendu.spidersdk;
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import org.json.JSONObject;
 
@@ -49,7 +51,7 @@ public class DSpiderView extends LinearLayout {
         webview.setWebEventListener(new DSWebview.WebEventListener() {
             @Override
             void onPageStart(String url) {
-                if(!url.equals(startUrl)){
+                if(!TextUtils.isEmpty(webview.getExceptUrl())&& !webview.getExceptUrl().equals(url)){
                    customProgressShow=true;
                    spiderEventListener.onProgressShow(true);
                 }else{
