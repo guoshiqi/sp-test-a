@@ -49,16 +49,18 @@ public class DSpiderView extends LinearLayout {
         webview.setWebEventListener(new DSWebview.WebEventListener() {
             @Override
             void onPageStart(String url) {
-                if(!(customProgressShow||webview.isDebug())) {
+                if(!url.equals(startUrl)){
+                   spiderEventListener.onProgressShow(true);
+                }else{
                     loading.setVisibility(VISIBLE);
                 }
+
             }
 
             @Override
             void onPageFinished(String url) {
                 super.onPageFinished(url);
                 loading.setVisibility(GONE);
-
             }
 
             @Override
