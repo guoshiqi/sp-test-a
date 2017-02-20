@@ -50,10 +50,13 @@ public class DSpiderView extends LinearLayout {
             @Override
             void onPageStart(String url) {
                 if(!url.equals(startUrl)){
+                   customProgressShow=true;
                    spiderEventListener.onProgressShow(true);
                 }else{
                     loading.setVisibility(VISIBLE);
                 }
+                webview.enableFocus(!customProgressShow);
+
 
             }
 
@@ -61,6 +64,7 @@ public class DSpiderView extends LinearLayout {
             void onPageFinished(String url) {
                 super.onPageFinished(url);
                 loading.setVisibility(GONE);
+                webview.enableFocus(!customProgressShow);
             }
 
             @Override

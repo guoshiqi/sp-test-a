@@ -89,7 +89,7 @@
                 android:textAlignment="center"
                 android:layout_marginTop="30dp"
                 android:layout_below="@id/work_progress"
-                android:text="正在初始化任务..." />
+                android:text="" />
 
             <TextView
                 android:id="@+id/percentage"

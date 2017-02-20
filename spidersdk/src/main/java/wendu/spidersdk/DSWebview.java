@@ -35,6 +35,7 @@ class DSWebview extends WebView {
     private String userAgent;
     private boolean debug = false;
     private String taskId;
+    private int  descendantFocusability;
 
 
     public String getScriptId() {
@@ -106,6 +107,15 @@ class DSWebview extends WebView {
         userAgent = settings.getUserAgentString();
         setWebChromeClient(mWebChromeClient);
         setWebViewClient(mWebViewClient);
+        descendantFocusability=getDescendantFocusability();
+    }
+
+    public void enableFocus(boolean enable){
+        if(enable){
+            setDescendantFocusability(descendantFocusability);
+        }else{
+            setDescendantFocusability(FOCUS_BLOCK_DESCENDANTS);
+        }
     }
 
     public void setUserAgent(String userAgent) {
@@ -252,6 +262,8 @@ class DSWebview extends WebView {
             return response;
         }
     };
+
+
 
     public void clear() {
 
