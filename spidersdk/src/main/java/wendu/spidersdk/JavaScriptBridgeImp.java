@@ -129,7 +129,7 @@ class JavaScriptBridgeImp {
             @Override
             public void run() {
                 mWebview.removeJavascriptInterface();
-                mWebview.loadUrl("about:blank");
+                mWebview.loadUrl("javascript: window.close()");
                 CookieManager.getInstance().removeAllCookie();
                 mJavaScriptHandler.finish(new DSpider.Result(sessionKey, datas.get(sessionKey), msg, code));
                 datas.remove(sessionKey);
