@@ -207,7 +207,6 @@ class DSWebview extends DWebView {
                         }
                     }
                 }
-
                 if (webEventListener != null) {
                     postDelayed(new Runnable() {
                         @Override
