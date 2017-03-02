@@ -16,6 +16,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.net.ssl.SSLSocketFactory;
+
 /**
  * Created by du on 16/10/8.
  */
@@ -26,14 +28,18 @@ public class DSpider implements Serializable {
     private boolean isDebug = false;
     public static int DEVICE_ID;
     public static int REQUEST = 2000;
-    public static final String SDK_VERSION = "1.0.0";
+    public static final String SDK_VERSION = "1.0.1";
     public static Context APP_CONTEXT;
     //public static final String  BASE_URL="http://172.19.23.62/dSpider-web/1.0/";
     //public static final String  BASE_URL="http://192.168.1.24/dSpider-web/1.0/";
     //public static final String REPORT_URL = "report";
 
-    public static final String BASE_URL = "http://119.29.112.230:8589/partner/crawl/";
+    //public static final String BASE_URL = "http://119.29.112.230:8589/partner/crawl/";
+    public static String BASE_URL ="https://ldp.xiaoying.com/partner/crawl/";
+
     public static final String REPORT_URL = "scriptReport";
+
+    private static SSLSocketFactory sslSocketFactory;
 
 
     private DSpider(Activity ctx) {
@@ -44,6 +50,14 @@ public class DSpider implements Serializable {
     public static DSpider build(Activity ctx) {
         return new DSpider(ctx);
     }
+
+    public static void setSSLSocketFactory(SSLSocketFactory factory) {
+        sslSocketFactory=factory;
+    }
+    public static SSLSocketFactory getSSLSocketFactory(){
+       return  sslSocketFactory;
+    }
+
 
     public static Result getLastResult(Context ctx, boolean clearResultCache) {
         File file = new File(ctx.getCacheDir() + "/spider.dat");
@@ -75,6 +89,8 @@ public class DSpider implements Serializable {
         arguments.put(key, value);
         return this;
     }
+
+
 
     public DSpider setDebug(boolean debug) {
         isDebug = debug;

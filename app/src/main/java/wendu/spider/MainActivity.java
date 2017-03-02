@@ -3,6 +3,7 @@ package wendu.spider;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -30,7 +31,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        DSpider.setSSLSocketFactory(HttpsVerify.getSSLSocketFactory(this));
         setContentView(R.layout.activity_main);
         setActivityTitle("数据爬虫");
         setRightImg(R.drawable.setting, new View.OnClickListener() {
@@ -42,6 +43,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         root = getView(R.id.root);
         hideBackImg();
         initFromLocal();
+        DSpider.BASE_URL="http://119.29.112.230:8589/partner/crawl/";
 
 //        DSpiderView dSpiderView= getView(R.id.dspier_view);
 //        dSpiderView.start(1, null, new SpiderEventListener() {
@@ -61,7 +63,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 //            }
 //        });
     }
-
 
 
 
@@ -143,6 +144,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             showDialog("暂未上线，敬请期待！");
             return;
         }
+
         DSpider.build(this)
                 //.addArgument("test",7)
                 .setDebug(KvStorage.getInstance().getBoolean("debug", false))

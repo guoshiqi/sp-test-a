@@ -30,7 +30,7 @@ import java.util.Map;
  * Created by du on 16/12/23.
  */
 
-class DSWebview extends WebView {
+public class DSWebview extends WebView {
 
     private String userAgent;
     private boolean debug = false;

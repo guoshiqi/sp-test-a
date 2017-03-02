@@ -1,14 +1,16 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 15
         targetSdkVersion 22
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.3"
     }
     android {
         lintOptions {
@@ -37,4 +39,30 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile "com.android.support:appcompat-v7:${rootProject.ext.supportVersion}"
     compile files('libs/zmxySDKALCmini_V1.01450366738902_release.jar')
+}
+
+signing {
+    required { has("release") && gradle.taskGraph.hasTask("uploadArchives") }
+    sign configurations.archives
+}
+
+uploadArchives {
+    configuration = configurations.archives
+    repositories.mavenDeployer {
+        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+        repository(url: 'http://10.0.10.2:8081/nexus/content/repositories/common-android/') {//仓库地址
+            authentication(userName: "admin",//用户名
+                    password: "admin123")//密码
+        }
+
+        pom.project {
+            name 'common-lib for Android'
+            packaging 'aar'
+            description 'none'
+            url 'http://10.0.10.2:8081/nexus/content/repositories/common-android/'//仓库地址
+            groupId "com.xiaoying.basiclib"
+            artifactId "dspider"
+            version android.defaultConfig.versionName
+        }
+    }
 }

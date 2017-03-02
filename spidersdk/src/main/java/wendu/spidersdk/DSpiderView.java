@@ -58,8 +58,6 @@ public class DSpiderView extends LinearLayout {
                     loading.setVisibility(VISIBLE);
                 }
                 webview.enableFocus(!customProgressShow);
-
-
             }
 
             @Override
@@ -88,6 +86,8 @@ public class DSpiderView extends LinearLayout {
         });
         addJavaScriptApi();
     }
+
+
 
 
     private void addJavaScriptApi() {
