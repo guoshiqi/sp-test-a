@@ -1,5 +1,5 @@
 
-dSpider("jd", function(session,env,$){
+dSpider("jd",120, function(session,env,$){
 
     var infokey = "infokey";
     var sid = "";
@@ -11,6 +11,7 @@ dSpider("jd", function(session,env,$){
 
     if (location.href.indexOf("://m.jd.com") !== -1 ) {
         session.showProgress(true);
+        session.showProgress(true);session.showProgress(true);
         session.setProgressMax(100);
         session.autoLoadImg(false);
         session.setProgress(5);
@@ -30,7 +31,6 @@ dSpider("jd", function(session,env,$){
 
     if (location.href.indexOf("://home.m.jd.com/maddress") != -1) {
         session.setProgress(20);
-
         globalInfo = session.get(infokey);
 
         global_contact_info = new contact_info([]);
