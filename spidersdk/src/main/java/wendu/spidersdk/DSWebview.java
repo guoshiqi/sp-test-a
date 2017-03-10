@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.JsResult;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
@@ -372,6 +373,8 @@ public class DSWebview extends WebView {
 
     public void clearCache() {
         CookieManager.getInstance().removeAllCookie();
+        CookieSyncManager.getInstance().sync();
+        clearCache(true);
         Context context = getContext();
         //清理Webview缓存数据库
         try {
@@ -396,6 +399,7 @@ public class DSWebview extends WebView {
 
 
     }
+
 
     public void deleteFile(File file) {
         if (file.exists()) {

@@ -179,6 +179,21 @@ public class DSpiderView extends LinearLayout {
         }
     }
 
+    public void clearCache(){
+        webview.clearCache();
+    }
+
+    public void stop(){
+        webview.post(new Runnable() {
+            @Override
+            public void run() {
+                webview.removeJavascriptInterface();
+                webview.loadUrl("javascript: window.close()");
+                CookieManager.getInstance().removeAllCookie();
+            }
+        });
+    }
+
     public  void setArguments(String  argumentsJson){
         this.arguments=argumentsJson;
     }

@@ -212,7 +212,7 @@ public class SpiderActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        spiderView.getWebview().clearCache();
+        spiderView.clearCache();
         super.onDestroy();
     }
 

@@ -47,6 +47,10 @@ public class DSpider implements Serializable {
         APP_CONTEXT = ctx.getApplicationContext();
     }
 
+    public static void clearCache(Context context){
+        context.getSharedPreferences("_dspider", Context.MODE_PRIVATE).edit().clear().commit();
+    }
+
     public static DSpider build(Activity ctx) {
         return new DSpider(ctx);
     }
@@ -60,7 +64,7 @@ public class DSpider implements Serializable {
 
 
     public static Result getLastResult(Context ctx, boolean clearResultCache) {
-        File file = new File(ctx.getCacheDir() + "/spider.dat");
+        File file = new File(ctx.getCacheDir() + "/dspider.dat");
         FileInputStream fileInputStream = null;
         Result resultData = null;
         try {

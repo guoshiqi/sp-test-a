@@ -29,7 +29,7 @@ class JavaScriptBridgeImp {
     public JavaScriptBridgeImp(DSWebview webview, JavaScriptHandler javaScriptHandler) {
         mWebview = webview;
         mJavaScriptHandler = javaScriptHandler;
-        sharedPreferences = webview.getContext().getSharedPreferences("spider", Context.MODE_PRIVATE);
+        sharedPreferences = webview.getContext().getSharedPreferences("_dspider", Context.MODE_PRIVATE);
         save("_log", "");
     }
 
