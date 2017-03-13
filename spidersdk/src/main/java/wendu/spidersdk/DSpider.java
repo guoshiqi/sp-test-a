@@ -52,11 +52,6 @@ public class DSpider implements Serializable {
         sPersistentData=persistenter;
     }
 
-
-    public  void clearCache(Context context){
-        context.getSharedPreferences(String.format("_dspider%s",mUid), Context.MODE_PRIVATE).edit().clear().commit();
-    }
-
     public static DSpider build(Activity ctx) {
         return new DSpider(ctx);
     }
