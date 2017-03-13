@@ -50,19 +50,27 @@ class JavaScriptBridgeImp {
 
 
     public void setStartUrl(String url) {
-       mWebview.setExceptUrl(url);
+        mWebview.setExceptUrl(url);
     }
 
     public void save(String key, String value) {
-        if (TextUtils.isEmpty(value)) {
-            sharedPreferences.edit().remove(key).commit();
-        } else {
-            sharedPreferences.edit().putString(key, value).commit();
+        if (DSpider.sPersistentData == null) {
+            if (TextUtils.isEmpty(value)) {
+                sharedPreferences.edit().remove(key).commit();
+            } else {
+                sharedPreferences.edit().putString(key, value).commit();
+            }
+        }else {
+            DSpider.sPersistentData.save(key,value);
         }
     }
 
     public String read(String key) {
-        return sharedPreferences.getString(key, "");
+        if (DSpider.sPersistentData == null) {
+            return sharedPreferences.getString(key, "");
+        }else {
+            return DSpider.sPersistentData.read(key);
+        }
     }
 
     public String clear(String sessionKey) {
@@ -146,9 +154,9 @@ class JavaScriptBridgeImp {
                     Map<String, String> map = new HashMap<String, String>();
                     map.put("state", result + "");
                     map.put("script_id", mWebview.getScriptId());
-                    map.put("task_id",mWebview.getTaskId());
+                    map.put("task_id", mWebview.getTaskId());
                     map.put("msg", msg);
-                    String s = Helper.post(DSpider.BASE_URL+DSpider.REPORT_URL, map);
+                    String s = Helper.post(DSpider.BASE_URL + DSpider.REPORT_URL, map);
                     Log.d("dspider finish!", s);
                 } catch (Exception e) {
                     e.printStackTrace();

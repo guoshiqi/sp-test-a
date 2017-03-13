@@ -1,7 +1,10 @@
 package wendu.spider;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,6 +25,7 @@ import wendu.common.base.BaseActivity;
 import wendu.common.utils.DpiHelper;
 import wendu.common.utils.KvStorage;
 import wendu.spidersdk.DSpider;
+import wendu.spidersdk.IPersistentData;
 import wendu.spidersdk.third.ZmxyActivity;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
@@ -62,6 +66,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 //                super.onError(code, msg);
 //            }
 //        });
+
     }
 
 

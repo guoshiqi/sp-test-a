@@ -28,8 +28,9 @@ public class DSpider implements Serializable {
     private boolean isDebug = false;
     public static int DEVICE_ID;
     public static int REQUEST = 2000;
-    public static final String SDK_VERSION = "1.0.6";
+    public static final String SDK_VERSION = "1.0.0";
     public static Context APP_CONTEXT;
+    public static IPersistentData sPersistentData;
     //public static final String  BASE_URL="http://172.19.23.62/dSpider-web/1.0/";
     //public static final String  BASE_URL="http://192.168.1.24/dSpider-web/1.0/";
     //public static final String REPORT_URL = "report";
@@ -47,8 +48,13 @@ public class DSpider implements Serializable {
         APP_CONTEXT = ctx.getApplicationContext();
     }
 
-    public static void clearCache(Context context){
-        context.getSharedPreferences("_dspider", Context.MODE_PRIVATE).edit().clear().commit();
+    public static void setDataPersistenter(IPersistentData persistenter){
+        sPersistentData=persistenter;
+    }
+
+
+    public  void clearCache(Context context){
+        context.getSharedPreferences(String.format("_dspider%s",mUid), Context.MODE_PRIVATE).edit().clear().commit();
     }
 
     public static DSpider build(Activity ctx) {
@@ -91,6 +97,12 @@ public class DSpider implements Serializable {
 
     public DSpider addArgument(String key, Object value) {
         arguments.put(key, value);
+        return this;
+    }
+
+    String mUid="1";
+    public DSpider setUID(String uid) {
+         mUid=uid;
         return this;
     }
 
