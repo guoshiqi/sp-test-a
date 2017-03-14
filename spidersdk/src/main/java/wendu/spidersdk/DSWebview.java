@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.JsResult;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
@@ -30,11 +31,22 @@ import java.util.Map;
  * Created by du on 16/12/23.
  */
 
-class DSWebview extends WebView {
+public class DSWebview extends WebView {
 
     private String userAgent;
     private boolean debug = false;
     private String taskId;
+    private int  descendantFocusability;
+
+    public String getExceptUrl() {
+        return exceptUrl;
+    }
+
+    public void setExceptUrl(String exceptUrl) {
+        this.exceptUrl = exceptUrl;
+    }
+
+    private String exceptUrl="";
 
 
     public String getScriptId() {
@@ -106,6 +118,15 @@ class DSWebview extends WebView {
         userAgent = settings.getUserAgentString();
         setWebChromeClient(mWebChromeClient);
         setWebViewClient(mWebViewClient);
+        descendantFocusability=getDescendantFocusability();
+    }
+
+    public void enableFocus(boolean enable){
+        if(enable){
+            setDescendantFocusability(descendantFocusability);
+        }else{
+            setDescendantFocusability(FOCUS_BLOCK_DESCENDANTS);
+        }
     }
 
     public void setUserAgent(String userAgent) {
@@ -253,6 +274,8 @@ class DSWebview extends WebView {
         }
     };
 
+
+
     public void clear() {
 
     }
@@ -350,6 +373,8 @@ class DSWebview extends WebView {
 
     public void clearCache() {
         CookieManager.getInstance().removeAllCookie();
+        CookieSyncManager.getInstance().sync();
+        clearCache(true);
         Context context = getContext();
         //清理Webview缓存数据库
         try {
@@ -374,6 +399,7 @@ class DSWebview extends WebView {
 
 
     }
+
 
     public void deleteFile(File file) {
         if (file.exists()) {

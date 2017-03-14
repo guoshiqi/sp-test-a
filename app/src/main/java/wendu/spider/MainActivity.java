@@ -1,8 +1,12 @@
 package wendu.spider;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -21,6 +25,7 @@ import wendu.common.base.BaseActivity;
 import wendu.common.utils.DpiHelper;
 import wendu.common.utils.KvStorage;
 import wendu.spidersdk.DSpider;
+import wendu.spidersdk.IPersistentData;
 import wendu.spidersdk.third.ZmxyActivity;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
@@ -30,7 +35,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        DSpider.setSSLSocketFactory(HttpsVerify.getSSLSocketFactory(this));
         setContentView(R.layout.activity_main);
         setActivityTitle("数据爬虫");
         setRightImg(R.drawable.setting, new View.OnClickListener() {
@@ -42,6 +47,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         root = getView(R.id.root);
         hideBackImg();
         initFromLocal();
+        DSpider.BASE_URL="http://119.29.112.230:8589/partner/crawl/";
 
 //        DSpiderView dSpiderView= getView(R.id.dspier_view);
 //        dSpiderView.start(1, null, new SpiderEventListener() {
@@ -60,8 +66,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 //                super.onError(code, msg);
 //            }
 //        });
-    }
 
+    }
 
 
 
@@ -143,6 +149,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             showDialog("暂未上线，敬请期待！");
             return;
         }
+
         DSpider.build(this)
                 //.addArgument("test",7)
                 .setDebug(KvStorage.getInstance().getBoolean("debug", false))

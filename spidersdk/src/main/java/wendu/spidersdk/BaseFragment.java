@@ -14,4 +14,5 @@ public abstract class BaseFragment extends Fragment {
        viewGroup.setDescendantFocusability(show?ViewGroup.FOCUS_AFTER_DESCENDANTS:ViewGroup.FOCUS_BLOCK_DESCENDANTS);
     }
 
+
 }

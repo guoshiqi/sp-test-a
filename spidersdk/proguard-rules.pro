@@ -19,13 +19,14 @@
 -keepattributes *JavascriptInterface*
 -keepattributes Signature
 -keepattributes *Annotation*
--keepclassmembers class wendu.spidersdk.JavaScriptBridge {
-      public *;
-   }
+
 -keep class wendu.spidersdk.DSpider
 -keep class wendu.spidersdk.DSpider.Result
 
 
+-keepclassmembers class wendu.spidersdk.JavaScriptBridge {
+      public *;
+ }
 -keep class com.alipayzhima.**{*;}
 -keep class com.android.moblie.zmxy.antgroup.creditsdk.**{*;}
 -keep class com.antgroup.zmxy.mobile.android.container.**{*;}

@@ -2,7 +2,6 @@ package wendu.spidersdk;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -11,14 +10,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,7 +34,6 @@ public class SpiderActivity extends AppCompatActivity {
     TextView titleTv;
     RelativeLayout errorLayout;
     RelativeLayout loading;
-    WaveProgress waveProgress;
     TextView msg;
     TextView progressMsg;
     ViewGroup toobar;
@@ -56,23 +51,10 @@ public class SpiderActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         setContentView(R.layout.activity_spider);
         container = getView(R.id.container);
         webviewLayout = getView(R.id.webview_container);
-        waveProgress=getView(R.id.wave);
-        waveProgress.setProgress(90);
-        waveProgress.setAmplitudeRatio(.05f);
-        waveProgress.setShapeType(WaveProgress.ShapeType.SQUARE);
-        waveProgress.setWaveSpeed(1200);
-        boolean style=getIntent().getBooleanExtra("style", false);
-        if(style) {
-            int waveColor = Helper.getColor(this, R.color.colorPrimaryDark);
-            if (waveColor != -1) {
-                int waveColor2 = Color.argb(130, Color.red(waveColor),
-                        Color.green(waveColor), Color.blue(waveColor));
-                waveProgress.setWaveColor(waveColor2, waveColor);
-            }
-        }
         spiderView=getView(R.id.dspider_view);
         toobar=getView(R.id.toolbar);
         spider = getView(R.id.spider);
@@ -85,10 +67,12 @@ public class SpiderActivity extends AppCompatActivity {
         msg = getView(R.id.msg);
         progressMsg = getView(R.id.progress_msg);
         fm = getSupportFragmentManager();
-        workProgress.setForegroundColor(Color.argb(70,19,94,148),Color.argb(170,19,94,148));
+        workProgress.setForegroundColor(Color.parseColor("#3f76f7"),Color.parseColor("#53ede6"));
         String title = getIntent().getStringExtra("title");
         arguments = getIntent().getStringExtra("arguments");
-        titleTv.setText(TextUtils.isEmpty(title) ? "爬取" : title);
+        title=TextUtils.isEmpty(title) ? "爬取中" : title;
+        ((TextView)findViewById(R.id.title_progress)).setText(title);
+        titleTv.setText(title);
         boolean isDebug = getIntent().getBooleanExtra("debug", false);
         String startUrl = getIntent().getStringExtra("startUrl");
         if (TextUtils.isEmpty(arguments)) {
@@ -181,7 +165,7 @@ public class SpiderActivity extends AppCompatActivity {
     private void backResult(DSpider.Result result) {
         Intent intent = new Intent();
         try {
-            String path = getCacheDir() + "/spider.dat";
+            String path = getCacheDir() + "/dspider.dat";
             File file = new File(path);
             file.delete();
             file.createNewFile();
@@ -228,7 +212,7 @@ public class SpiderActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        spiderView.getWebview().clearCache();
+        spiderView.clearCache();
         super.onDestroy();
     }
 

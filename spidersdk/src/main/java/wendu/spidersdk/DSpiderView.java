@@ -3,11 +3,13 @@ package wendu.spidersdk;
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import org.json.JSONObject;
 
@@ -49,15 +51,20 @@ public class DSpiderView extends LinearLayout {
         webview.setWebEventListener(new DSWebview.WebEventListener() {
             @Override
             void onPageStart(String url) {
-                if(!(customProgressShow||webview.isDebug())) {
+                if(!TextUtils.isEmpty(webview.getExceptUrl())&& !webview.getExceptUrl().equals(url)){
+                   customProgressShow=true;
+                   spiderEventListener.onProgressShow(true);
+                }else{
                     loading.setVisibility(VISIBLE);
                 }
+                webview.enableFocus(!customProgressShow);
             }
 
             @Override
             void onPageFinished(String url) {
                 super.onPageFinished(url);
-
+                loading.setVisibility(GONE);
+                webview.enableFocus(!customProgressShow);
             }
 
             @Override
@@ -79,6 +86,8 @@ public class DSpiderView extends LinearLayout {
         });
         addJavaScriptApi();
     }
+
+
 
 
     private void addJavaScriptApi() {
@@ -168,6 +177,21 @@ public class DSpiderView extends LinearLayout {
         } catch (Exception e) {
             this.arguments="{}";
         }
+    }
+
+    public void clearCache(){
+        webview.clearCache();
+    }
+
+    public void stop(){
+        webview.post(new Runnable() {
+            @Override
+            public void run() {
+                webview.removeJavascriptInterface();
+                webview.loadUrl("javascript: window.close()");
+                CookieManager.getInstance().removeAllCookie();
+            }
+        });
     }
 
     public  void setArguments(String  argumentsJson){

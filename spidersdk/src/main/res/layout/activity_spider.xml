@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:auto="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="@color/white"
     tools:context=".SpiderActivity">
@@ -28,7 +29,7 @@
             android:src="@drawable/back" />
 
         <TextView
-            android:id="@+id/title"
+            android:id="@+id/title_progress"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
@@ -59,7 +60,7 @@
             android:id="@+id/spider"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white"
+            android:background="#eff5ff"
             android:clickable="true"
             android:visibility="gone"
             android:paddingTop="@dimen/status_bar_height"
@@ -74,13 +75,39 @@
                 android:paddingRight="19dp"
                 android:paddingBottom="14dp"
                 android:src="@drawable/back_dark" />
+            <TextView
+                android:id="@id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="30dp"
+                android:textAlignment="center"
+                android:text=""
+                android:layout_below="@id/back_gray"
+                />
+            <RelativeLayout
+                android:id="@+id/progress"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/title"
+                >
             <wendu.spidersdk.CircleProgress
                 android:id="@+id/work_progress"
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                android:layout_marginTop="40dp"
-                android:layout_centerHorizontal="true"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                  />
+                <TextView
+                    android:id="@+id/percentage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="100dp"
+                    android:textColor="#4c52a7"
+                    android:text="0%"
+                    android:layout_centerInParent="true"
+                    android:textSize="35dp" />
+            </RelativeLayout>
+
             <TextView
                 android:id="@+id/progress_msg"
                 android:layout_width="match_parent"
@@ -88,23 +115,24 @@
                 android:singleLine="true"
                 android:textAlignment="center"
                 android:layout_marginTop="30dp"
-                android:layout_below="@id/work_progress"
-                android:text="正在初始化任务..." />
+                android:layout_below="@id/progress"
+                android:text="" />
 
-            <TextView
-                android:id="@+id/percentage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="115dp"
-                android:text="0%"
-                android:layout_centerHorizontal="true"
-                android:textSize="30dp" />
-
-            <wendu.spidersdk.WaveProgress
-                android:id="@+id/wave"
+              <ImageView
+                android:id="@+id/bg_progress"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/bg_bottom"
+                android:layout_marginTop="40dp"
+                  android:scaleType="centerCrop"
+                android:layout_below="@id/progress_msg"
+                />
+              <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#fff"
                 android:layout_alignParentBottom="true"
+                android:layout_below="@id/bg_progress"
                 />
         </RelativeLayout>
 

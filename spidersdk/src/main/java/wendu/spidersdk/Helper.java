@@ -25,8 +25,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.security.MessageDigest;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -34,6 +40,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * Created by du on 16/4/15.
@@ -221,12 +235,41 @@ public class Helper {
         return request("POST", url, addSign(param));
     }
 
+
     public static String request(String method, String url, String param) throws Exception {
+        if(url.toLowerCase().startsWith("https")){
+         return requestHttps(method, url, param);
+        }
         URL uri = new URL(url);
         method = method.toUpperCase();
         HttpURLConnection urlCon = (HttpURLConnection) uri.openConnection();
         urlCon.setRequestMethod(method);
         urlCon.setConnectTimeout(10000);
+        urlCon.setRequestProperty("X-Requested-With", "XMLHttpRequest");
+        if (method.equals("POST")) {
+            urlCon.setDoOutput(true);
+            urlCon.setDoInput(true);
+            if (!param.trim().isEmpty()) {
+                PrintWriter pw = new PrintWriter(urlCon.getOutputStream());
+                pw.print(param);
+                pw.flush();
+                pw.close();
+            }
+        }
+        return inputStream2String(urlCon.getInputStream());
+
+    }
+
+
+    private  static String requestHttps(String method, String url, String param) throws Exception {
+        URL uri = new URL(url);
+        method = method.toUpperCase();
+        HttpsURLConnection urlCon = (HttpsURLConnection) uri.openConnection();
+        urlCon.setRequestMethod(method);
+        urlCon.setConnectTimeout(10000);
+        if(DSpider.getSSLSocketFactory()!=null) {
+            urlCon.setSSLSocketFactory(DSpider.getSSLSocketFactory());
+        }
         urlCon.setRequestProperty("X-Requested-With", "XMLHttpRequest");
         if (method.equals("POST")) {
             urlCon.setDoOutput(true);

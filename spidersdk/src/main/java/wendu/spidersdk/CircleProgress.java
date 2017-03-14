@@ -100,11 +100,13 @@ class CircleProgress extends View {
             paint.setColor(foregroundColor);
             canvas.drawArc(rectF, start, delta, false, paint);
             start+=delta;
-        }else if(delta==360){
-            paint.setColor(colorGradientHelper.getEndColor());
-            canvas.drawArc(rectF, start, 360, false, paint);
-            start=toDegree(endDegree);
-        }else
+        }
+//        else if(delta==360){
+//            paint.setColor(colorGradientHelper.getEndColor());
+//            canvas.drawArc(rectF, start, 360, false, paint);
+//            start=toDegree(endDegree);
+//        }
+        else
         {
             for (int i = 0; i < delta; i++) {
                 int color = colorGradientHelper.getColor(i);
