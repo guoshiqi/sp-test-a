@@ -25,8 +25,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.security.MessageDigest;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -35,12 +41,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
+
 /**
  * Created by du on 16/4/15.
  */
 public class Helper {
 
     public static final String TAG = "spider";
+    public static X509TrustManager trustManager;
 
     public static int getColor(Context ctx, int resId) {
         int color = -1;
@@ -242,6 +256,69 @@ public class Helper {
 
     }
 
+    public static X509TrustManager getTrustManager(){
+        try {
+            if(trustManager == null){
+                trustManager = trustManagerForCertificates(DSpider.APP_CONTEXT
+                        .getAssets().open("xiaoying.com.cer"));
+                // .getAssets().open("www.dtworkroom.com.crt"));
+            }
+            return  trustManager;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public static SSLSocketFactory getSSLSocketFactory(){
+        try {
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, new TrustManager[] { getTrustManager() }, new java.security.SecureRandom());
+            return  sslContext.getSocketFactory();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    public static X509TrustManager trustManagerForCertificates(InputStream in)
+            throws GeneralSecurityException {
+        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+        Collection<? extends Certificate> certificates = certificateFactory.generateCertificates(in);
+        if (certificates.isEmpty()) {
+            throw new IllegalArgumentException("expected non-empty set of trusted certificates");
+        }
+
+        // Put the certificates a key store.
+        char[] password = "password".toCharArray(); // Any password will work.
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        try{
+            keyStore.load(null, password);
+        }catch (Exception e){
+        }
+        int index = 0;
+        for (Certificate certificate : certificates) {
+            String certificateAlias = Integer.toString(index++);
+            keyStore.setCertificateEntry(certificateAlias, certificate);
+        }
+
+        // Use it to build an X509 trust manager.
+        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(
+                KeyManagerFactory.getDefaultAlgorithm());
+        keyManagerFactory.init(keyStore, password);
+        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(
+                TrustManagerFactory.getDefaultAlgorithm());
+        trustManagerFactory.init(keyStore);
+        TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
+        if (trustManagers.length != 1 || !(trustManagers[0] instanceof X509TrustManager)) {
+            throw new IllegalStateException("Unexpected default trust managers:"
+                    + Arrays.toString(trustManagers));
+        }
+
+        return (X509TrustManager)trustManagers[0];
+    }
+
+
 
     public static String getDeviceId(Context ctx) {
 
@@ -310,45 +387,6 @@ public class Helper {
 
     }
 
-
-//    public static void initSpider(final Context ctx, @NonNull final InitStateListener initStateListener) {
-//        final int device_id = ctx.getSharedPreferences("spider",
-//                Context.MODE_PRIVATE).getInt("device_id", 0);
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                if (device_id == 0) {
-//                    try {
-//                        JSONObject ret = new JSONObject(Helper.post(DSpider.BASE_URL + "device/save",
-//                                collectDeviceInfo(ctx)));
-//                        int code = ret.getInt("code");
-//                        if (code != 0) {
-//                            initStateListener.onFail(ret.getString("msg"),
-//                                    DSpider.Result.STATE_ERROR_MSG);
-//
-//                        } else {
-//                            int deviceId = ret.getInt("data");
-//                            ctx.getSharedPreferences("spider", Context.MODE_PRIVATE)
-//                                    .edit().putInt("device_id", deviceId).commit();
-//                            DSpider.DEVICE_ID = deviceId;
-//                            initStateListener.onSucceed(deviceId);
-//
-//                        }
-//
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                        initStateListener.onFail(e.getMessage(),
-//                                DSpider.Result.STATE_DSPIDER_SERVER_ERROR);
-//
-//                    }
-//                } else {
-//                    DSpider.DEVICE_ID = device_id;
-//                    initStateListener.onSucceed(device_id);
-//                }
-//            }
-//        }).start();
-//
-//    }
 
 
     public static class ColorGradientHelper {
