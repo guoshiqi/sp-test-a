@@ -6,6 +6,7 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 
 import org.json.JSONObject;
 
@@ -50,15 +51,23 @@ class JavaScriptBridgeImp {
 
 
     public void save(String key, String value) {
-        if (TextUtils.isEmpty(value)) {
-            sharedPreferences.edit().remove(key).commit();
-        } else {
-            sharedPreferences.edit().putString(key, value).commit();
+        if (DSpider.sPersistence == null) {
+            if (TextUtils.isEmpty(value)) {
+                sharedPreferences.edit().remove(key).commit();
+            } else {
+                sharedPreferences.edit().putString(key, value).commit();
+            }
+        }else {
+            DSpider.sPersistence.save(key,value);
         }
     }
 
     public String read(String key) {
-        return sharedPreferences.getString(key, "");
+        if (DSpider.sPersistence == null) {
+            return sharedPreferences.getString(key, "");
+        }else {
+            return DSpider.sPersistence.read(key);
+        }
     }
 
     public String clear(String sessionKey) {
@@ -128,11 +137,10 @@ class JavaScriptBridgeImp {
         mWebview.post(new Runnable() {
             @Override
             public void run() {
-
                 mWebview.removeJavascriptInterface();
                 CookieManager.getInstance().removeAllCookie();
+                CookieSyncManager.getInstance().sync();
                 mJavaScriptHandler.finish(new DSpider.Result(sessionKey, datas.get(sessionKey), msg, code));
-                //mWebview.loadUrl("about:blank");
                 mWebview.loadUrl("javascript: window.close()");
                 datas.remove(sessionKey);
             }

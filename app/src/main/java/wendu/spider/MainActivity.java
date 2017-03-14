@@ -22,7 +22,6 @@ import wendu.common.base.BaseActivity;
 import wendu.common.utils.DpiHelper;
 import wendu.common.utils.KvStorage;
 import wendu.spidersdk.DSpider;
-import wendu.spidersdk.third.ZmxyActivity;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
@@ -128,9 +127,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     spiderCategory = category;
                     SpiderItem item = category.spiders.get(position);
                     switch (item.sid) {
-                        case Util.ZHIMA:
-                            startActivity(ZmxyActivity.class);
-                            break;
                         case Util.EMAIL:
                             startActivity(EmailActivity.class);
                             break;

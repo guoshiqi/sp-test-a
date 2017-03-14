@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
@@ -554,6 +555,7 @@ public class DWebView extends WebView {
     public void clearCache(boolean includeDiskFiles) {
         super.clearCache(includeDiskFiles);
         CookieManager.getInstance().removeAllCookie();
+        CookieSyncManager.getInstance().sync();
         Context context = getContext();
         //清理Webview缓存数据库
         try {

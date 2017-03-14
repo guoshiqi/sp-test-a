@@ -198,7 +198,7 @@ public class DSpiderView extends LinearLayout {
 
     public void stop() {
         webview.removeJavascriptInterface();
-        //webview.destroy();
+        webview.loadUrl("javascript: window.close()");
     }
 
     public void clearCache() {

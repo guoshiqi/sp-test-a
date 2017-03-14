@@ -1,2 +1,0 @@
-configurations.maybeCreate("default")
-artifacts.add("default", file('zmxySDKALCmini_V1.01450366738902_release.jar'))

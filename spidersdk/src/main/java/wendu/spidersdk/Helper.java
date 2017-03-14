@@ -41,8 +41,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -236,6 +240,9 @@ public class Helper {
     }
 
     public static String request(String method, String url, String param) throws Exception {
+        if(url.toLowerCase().startsWith("https")){
+            return requestHttps(method, url, param);
+        }
         URL uri = new URL(url);
         method = method.toUpperCase();
         HttpURLConnection urlCon = (HttpURLConnection) uri.openConnection();
@@ -256,12 +263,42 @@ public class Helper {
 
     }
 
+
+    private  static String requestHttps(String method, String url, String param) throws Exception {
+        URL uri = new URL(url);
+        method = method.toUpperCase();
+        HttpsURLConnection urlCon = (HttpsURLConnection) uri.openConnection();
+        urlCon.setRequestMethod(method);
+        urlCon.setConnectTimeout(10000);
+        urlCon.setSSLSocketFactory(getSSLSocketFactory());
+        urlCon.setHostnameVerifier(new HostnameVerifier() {
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        });
+        urlCon.setRequestProperty("X-Requested-With", "XMLHttpRequest");
+        if (method.equals("POST")) {
+            urlCon.setDoOutput(true);
+            urlCon.setDoInput(true);
+            if (!param.trim().isEmpty()) {
+                PrintWriter pw = new PrintWriter(urlCon.getOutputStream());
+                pw.print(param);
+                pw.flush();
+                pw.close();
+            }
+        }
+        return inputStream2String(urlCon.getInputStream());
+
+    }
+
+
     public static X509TrustManager getTrustManager(){
         try {
             if(trustManager == null){
                 trustManager = trustManagerForCertificates(DSpider.APP_CONTEXT
-                        .getAssets().open("xiaoying.com.cer"));
-                // .getAssets().open("www.dtworkroom.com.crt"));
+                        //.getAssets().open("xiaoying.com.cer"));
+                  .getAssets().open("www.dtworkroom.com.crt"));
             }
             return  trustManager;
         } catch (Exception e) {
@@ -378,8 +415,13 @@ public class Helper {
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    initStateListener.onFail(e.getMessage(),
-                            DSpider.Result.STATE_DSPIDER_SERVER_ERROR);
+                    if(e instanceof SSLHandshakeException){
+                        initStateListener.onFail("您当前网络环境不安全",
+                                DSpider.Result.STATE_ERROR_MSG);
+                    }else {
+                        initStateListener.onFail(e.getMessage(),
+                                DSpider.Result.STATE_DSPIDER_SERVER_ERROR);
+                    }
                 }
             }
 

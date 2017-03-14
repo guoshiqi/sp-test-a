@@ -36,6 +36,12 @@ public class DSpider implements Serializable {
     private String debugSrcFileName;
     private String debugStartUrl;
 
+    public static void setPersistenceImp(IPersistence iPersistence) {
+        DSpider.sPersistence= iPersistence;
+    }
+
+    static IPersistence sPersistence;
+
 //    public static final String BASE_URL = "http://119.29.112.230:8589/partner/crawl/";
 //    public static final String REPORT_URL = "scriptReport";
 
