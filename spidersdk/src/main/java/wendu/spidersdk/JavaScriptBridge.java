@@ -57,6 +57,11 @@ class JavaScriptBridge {
     }
 
     @JavascriptInterface
+    public void showProgressExcept(JSONObject jsonObject) throws JSONException  {
+        jsbImp.showProgressExcept(jsonObject.getString("url"));
+    }
+
+    @JavascriptInterface
     public void setProgress(JSONObject jsonObject) throws JSONException {
         jsbImp.setProgress(jsonObject.getInt("progress"));
     }

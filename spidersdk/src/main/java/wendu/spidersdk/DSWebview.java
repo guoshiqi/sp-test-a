@@ -29,6 +29,21 @@ class DSWebview extends DWebView {
     private String userAgent;
     private boolean debug = false;
     private String taskId;
+    private String scriptId;
+    private String script;
+    private int  descendantFocusability;
+    private String debugSrc = "";
+    private final String contentType = "application/javascript";
+
+    public String getExceptUrl() {
+        return exceptUrl;
+    }
+
+    public void setExceptUrl(String exceptUrl) {
+        this.exceptUrl = exceptUrl;
+    }
+
+    private String exceptUrl="";
 
     public String getScriptId() {
         return scriptId;
@@ -37,9 +52,6 @@ class DSWebview extends DWebView {
     public void setScriptId(String scriptId) {
         this.scriptId = scriptId;
     }
-
-    private String scriptId;
-    private String script;
 
     public String getTaskId() {
         return taskId;
@@ -66,9 +78,13 @@ class DSWebview extends DWebView {
         this.debugSrc = debugSrc;
     }
 
-
-    private String debugSrc = "";
-    private final String contentType = "application/javascript";
+    public void enableFocus(boolean enable){
+        if(enable){
+            setDescendantFocusability(descendantFocusability);
+        }else{
+            setDescendantFocusability(FOCUS_BLOCK_DESCENDANTS);
+        }
+    }
 
     public DSWebview(Context context) {
         super(context);
@@ -81,6 +97,7 @@ class DSWebview extends DWebView {
     }
 
     private void init(Context context) {
+        descendantFocusability=getDescendantFocusability();
         setWebChromeClient(mWebChromeClient);
         setWebViewClient(mWebViewClient);
     }

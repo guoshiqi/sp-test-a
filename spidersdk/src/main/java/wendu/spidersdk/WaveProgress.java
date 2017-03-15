@@ -325,7 +325,7 @@ public class WaveProgress extends View {
         // horizontal animation.
         // wave waves infinitely.
         ObjectAnimator waveShiftAnim = ObjectAnimator.ofFloat(
-                this, "waveShiftRatio", 0f, 1f);
+                this, "waveShiftRatio", 1f, 0f);
         waveShiftAnim.setRepeatCount(ValueAnimator.INFINITE);
         waveShiftAnim.setDuration(mSpeed);
         waveShiftAnim.setInterpolator(new LinearInterpolator());

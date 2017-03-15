@@ -1,8 +1,8 @@
 /**
  * Created by du on 16/9/1.
  */
+
 var $ = dQuery;
-var jQuery=$;
 String.prototype.format = function () {
     var args = Array.prototype.slice.call(arguments);
     var count = 0;
@@ -11,34 +11,26 @@ String.prototype.format = function () {
     });
 };
 
-String.prototype.trim = function () {
-    return this.replace(/(^\s*)|(\s*$)/g, '');
-};
-
-String.prototype.empty = function () {
-    return this.trim() === "";
-};
-
-function _logstr(str){
-    str=str||" "
-    return typeof str=="object"?JSON.stringify(str):(new String(str)).toString()
+function _logstr(str) {
+    str = str || " "
+    return typeof str == "object" ? JSON.stringify(str) : (new String(str)).toString()
 }
+
 function log(str) {
-    var s= window.curSession
-    if(s){
+    var s = window.curSession
+    if (s) {
         s.log(str)
-    }else {
-        console.log("dSpider: "+_logstr(str))
+    } else {
+        console.log("dSpider: " + _logstr(str))
     }
 }
 
 //异常捕获
 function errorReport(e) {
-    var stack=e.stack? e.stack.replace(/http.*?inject\.php.*?:/ig," "+_su+":"): e.toString();
-    var msg="语法错误: " + e.message +"\nscript_url:"+_su+"\n"+stack
-    if(window.curSession){
+    var msg = "语法错误: " + e.message + "\nscript_url:" + _su + "\n" + e.stack
+    if (window.curSession) {
         curSession.log(msg);
-        curSession.finish(e.message,"",3,msg);
+        curSession.finish(e.message, "", 2, msg);
     }
 }
 
@@ -67,9 +59,9 @@ function safeCallback(f) {
         }
     }
 }
-//设置dQuery异常处理器
-dQuery.safeCallback = safeCallback;
-dQuery.errorReport = errorReport;
+//设置$异常处理器
+$.safeCallback = safeCallback;
+$.errorReport = errorReport;
 
 function hook(fun) {
     return function () {
@@ -99,7 +91,7 @@ function waitDomAvailable(selector, success, fail) {
     var timeout = 10000;
     var t = setInterval(function () {
         timeout -= 10;
-        var ob = dQuery(selector)
+        var ob = $(selector)
         if (ob[0]) {
             clearInterval(t)
             success(ob, 10000 - timeout)
@@ -116,31 +108,38 @@ function Observe(ob, options, callback) {
     mo.observe(ob, options);
     return mo;
 }
+var _timer,_timeOut=-1;
 
-//dquery,api加载成功的标志是window.xyApiLoaded=true,所有操作都必须在初始化成功之后
-function apiInit() {
-    dQuery.noConflict();
-    var withCheck=function(attr) {
-        var f = DataSession.prototype[attr];
-        return function () {
-            if (this.finished) {
-                console.log("dSpider: call " + attr + " ignored, since finish has been called! ")
-            } else {
-                return f.apply(this, arguments);
-            }
+function _startTimer(s){
+    var left=_timeOut*1000- (s.get("_pass")||0)
+    if(left<0) left=0;
+    _timer=setTimeout(function(){
+        log("time out");
+        if (!s.finished) {
+            s.finish("timeout ["+_timeOut+"s] ", "",4)
         }
+    },left);
+    log("_Timer:"+left/1000+"s left");
+}
+function _resetTimer(show){
+    var s=window.curSession;
+    if(_timeOut==-1) return;
+    var key=show?"_show":"_hide";
+    var last=s.get("_last");
+    last=last||"_hide";
+    //显示状态没有改变则什么也不做
+    if(last==key) return;
+    var now=new Date().getTime()
+    var passed;
+    if(key=="_show"){
+        _startTimer(s)
+    }else{
+        passed=now- (s.get("_show")||now);
+        s.set("_pass", (s.get("_pass")||0)+passed);
+        clearTimeout(_timer)
     }
-
-    for (var attr in DataSession.prototype) {
-        DataSession.prototype[attr] = withCheck(attr);
-    }
-    var t = setInterval(function () {
-        if (!(window._xy || window.bridge)) {
-            return;
-        }
-        window.xyApiLoaded = true;
-        clearInterval(t);
-    }, 20);
+    s.set("_last",key);
+    s.set(key,now)
 }
 
 //爬取入口
@@ -163,167 +162,197 @@ function dSpider(sessionKey,timeOut, callback) {
             }
         }
         $(window).on("beforeunload",onclose)
-        window.curSession = session;
         session._init(function(){
             //超时处理
             if (!callback) {
                 callback = timeOut;
                 timeOut = -1;
             }
+            window.curSession = session;
             if (timeOut != -1) {
-                var startTime = session.get("startTime")
-                var now = new Date().getTime();
-                if (!startTime) {
-                    session.set("startTime", now);
-                    startTime=now
+                _timeOut=timeOut;
+                if(session.get("_last")=="_show"){
+                    var now=new Date().getTime()
+                    var passed=now-(session.get("_show")||now);
+                    session.set("_pass", (session.get("_pass")||0)+passed);
+                    session.set("_show",now);
+                    _startTimer(session)
                 }
-                timeOut *= 1000;
-                var passed = (now - startTime);
-                var left = timeOut -passed;
-                left = left > 0 ? left : 0;
-                log("left:"+left)
-                setTimeout(function () {
-                    log("time out");
-                    if (!session.finished) {
-                        session.finish("timeout ["+timeOut/1000+"s] ", "",4)
-                    }
-                }, left);
             }
             DataSession.getExtraData(function (extras) {
-                $(safeCallback(function(){
-                    $("body").on("click","a",function(){
-                        $(this).attr("target",function(_,v){
-                            if(v=="_blank") return "_self"
+                DataSession.getArguments(function(args){
+                    session.getArguments=function(){
+                        return JSON.parse(args||"{}")
+                    }
+                    $(safeCallback(function(){
+                        $("body").on("click","a",function(){
+                            $(this).attr("target",function(_,v){
+                                if(v=="_blank") return "_self"
+                            })
                         })
-                    })
-                    log("dSpider start!")
-                    extras.config=typeof _config==="object"?_config:"{}";
-                    session._args=extras.args;
-                    callback(session, extras, $);
-                }))
+                        log("dSpider start!")
+                        extras.config=typeof _config==="object"?_config:"{}";
+                        callback(session, extras, $);
+                    }))
+                })
             })
         })
     }, 20);
 }
 
-dQuery(function(){
-    if(window.onSpiderInited){
-        window.onSpiderInited(dSpider.bind(5));
-    }
+$(function () {
+    var f = window.onSpiderInited;
+    f && f(dSpider.bind(5))
 })
 
-//邮件爬取入口
-function dSpiderMail(sessionKey, callback) {
-    dSpider(sessionKey,function(session,env,$){
-        callback(session.getLocal("u"), session.getLocal("wd"), session, env, $);
-    })
+var bridge = getJsBridge();
+function callHandler() {
+    var f = arguments[2];
+    if (f) {
+        arguments[2] = safeCallback(f)
+    }
+    return bridge.call.apply(bridge, arguments);
 }
 function DataSession(key) {
     this.key = key;
+    log("start called")
     this.finished = false;
-    _xy.start(key);
+    callHandler("start", {sessionKey: key})
 }
 
 DataSession.getExtraData = function (f) {
-    f = safeCallback(f);
-    f && f(JSON.parse(_xy.getExtraData() || "{}"));
+    log("getExtraData called")
+    return callHandler("getExtraData")
 }
+
+var getArguments =function () {
+    log("getArguments called")
+    return JSON.parse(callHandler("getArguments")||'{}')
+};
 
 DataSession.prototype = {
     _save: function () {
-        _xy.set(this.key, JSON.stringify(this.data));
+        callHandler("set", {key: this.key, value: JSON.stringify(this.data)})
     },
-    _init: function (f) {
-        this.data = JSON.parse(_xy.get(this.key) || "{}");
-        this.local=JSON.parse(_xy.read(this.key)|| "{}")
-        f()
+    _init: function () {
+        var data = callHandler("get", {key: this.key});
+        this.data = JSON.parse(data || "{}");
+        this.local = JSON.parse(callHandler("read", {key: this.key}) || "{}");
+    },
+
+    getArguments :getArguments,
+
+    addArgument: function(key,value){
+        var t=this.getArguments();
+        t[key]=value;
+        this.setArguments(t);
+    },
+
+    setArguments: function(object){
+        callHandler("setArguments",{args:JSON.stringify(object)})
     },
 
     get: function (key) {
+        log("get called")
         return this.data[key];
     },
     set: function (key, value) {
+        log("set called")
         this.data[key] = value;
+        this._save();
     },
 
     showProgress: function (isShow) {
-        _xy.showProgress(isShow === undefined ? true : !!isShow);
+        log("showProgress called")
+        callHandler("showProgress", {show: isShow === undefined ? true : !!isShow});
     },
     setProgressMax: function (max) {
-        _xy.setProgressMax(max);
+        log("setProgressMax called")
+        callHandler("setProgressMax", {progress: max});
     },
     setProgress: function (progress) {
-        _xy.setProgress(progress);
+        log("setProgress called")
+        callHandler("setProgress", {progress: progress});
     },
-    getProgress: function (f) {
-        f = safeCallback(f);
-        f && f(_xy.getProgress());
-    },
-    showLoading: function (s) {
-        _xy.showLoading(s || "正在爬取,请耐心等待...")
-    },
-    hideLoading: function () {
-        _xy.hideLoading()
-    },
-    setStartUrl:function(){
-           this.set('__loginUrl',location.href);
+    setProgressMsg: function (msg) {
+        if (!msg) return;
+        callHandler("setProgressMsg", {msg: msg})
     },
     finish: function (errmsg, content, code, stack) {
-        this.finished = true;
+        log("finish called")
+        var ret = {sessionKey: this.key, result: 0, msg: ""}
         if (errmsg) {
             var ob = {
                 url: location.href,
                 msg: errmsg,
-                //content: content || document.documentElement.outerHTML,
-                args: this._args
+                args: this.getArguments(),
+                content: content ,
             }
             stack && (ob.stack = stack);
-            return _xy.finish(this.key || "", code || 2, JSON.stringify(ob));
+            ret.result = code || 2;
+            ret.msg = JSON.stringify(ob);
         }
-        return _xy.finish(this.key || "", 0, "")
+        this.finished = true;
+        callHandler("finish", ret);
+
     },
-    upload: function (value) {
+    upload: function (value, f) {
         if (value instanceof Object) {
             value = JSON.stringify(value);
         }
-        return _xy.push(this.key, value)
+        log("push called")
+        callHandler("push", {"sessionKey": this.key, "value": value});
     },
+    push: this.upload,
     load: function (url, headers) {
         headers = headers || {}
         if (typeof headers !== "object") {
             alert("the second argument of function load  must be Object!")
             return
         }
-        _xy.load(url, JSON.stringify(headers));
+        callHandler("load", {url: url, headers: headers});
     },
     setUserAgent: function (str) {
-        _xy.setUserAgent(str)
+        callHandler("setUserAgent", {userAgent: str})
     },
-    openWithSpecifiedCore: function (url, core) {
-        _xy.openWithSpecifiedCore(url, core)
-    },
+
     autoLoadImg: function (load) {
-        _xy.autoLoadImg(load === true)
+        callHandler("autoLoadImg", {load: load === true})
     },
+
     string: function () {
         log(this.data)
     },
-    setProgressMsg:function(str){
-        if(!str) return;
-        _xy.setProgressMsg(str);
-    },
-    log: function(str,type) {
-        str=_logstr(str);
-        console.log("dSpider: "+str)
-        _xy.log(str,type||1)
+    log: function (str, type) {
+        str = _logstr(str);
+        console.log("dSpider: " + str)
+        callHandler("log", {type: type || 1, msg: str})
     },
     setLocal: function (k, v) {
-        this.local[k]=v
-        _xy.save(this.key,JSON.stringify(this.local))
-
+        log("save called")
+        this.local[k] = v;
+        callHandler("save", {key: this.key, value: JSON.stringify(this.local)})
     },
     getLocal: function (k) {
+        log("read called")
         return this.local[k];
-    }
+    },
+    showProgressExcept:function(url){
+       url=url||location.href;
+       callHandler("showProgressExcept", {url: url})
+    },
+    setStartUrl:this.showProgressExcept
 };
-apiInit();
+var withCheck = function (attr) {
+    var f = DataSession.prototype[attr];
+    return function () {
+        if (this.finished) {
+            console.log("dSpider: call " + attr + " ignored, since finish has been called! ")
+        } else {
+            return f.apply(this, arguments);
+        }
+    }
+}
+for (var attr in DataSession.prototype) {
+    DataSession.prototype[attr] = withCheck(attr);
+}

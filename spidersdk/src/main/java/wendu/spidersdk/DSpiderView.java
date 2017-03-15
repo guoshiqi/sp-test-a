@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import org.json.JSONObject;
 
@@ -24,15 +25,11 @@ public class DSpiderView extends LinearLayout {
     private SpiderEventListener spiderEventListener;
     private int max = 100;
     private int sid=0;
-    private int retry = 0;
+    private int retry=1;
     private int mScriptCount=1;
-    private String startUrl;
+    private String startUrl="";
     private boolean customProgressShow=false;
-
-    private String arguments="{}";
-
-
-
+    private String arguments;
     public DSpiderView(Context context) {
         super(context);
         init();
@@ -50,15 +47,20 @@ public class DSpiderView extends LinearLayout {
         webview.setWebEventListener(new DSWebview.WebEventListener() {
             @Override
             void onPageStart(String url) {
-                if(!(customProgressShow||webview.isDebug())) {
+                if(!TextUtils.isEmpty(webview.getExceptUrl())&& !webview.getExceptUrl().equals(url)){
+                    customProgressShow=true;
+                    spiderEventListener.onProgressShow(true);
+                }else{
                     loading.setVisibility(VISIBLE);
                 }
+                webview.enableFocus(!customProgressShow);
             }
 
             @Override
             void onPageFinished(String url) {
                 super.onPageFinished(url);
                 loading.setVisibility(GONE);
+                webview.enableFocus(!customProgressShow);
             }
 
             @Override
@@ -80,6 +82,8 @@ public class DSpiderView extends LinearLayout {
         });
         addJavaScriptApi();
     }
+
+
 
 
     private void addJavaScriptApi() {
@@ -109,13 +113,13 @@ public class DSpiderView extends LinearLayout {
             }
 
             @Override
-            public void setArguments(String json) {
-                arguments = json;
+            public String getArguments() {
+                return arguments;
             }
 
             @Override
-            public String getArguments() {
-                return arguments;
+            public void setArguments(String json) {
+                arguments=json;
             }
 
             @Override
@@ -149,12 +153,12 @@ public class DSpiderView extends LinearLayout {
     }
 
     public boolean canRetry(){
-      return retry<mScriptCount;
+        return retry<mScriptCount;
     }
 
     public void retry(){
         if(canRetry()) {
-           start();
+            start();
         }
     }
 
@@ -176,6 +180,21 @@ public class DSpiderView extends LinearLayout {
         }
     }
 
+    public void clearCache(){
+        webview.clearCache(true);
+    }
+
+    public void stop(){
+        webview.post(new Runnable() {
+            @Override
+            public void run() {
+                webview.removeJavascriptInterface();
+                webview.loadUrl("javascript: window.close()");
+                CookieManager.getInstance().removeAllCookie();
+            }
+        });
+    }
+
     public  void setArguments(String  argumentsJson){
         this.arguments=argumentsJson;
     }
@@ -187,24 +206,9 @@ public class DSpiderView extends LinearLayout {
         start();
     }
 
-    public void start(int sid, String startUrl, @NonNull SpiderEventListener spiderEventListener) {
-        this.startUrl = startUrl;
-        start(sid, spiderEventListener);
-    }
-
     public DSWebview getWebview(){
         return  webview;
     }
-
-    public void stop() {
-        webview.removeJavascriptInterface();
-        webview.loadUrl("javascript: window.close()");
-    }
-
-    public void clearCache() {
-        webview.clearCache(true);
-    }
-
 
     private void start(){
         final Context ctx = getContext();
@@ -218,10 +222,8 @@ public class DSpiderView extends LinearLayout {
                 webview.setScriptId(scriptId+"");
                 webview.setTaskId(taskId + "");
                 webview.setInjectScript(script);
-                if (TextUtils.isEmpty(startUrl)) {
-                    startUrl = url;
-                }
-                webview.loadUrl(startUrl);
+                startUrl=url;
+                webview.loadUrl(url);
             }
 
             @Override

@@ -12,27 +12,4 @@
     <color name="black">#000000</color>
     <color name="transparent">#00000000</color>
     <color name="windowBackground">#f6f6f6</color>
-    <color name="divider_line_color">#dedede</color>
-    <!-- 大部分字体采用下面三种颜色 -->
-    <color name="text_color_dark">#333333</color>
-    <color name="text_color_middle">#666666</color>
-    <color name="text_color_light">#999999</color>
-
-    <!-- 黑色  透明度10->100  -->
-    <color name="black_transparent_10">#19000000</color>
-    <color name="black_transparent_15">#26000000</color>
-    <color name="black_transparent_20">#33000000</color>
-    <color name="black_transparent_30">#4D000000</color>
-    <color name="black_transparent_40">#66000000</color>
-    <color name="black_transparent_50">#80000000</color>
-    <color name="black_transparent_60">#99000000</color>
-    <color name="black_transparent_70">#B3000000</color>
-    <color name="black_transparent_80">#CC000000</color>
-    <color name="black_transparent_90">#E6000000</color>
-    <color name="black_transparent_100">#FF000000</color>
-
-
-
-
-
 </resources>

@@ -12,14 +12,6 @@
         <activity
             android:name=".SpiderActivity"
             android:theme="@style/ColorTranslucentTheme" />
-        <activity
-            android:name=".third.ZmxyActivity"
-            android:label="芝麻信用"
-            android:theme="@style/ColorTranslucentTheme"></activity>
-        <activity
-            android:name="com.android.moblie.zmxy.antgroup.creditsdk.app.SDKActivity"
-            android:label="芝麻信用"
-            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

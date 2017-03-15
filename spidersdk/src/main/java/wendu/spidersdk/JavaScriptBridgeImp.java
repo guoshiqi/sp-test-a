@@ -124,6 +124,9 @@ class JavaScriptBridgeImp {
 
     }
 
+    public void showProgressExcept(String url) {
+        mWebview.setExceptUrl(url);
+    }
 
     public void finish(final String sessionKey, final int code, final String msg) {
         //已经关闭

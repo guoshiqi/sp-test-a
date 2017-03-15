@@ -60,15 +60,6 @@ public class SpiderActivity extends AppCompatActivity {
         waveProgress.setAmplitudeRatio(.05f);
         waveProgress.setShapeType(WaveProgress.ShapeType.SQUARE);
         waveProgress.setWaveSpeed(1200);
-        boolean style=getIntent().getBooleanExtra("style", false);
-        if(style) {
-            int waveColor = Helper.getColor(this, R.color.colorPrimaryDark);
-            if (waveColor != -1) {
-                int waveColor2 = Color.argb(130, Color.red(waveColor),
-                        Color.green(waveColor), Color.blue(waveColor));
-                waveProgress.setWaveColor(waveColor2, waveColor);
-            }
-        }
         spiderView=getView(R.id.dspider_view);
         toobar=getView(R.id.toolbar);
         spider = getView(R.id.spider);
@@ -81,7 +72,7 @@ public class SpiderActivity extends AppCompatActivity {
         msg = getView(R.id.msg);
         progressMsg = getView(R.id.progress_msg);
         fm = getSupportFragmentManager();
-        workProgress.setForegroundColor(Color.argb(70,19,94,148),Color.argb(170,19,94,148));
+        workProgress.setForegroundColor(Color.parseColor("#2189bf"),Color.parseColor("#64C0F0"));
         String title = getIntent().getStringExtra("title");
         arguments = getIntent().getStringExtra("arguments");
         titleTv.setText(TextUtils.isEmpty(title) ? "爬取" : title);
@@ -95,7 +86,7 @@ public class SpiderActivity extends AppCompatActivity {
                     getIntent().getStringExtra("debugSrc"), spiderEventListener);
         } else {
             int  sid = getIntent().getIntExtra("sid",-1);
-            spiderView.start(sid, getIntent().getStringExtra("startUrl"), spiderEventListener);
+            spiderView.start(sid, spiderEventListener);
         }
         ImageView back=getView(R.id.back) ;
         back.setOnClickListener(new View.OnClickListener() {
@@ -208,7 +199,7 @@ public class SpiderActivity extends AppCompatActivity {
     }
 
     public void showInput(boolean show) {
-        spiderView.getWebview().setDescendantFocusability(show ? ViewGroup.FOCUS_AFTER_DESCENDANTS : ViewGroup.FOCUS_BLOCK_DESCENDANTS);
+        spiderView.getWebview().enableFocus(show);
     }
 
     public void showProgress(boolean show) {
@@ -228,6 +219,10 @@ public class SpiderActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+
+    public void setToobarBackgroundColor(int color){
+      toobar.setBackgroundColor(color);
+    }
 
     @Override
     public void onBackPressed() {
