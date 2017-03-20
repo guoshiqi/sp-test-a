@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Created by du on 16/10/8.
  */
-public class DSpider implements Serializable {
+public class DSpider  {
 
     private Activity ctx;
     private HashMap<String, Object> arguments = new HashMap<>();
@@ -27,7 +27,7 @@ public class DSpider implements Serializable {
     public static int DEVICE_ID;
     public static int REQUEST = 2000;
     public static final String SDK_VERSION = "1.0.0";
-    public static Context APP_CONTEXT;
+
 
     //public static final String  BASE_URL="http://172.19.23.62/dSpider-web/1.0/";
     public static final String BASE_URL = "https://api.dtworkroom.com/1.0/";
@@ -47,15 +47,15 @@ public class DSpider implements Serializable {
 
 
     private DSpider(Activity ctx) {
-        this.ctx = ctx;
-        APP_CONTEXT = ctx.getApplicationContext();
+        this.ctx=ctx;
+        Helper.APP_CONTEXT = ctx.getApplicationContext();
     }
 
     public static DSpider build(Activity ctx) {
         return new DSpider(ctx);
     }
 
-    public static Result getLastResult(Context ctx, boolean clearResultCache) {
+    private static Result getLastResult(Context ctx, boolean clearResultCache) {
         File file = new File(ctx.getCacheDir() + "/spider.dat");
         FileInputStream fileInputStream = null;
         Result resultData = null;
@@ -74,9 +74,11 @@ public class DSpider implements Serializable {
     }
 
     public static Result getLastResult(Context ctx) {
+        return getLastResult(ctx, false);
+    }
+    public static Result getLastResultAndClean(Context ctx) {
         return getLastResult(ctx, true);
     }
-
     public static String getLastLog(Context ctx) {
         return ctx.getSharedPreferences("spider", Context.MODE_PRIVATE).getString("_log", "");
     }
@@ -86,20 +88,22 @@ public class DSpider implements Serializable {
         return this;
     }
 
+
     public void start(int sid,String title) {
         start(sid, title, "");
     }
 
     public DSpider start(int sid, String title, String startUrl) {
         start_(sid, title, startUrl);
+        isDebug=false;
         return this;
     }
 
-    public void startDebug(int sid, String title, String debugSrcFileName, String debugStartUrl) {
+    public void startDebug(String title, String debugSrcFileName, String debugStartUrl) {
         isDebug = true;
         this.debugSrcFileName = debugSrcFileName;
         this.debugStartUrl = debugStartUrl;
-        start(sid, title, "");
+        start(0, title, "");
     }
 
     private void showDialog(final String msg) {

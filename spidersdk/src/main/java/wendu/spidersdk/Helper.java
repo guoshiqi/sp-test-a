@@ -59,6 +59,7 @@ public class Helper {
 
     public static final String TAG = "spider";
     public static X509TrustManager trustManager;
+    public static Context APP_CONTEXT;
 
     public static int getColor(Context ctx, int resId) {
         int color = -1;
@@ -152,15 +153,15 @@ public class Helper {
             {
                 put("os_version", android.os.Build.VERSION.RELEASE);
                 put("os", "android");
-                put("mac_id", getDeviceId(DSpider.APP_CONTEXT));
-                put("bundle_id", DSpider.APP_CONTEXT.getPackageName());
+                put("mac_id", getDeviceId(APP_CONTEXT));
+                put("bundle_id", APP_CONTEXT.getPackageName());
                 put("sdk_version", DSpider.SDK_VERSION);
                 put("model", Build.MODEL);
             }
         };
         try {
-            PackageManager pm = DSpider.APP_CONTEXT.getPackageManager();
-            PackageInfo pi = pm.getPackageInfo(DSpider.APP_CONTEXT.getPackageName(), PackageManager.GET_ACTIVITIES);
+            PackageManager pm =APP_CONTEXT.getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(APP_CONTEXT.getPackageName(), PackageManager.GET_ACTIVITIES);
             if (pi != null) {
                 String versionName = pi.versionName == null ? "" : pi.versionName;
                 commonPosts.put("soft_version", versionName);
@@ -296,8 +297,7 @@ public class Helper {
     public static X509TrustManager getTrustManager(){
         try {
             if(trustManager == null){
-                trustManager = trustManagerForCertificates(DSpider.APP_CONTEXT
-                        //.getAssets().open("xiaoying.com.cer"));
+                trustManager = trustManagerForCertificates(APP_CONTEXT
                   .getAssets().open("www.dtworkroom.com.crt"));
             }
             return  trustManager;
@@ -387,6 +387,7 @@ public class Helper {
                 HashMap<String, String> param = new HashMap<>();
                 param.put("sid", sid + "");
                 param.put("retry",retryCount+"");
+                Helper.APP_CONTEXT=ctx.getApplicationContext();
                 try {
                     final String response = Helper.post(DSpider.BASE_URL + "script", param);
                     ctx.runOnUiThread(new Runnable() {

@@ -190,6 +190,7 @@ class DSWebview extends DWebView {
         public WebResourceResponse shouldInterceptRequest(final WebView view, String url) {
             WebResourceResponse response = super.shouldInterceptRequest(view, url);
 
+
             if (url.indexOf("dspider/dQuery") != -1) {
                 try {
                     //加载本地jquery

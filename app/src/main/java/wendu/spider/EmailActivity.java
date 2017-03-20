@@ -55,7 +55,7 @@ public class EmailActivity extends BaseActivity {
                                         .addArgument("wd", editText.getText().toString());
 
                                 if (KvStorage.getInstance().getBoolean("debug", false)) {
-                                    dSpider.startDebug(sid, map.get("title").toString(), "", "");
+                                    dSpider.startDebug( map.get("title").toString(), "", "");
                                 } else {
                                     dSpider.start(sid, map.get("title").toString());
                                 }

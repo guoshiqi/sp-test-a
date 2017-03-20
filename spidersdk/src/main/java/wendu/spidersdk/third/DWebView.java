@@ -66,6 +66,7 @@ public class DWebView extends WebView {
         init();
     }
 
+    @Keep
     void init() {
         APP_CACAHE_DIRNAME = getContext().getFilesDir().getAbsolutePath() + "/webcache";
         WebSettings settings = getSettings();

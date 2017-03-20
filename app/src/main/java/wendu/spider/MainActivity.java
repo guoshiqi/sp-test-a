@@ -107,6 +107,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         category.name = "小说";
         category.spiders = new ArrayList<SpiderItem>() {{
             add(new SpiderItem(12, R.mipmap.ic_launcher, "顶点小说", "http://m.23us.com/", "dingdian.js"));
+            add(new SpiderItem(13, R.mipmap.ic_launcher,"简书","http://www.jianshu.com/","jianshu.js"));
         }};
         items.add(category);
         parseCategories(items);
@@ -150,7 +151,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         DSpider dSpider = DSpider.build(this);
                 //.addArgument("test",7)
         if (KvStorage.getInstance().getBoolean("debug", false)) {
-            dSpider.startDebug(sid, title, debugSrcFileName, debugStartUrl);
+            dSpider.startDebug(title, debugSrcFileName, debugStartUrl);
         } else {
             dSpider.start(sid, title);
         }

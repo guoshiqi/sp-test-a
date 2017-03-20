@@ -22,12 +22,10 @@
 -keepclassmembers class wendu.spidersdk.JavaScriptBridge {
       public *;
    }
--keep class wendu.spidersdk.DSpider
--keep class wendu.spidersdk.DSpider.Result
+-keep class wendu.spidersdk.DSpider{public *;}
+-keep class wendu.spidersdk.DSpiderView{public *;}
+-keep class wendu.spidersdk.DSpider$Result{*;}
+-keep class wendu.spidersdk.IPersistence{*;}
+-keep class wendu.spidersdk.SpiderEventListener{*;}
 
-
--keep class com.alipayzhima.**{*;}
--keep class com.android.moblie.zmxy.antgroup.creditsdk.**{*;}
--keep class com.antgroup.zmxy.mobile.android.container.**{*;}
--keep class org.json.alipayzhima.**{*;}
 

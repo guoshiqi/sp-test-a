@@ -9,10 +9,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-
 import org.json.JSONObject;
-
 import java.util.Map;
 
 /**
@@ -132,6 +129,9 @@ public class DSpiderView extends LinearLayout {
             @Override
             public void log(String log, int type) {
                 super.log(log, type);
+                if (spiderEventListener != null) {
+                    spiderEventListener.onLog(log,type);
+                }
             }
 
             @Override

@@ -3,6 +3,7 @@
  */
 
 var $ = dQuery;
+
 String.prototype.format = function () {
     var args = Array.prototype.slice.call(arguments);
     var count = 0;
@@ -108,6 +109,7 @@ function Observe(ob, options, callback) {
     mo.observe(ob, options);
     return mo;
 }
+
 var _timer,_timeOut=-1;
 
 function _startTimer(s){
@@ -141,63 +143,52 @@ function _resetTimer(show){
     s.set("_last",key);
     s.set(key,now)
 }
-
 //爬取入口
-function dSpider(sessionKey,timeOut, callback) {
-    if(window.onSpiderInited&&this!=5)
+function dSpider(sessionKey, timeOut, callback) {
+    //判断调用源,如果是在onSpiderInited中调用,则下发脚本中的dSpider函数不执行
+    if (window.onSpiderInited && this != 5) {
         return;
-    var $=dQuery;
-    var t = setInterval(function () {
-        if (window.xyApiLoaded) {
-            clearInterval(t);
-        } else {
-            return;
+    }
+    var session = new DataSession(sessionKey);
+    var onclose = function () {
+        log("onNavigate:" + location.href)
+        session._save()
+        if (session.onNavigate) {
+            session.onNavigate(location.href);
         }
-        var session = new DataSession(sessionKey);
-        var onclose=function(){
-            log("onNavigate:"+location.href)
-            session._save()
-            if(session.onNavigate){
-                session.onNavigate(location.href);
-            }
+    }
+    $(window).on("beforeunload", onclose)
+    window.curSession = session;
+    session._init()
+    if (!callback) {
+        callback = timeOut;
+        timeOut = -1;
+    }
+
+    if (timeOut != -1) {
+        _timeOut = timeOut;
+        if (session.get("_last") == "_show") {
+            var now = new Date().getTime()
+            var passed = now - (session.get("_show") || now);
+            session.set("_pass", (session.get("_pass") || 0) + passed);
+            session.set("_show", now);
+            _startTimer(session)
         }
-        $(window).on("beforeunload",onclose)
-        session._init(function(){
-            //超时处理
-            if (!callback) {
-                callback = timeOut;
-                timeOut = -1;
-            }
-            window.curSession = session;
-            if (timeOut != -1) {
-                _timeOut=timeOut;
-                if(session.get("_last")=="_show"){
-                    var now=new Date().getTime()
-                    var passed=now-(session.get("_show")||now);
-                    session.set("_pass", (session.get("_pass")||0)+passed);
-                    session.set("_show",now);
-                    _startTimer(session)
-                }
-            }
-            DataSession.getExtraData(function (extras) {
-                DataSession.getArguments(function(args){
-                    session.getArguments=function(){
-                        return JSON.parse(args||"{}")
-                    }
-                    $(safeCallback(function(){
-                        $("body").on("click","a",function(){
-                            $(this).attr("target",function(_,v){
-                                if(v=="_blank") return "_self"
-                            })
-                        })
-                        log("dSpider start!")
-                        extras.config=typeof _config==="object"?_config:"{}";
-                        callback(session, extras, $);
-                    }))
-                })
+    }
+    var extras = DataSession.getExtraData()
+    extras = JSON.parse(extras || "{}")
+    $(safeCallback(function () {
+        $("body").on("click", "a", function () {
+            $(this).attr("target", function (_, v) {
+                if (v == "_blank") return "_self"
             })
         })
-    }, 20);
+        log("dSpider start!")
+        session.getConfig = function () {
+            return typeof _config === "object" ? _config : {}
+        }
+        callback(session, extras, $);
+    }))
 }
 
 $(function () {
@@ -264,7 +255,9 @@ DataSession.prototype = {
 
     showProgress: function (isShow) {
         log("showProgress called")
-        callHandler("showProgress", {show: isShow === undefined ? true : !!isShow});
+        isShow=isShow === undefined ? true : !!isShow;
+        _resetTimer(isShow)
+        callHandler("showProgress", {show: isShow});
     },
     setProgressMax: function (max) {
         log("setProgressMax called")
@@ -296,14 +289,16 @@ DataSession.prototype = {
         callHandler("finish", ret);
 
     },
-    upload: function (value, f) {
+    upload: function (value) {
         if (value instanceof Object) {
             value = JSON.stringify(value);
         }
         log("push called")
         callHandler("push", {"sessionKey": this.key, "value": value});
     },
-    push: this.upload,
+    push:function(value){
+     this.upload(value)
+    },
     load: function (url, headers) {
         headers = headers || {}
         if (typeof headers !== "object") {
@@ -338,10 +333,12 @@ DataSession.prototype = {
         return this.local[k];
     },
     showProgressExcept:function(url){
+       this.setStartUrl(url);
+    },
+    setStartUrl:function(url){
        url=url||location.href;
        callHandler("showProgressExcept", {url: url})
-    },
-    setStartUrl:this.showProgressExcept
+    }
 };
 var withCheck = function (attr) {
     var f = DataSession.prototype[attr];

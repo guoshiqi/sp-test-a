@@ -26,5 +26,8 @@ public abstract class SpiderEventListener {
     public void onError(int code, String msg) {
 
     }
+    public void onLog(String log, int type) {
+
+    }
 
 }

@@ -28,7 +28,6 @@ public class SpiderActivity extends AppCompatActivity {
     RelativeLayout spider;
     CircleProgress workProgress;
     TextView percentage;
-    TextView initView;
     FragmentManager fm;
     BaseFragment fragment;
     TextView titleTv;
@@ -65,7 +64,6 @@ public class SpiderActivity extends AppCompatActivity {
         spider = getView(R.id.spider);
         workProgress = getView(R.id.work_progress);
         percentage = getView(R.id.percentage);
-        initView = getView(R.id.init);
         titleTv = getView(R.id.title);
         errorLayout = getView(R.id.error_layout);
         loading = getView(R.id.loading);
@@ -216,6 +214,7 @@ public class SpiderActivity extends AppCompatActivity {
     protected void onDestroy() {
         spiderView.clearCache();
         spiderView.stop();
+        spiderView.getWebview().destroy();
         super.onDestroy();
     }
 
