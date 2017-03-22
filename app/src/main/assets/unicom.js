@@ -141,6 +141,7 @@ dSpider("unicom", 60*5, function(session,env,$){
         if(passFind) {
             passFind.css("visibility", "hidden");
         }
+
         var loginBtn = $("a#login1:eq(0)");
         if(loginBtn) {
             loginBtn.click(function(){
@@ -157,8 +158,22 @@ dSpider("unicom", 60*5, function(session,env,$){
             });
         }
 
-        $("input#userName:eq(0)").val(session.getLocal("userName"));
+        // 填充默认手机号
+        var prePhone = null;
+        prePhone = session.getArguments().phoneNo;
+        log('默认手机号：' + prePhone);
+        if (!prePhone) {
+            prePhone = session.getLocal("userName");
+        }
+        $("input#userName:eq(0)").val(prePhone);
         $("input#userPwd:eq(0)").val(session.getLocal("password"));
+
+        //禁用输入框
+        $("input#userName:eq(0)").attr("disabled", "disabled");
+        var emObj = $("input#userName:eq(0)").next();
+        if(emObj.is("em") && emObj.attr("class") == "sl-delect") {
+            emObj.css("display", "none");
+        }
 
         session.setStartUrl();
         session.showProgress(false);
@@ -167,51 +182,55 @@ dSpider("unicom", 60*5, function(session,env,$){
         session.showProgress();
 
         //计算月份信息
-        //var date = new Date();
-        //var curMonth = date.getMonth() + 1;
-        //var curYear = date.getFullYear();
         var curMonth, curYear;
 
         var ul = $(".month_list");
         if (ul) {
-        	if (ul.has("li")) {
-        		var li = ul.find("li.active:eq(0)");
-        		var month = li.find("p:eq(0)").text();
-        		month = month.replace("月", "");
-        		month = month.trim();
-        		try {
-        			curMonth = parseInt(month);
-        		} catch (e) {
-       				log("月份获取失败...");
-        		}
-        		var year = li.find("p:eq(1)").text();
-        		year = year.trim();
-        		try {
-        			curYear = parseInt(year);
-        		} catch (e) {
-       				log("年获取失败...");
-        		}
-        	};
+            if (ul.has("li")) {
+                var li = ul.find("li.active:eq(0)");
+                var month = li.find("p:eq(0)").text();
+                month = month.replace("月", "");
+                month = month.trim();
+                try {
+                    curMonth = parseInt(month);
+                } catch (e) {
+                    log("月份获取失败...");
+                }
+                var year = li.find("p:eq(1)").text();
+                year = year.trim();
+                try {
+                    curYear = parseInt(year);
+                } catch (e) {
+                    log("年获取失败...");
+                }
+            };
         };
+        //若获取时间失败，则使用当前时间
+        if(!curMonth || !curYear) {
+            var date = new Date();
+            curMonth = date.getMonth() + 1;
+            curYear = date.getFullYear();
+            log("获取网页时间失败，获取当前系统时间...");
+        }
         var monthArr = []
         var max = 0;
         if (curMonth && curYear) {
-        	for (var i = 0; i < 6; i++) {
-	            var month = curMonth - i;
-	            var year = curYear;
-	            if (month < 1) {
-	                month += 12;
-	                year -= 1;
-	            }
-	            if (month < 10) {
-	                month = "0" + month;
-	            }
-	            monthArr.push({ "year": year, "month": month });
-	        }
-	        max = monthArr.length + 1;
-	        log("开始爬取....." + JSON.stringify(monthArr));
+            for (var i = 0; i < 6; i++) {
+                var month = curMonth - i;
+                var year = curYear;
+                if (month < 1) {
+                    month += 12;
+                    year -= 1;
+                }
+                if (month < 10) {
+                    month = "0" + month;
+                }
+                monthArr.push({ "year": year, "month": month });
+            }
+            max = monthArr.length + 1;
+            log("开始爬取....." + JSON.stringify(monthArr));
         } else {
-        	log("没有通话时间，可能刚开卡..");
+            log("没有通话时间，可能刚开卡..");
         }
         //设置月份信息
         session.set("months", monthArr);
