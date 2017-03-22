@@ -165,7 +165,7 @@ public class SpiderActivity extends AppCompatActivity {
     private void backResult(DSpider.Result result) {
         Intent intent = new Intent();
         try {
-            String path = getCacheDir() + "/spider.dat";
+            String path = getCacheDir() + "/dspider.dat";
             File file = new File(path);
             file.delete();
             file.createNewFile();

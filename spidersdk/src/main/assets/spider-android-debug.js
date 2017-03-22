@@ -235,10 +235,9 @@ function dSpider(sessionKey,timeOut, callback) {
     }, 20);
 }
 //网页回调
-$(function(){
-    if(window.onSpiderInited){
-        window.onSpiderInited(dSpider.bind(5));
-    }
+$(function () {
+    var f = window.onSpiderInited;
+    f && f(dSpider.bind(5))
 })
 
 function DataSession(key) {
