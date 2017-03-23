@@ -20,7 +20,7 @@ class CircleProgress extends View {
     int max=100;
     int percent;
     float WIDTH = 2f * getResources().getDisplayMetrics().density;
-    int foregroundColor = Helper.getColor(getContext(), R.color.colorPrimary);
+    int foregroundColor = Helper.getColor(getContext(), Color.BLUE);
     int backgroundColor = Color.argb(30, Color.red(foregroundColor),
             Color.green(foregroundColor),Color.blue(foregroundColor));
 

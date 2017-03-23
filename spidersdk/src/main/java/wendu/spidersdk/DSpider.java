@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 
@@ -27,6 +28,7 @@ public class DSpider  {
     public static int DEVICE_ID;
     public static int REQUEST = 2000;
     public static final String SDK_VERSION = "1.0.0";
+    public static  int APPID=0;
 
 
     //public static final String  BASE_URL="http://172.19.23.62/dSpider-web/1.0/";
@@ -51,21 +53,24 @@ public class DSpider  {
         Helper.APP_CONTEXT = ctx.getApplicationContext();
     }
 
+    public static void init(Context ctx,int appId){
+        APPID=appId;
+        Helper.APP_CONTEXT=ctx;
+    }
+
     public static DSpider build(Activity ctx) {
         return new DSpider(ctx);
     }
 
-    private static Result getLastResult(Context ctx, boolean clearResultCache) {
-        File file = new File(ctx.getCacheDir() + "/spider.dat");
+    public static Result getLastResult() {
+        if(Helper.APP_CONTEXT== null) return null;
+        File file = new File(Helper.APP_CONTEXT.getCacheDir() + "/spider.dat");
         FileInputStream fileInputStream = null;
         Result resultData = null;
         try {
             fileInputStream = new FileInputStream(file.toString());
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
             resultData = (Result) objectInputStream.readObject();
-            if (clearResultCache) {
-                file.delete();
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -73,14 +78,9 @@ public class DSpider  {
         return resultData;
     }
 
-    public static Result getLastResult(Context ctx) {
-        return getLastResult(ctx, false);
-    }
-    public static Result getLastResultAndClean(Context ctx) {
-        return getLastResult(ctx, true);
-    }
-    public static String getLastLog(Context ctx) {
-        return ctx.getSharedPreferences("spider", Context.MODE_PRIVATE).getString("_log", "");
+    public static String getLastLog() {
+        if(Helper.APP_CONTEXT== null) return null;
+        return Helper.APP_CONTEXT.getSharedPreferences("spider", Context.MODE_PRIVATE).getString("_log", "");
     }
 
     public DSpider addArgument(String key, Object value) {
@@ -93,7 +93,7 @@ public class DSpider  {
         start(sid, title, "");
     }
 
-    public DSpider start(int sid, String title, String startUrl) {
+    private DSpider start(int sid, String title, String startUrl) {
         start_(sid, title, startUrl);
         isDebug=false;
         return this;
@@ -125,6 +125,10 @@ public class DSpider  {
     }
 
     private void start_(int sid, String title, String startUrl) {
+        if(APPID<1){
+            showDialog("SDK未初始化!");
+            return;
+        }
         if (isDebug) {
             if (TextUtils.isEmpty(debugSrcFileName) || TextUtils.isEmpty(debugStartUrl)) {
                 showDialog("缺少调试参数");

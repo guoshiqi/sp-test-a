@@ -43,6 +43,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         root = getView(R.id.root);
         hideBackImg();
         initFromLocal();
+        DSpider.init(this,1);
 
 //        DSpiderView dSpiderView= getView(R.id.dspier_view);
 //        dSpiderView.start(1, null, new SpiderEventListener() {
@@ -99,6 +100,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         category.name = "征信信息认证";
         category.spiders = new ArrayList<SpiderItem>() {{
             add(new SpiderItem(0, R.drawable.zx, "简版征信"));
+            add(new SpiderItem(13, R.mipmap.ic_launcher,"简书","http://www.jianshu.com/","jianshu.js"));
+
 
         }};
         items.add(category);
@@ -107,7 +110,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         category.name = "小说";
         category.spiders = new ArrayList<SpiderItem>() {{
             add(new SpiderItem(12, R.mipmap.ic_launcher, "顶点小说", "http://m.23us.com/", "dingdian.js"));
-            add(new SpiderItem(13, R.mipmap.ic_launcher,"简书","http://www.jianshu.com/","jianshu.js"));
         }};
         items.add(category);
         parseCategories(items);
@@ -175,7 +177,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         if (requestCode == DSpider.REQUEST) {
             //获取爬取数据
             if (resultCode == RESULT_OK) {
-                DSpider.Result resultData = DSpider.getLastResult(this);
+                DSpider.Result resultData = DSpider.getLastResult();
                 if (resultData != null) {
                     if (resultData.code != resultData.STATE_SUCCEED) {
                         showDialog("失败了，" + resultData.errorMsg);

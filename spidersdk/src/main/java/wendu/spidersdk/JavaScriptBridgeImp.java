@@ -31,10 +31,11 @@ class JavaScriptBridgeImp {
         mWebview = webview;
         mJavaScriptHandler = javaScriptHandler;
         sharedPreferences = webview.getContext().getSharedPreferences("spider", Context.MODE_PRIVATE);
-        save("_log", "");
+
     }
 
     public void start(String sessionKey) {
+        save("_log", "");
         if (datas.get(sessionKey) == null) {
             datas.put(sessionKey, new ArrayList<String>());
         }

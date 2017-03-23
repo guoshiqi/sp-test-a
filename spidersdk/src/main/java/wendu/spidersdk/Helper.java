@@ -157,6 +157,7 @@ public class Helper {
                 put("bundle_id", APP_CONTEXT.getPackageName());
                 put("sdk_version", DSpider.SDK_VERSION);
                 put("model", Build.MODEL);
+                put("app_id",DSpider.APPID+"");
             }
         };
         try {

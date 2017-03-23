@@ -36,7 +36,6 @@ public class SpiderActivity extends AppCompatActivity {
     WaveProgress waveProgress;
     TextView msg;
     TextView progressMsg;
-    ViewGroup toobar;
 
     private boolean isProgressShow = false;
     private DSpiderView spiderView;
@@ -60,7 +59,6 @@ public class SpiderActivity extends AppCompatActivity {
         waveProgress.setShapeType(WaveProgress.ShapeType.SQUARE);
         waveProgress.setWaveSpeed(1200);
         spiderView=getView(R.id.dspider_view);
-        toobar=getView(R.id.toolbar);
         spider = getView(R.id.spider);
         workProgress = getView(R.id.work_progress);
         percentage = getView(R.id.percentage);
@@ -91,13 +89,6 @@ public class SpiderActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                     onBackPressed();
-            }
-        });
-        getView(R.id.back_gray).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                    onBackPressed();
-
             }
         });
         errorLayout.setOnClickListener(new View.OnClickListener() {
@@ -207,7 +198,6 @@ public class SpiderActivity extends AppCompatActivity {
         showInput(!show);
         webviewLayout.setVisibility(show ? View.GONE : View.VISIBLE);
         spider.setVisibility(show ? View.VISIBLE : View.GONE);
-        toobar.setVisibility(show ? View.GONE : View.VISIBLE);
     }
 
     @Override
@@ -218,10 +208,6 @@ public class SpiderActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-
-    public void setToobarBackgroundColor(int color){
-      toobar.setBackgroundColor(color);
-    }
 
     @Override
     public void onBackPressed() {

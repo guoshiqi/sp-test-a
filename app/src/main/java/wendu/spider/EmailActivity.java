@@ -112,7 +112,7 @@ public class EmailActivity extends BaseActivity {
         if (requestCode == DSpider.REQUEST) {
             //获取爬取数据
             if (resultCode == RESULT_OK) {
-                DSpider.Result resultData = DSpider.getLastResult(this);
+                DSpider.Result resultData = DSpider.getLastResult();
                 if (resultData != null) {
                     if (resultData.code != resultData.STATE_SUCCEED) {
                         showDialog("失败了，" + resultData.errorMsg);

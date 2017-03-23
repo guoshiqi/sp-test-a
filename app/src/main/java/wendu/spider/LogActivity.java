@@ -14,7 +14,7 @@ public class LogActivity extends BaseActivity {
         setContentView(R.layout.activity_data_read);
         setActivityTitle("上次爬取日志页");
         final TextView textView = getView(R.id.text);
-        textView.setText(DSpider.getLastLog(this));
+        textView.setText(DSpider.getLastLog());
 
     }
 }

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/white"
+    android:background="@color/windowBackground"
     tools:context=".SpiderActivity">
 
     <LinearLayout
@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@color/colorPrimary"
+        android:background="@color/white"
         android:paddingTop="@dimen/status_bar_height"
         >
     <RelativeLayout
@@ -25,24 +25,25 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:padding="10dp"
-            android:src="@drawable/back" />
-
-        <TextView
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/back_dark" />
+          <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="爬取"
-            android:textColor="@color/grey"
-            android:textSize="18dp" />
+            android:textSize="18dp"
+            android:textColor="@color/black"
+           />
     </RelativeLayout>
     </LinearLayout>
-
-
     <RelativeLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="1px"
+        >
 
         <RelativeLayout
             android:id="@+id/webview_container"
@@ -64,23 +65,11 @@
             android:visibility="gone"
             android:paddingTop="@dimen/status_bar_height"
             >
-            <ImageView
-                android:id="@+id/back_gray"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:paddingTop="14dp"
-                android:paddingLeft="19dp"
-                android:paddingRight="19dp"
-                android:paddingBottom="14dp"
-                android:src="@drawable/back_dark" />
             <RelativeLayout
                 android:id="@+id/progress_container"
                 android:layout_width="200dp"
                 android:layout_height="200dp"
-
                 android:layout_centerHorizontal="true"
-                android:layout_below="@+id/back_gray"
                 >
                 <wendu.spidersdk.CircleProgress
                     android:id="@+id/work_progress"
@@ -141,7 +130,6 @@
                 android:layout_below="@+id/error"
                 android:layout_marginTop="20dp"
                 android:gravity="center"
-                android:textColor="@color/c2"
                 android:text="网络貌似有问题，请点击屏幕重试"
                 android:textSize="14dp" />
         </RelativeLayout>
