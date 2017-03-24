@@ -55,11 +55,12 @@ import javax.net.ssl.X509TrustManager;
 /**
  * Created by du on 16/4/15.
  */
-public class Helper {
+ class Helper {
 
     public static final String TAG = "spider";
     public static X509TrustManager trustManager;
     public static Context APP_CONTEXT;
+    public static OnRetryListener retryListener;
 
     public static int getColor(Context ctx, int resId) {
         int color = -1;

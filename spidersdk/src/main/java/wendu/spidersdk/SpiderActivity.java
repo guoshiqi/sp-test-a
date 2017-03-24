@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,6 +37,7 @@ public class SpiderActivity extends AppCompatActivity {
     WaveProgress waveProgress;
     TextView msg;
     TextView progressMsg;
+
 
     private boolean isProgressShow = false;
     private DSpiderView spiderView;
@@ -129,24 +131,43 @@ public class SpiderActivity extends AppCompatActivity {
 
         @Override
         public void onError(final int code, final String msg) {
+            String tipMsg=getIntent().getStringExtra("retryTip");
+            if(TextUtils.isEmpty(tipMsg)){
+               tipMsg= "遇到点问题，正在尝试新的方案" ;
+            }
            if(spiderView.canRetry()){
-               Dialog alertDialog = new AlertDialog.Builder(SpiderActivity.this).
-                       setTitle("提示").
-                       setMessage("遇到点问题，检测到新的方案，是否重试？").
-                       setPositiveButton("重试", new DialogInterface.OnClickListener() {
-                           @Override
-                           public void onClick(DialogInterface dialog, int which) {
-                               spiderView.retry();
-                           }
-                       })
-                       .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                           @Override
-                           public void onClick(DialogInterface dialog, int which) {
-                               backResult(new DSpider.Result(code, msg));
-                           }
-                       })
-                       .create();
-               alertDialog.show();
+               if(Helper.retryListener!=null){
+                   if(Helper.retryListener.onRetry(code,msg)){
+                       spiderView.retry();
+                   }else {
+                       backResult(new DSpider.Result(code,msg));
+                   }
+               }else {
+                   int type=getIntent().getIntExtra("showType",DSpider.TYPE_TOAST);
+                   if(type==DSpider.TYPE_DIALOG) {
+                       Dialog alertDialog = new AlertDialog.Builder(SpiderActivity.this).
+                               setTitle("提示").
+                               setMessage(tipMsg).
+                               setPositiveButton("重试", new DialogInterface.OnClickListener() {
+                                   @Override
+                                   public void onClick(DialogInterface dialog, int which) {
+                                       spiderView.retry();
+                                   }
+                               })
+                               .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                   @Override
+                                   public void onClick(DialogInterface dialog, int which) {
+                                       backResult(new DSpider.Result(code, msg));
+                                   }
+                               })
+                               .create();
+                       alertDialog.show();
+                       return;
+                   }else if(type==DSpider.TYPE_TOAST) {
+                       Toast.makeText(SpiderActivity.this.getApplicationContext(),tipMsg,Toast.LENGTH_SHORT).show();
+                   }
+                   spiderView.retry();
+               }
            } else{
                backResult(new DSpider.Result(code, msg));
            }
@@ -154,6 +175,7 @@ public class SpiderActivity extends AppCompatActivity {
     };
 
     private void backResult(DSpider.Result result) {
+        Helper.retryListener=null;
         Intent intent = new Intent();
         try {
             String path = getCacheDir() + "/spider.dat";

@@ -26,6 +26,7 @@
 -keep class wendu.spidersdk.DSpiderView{public *;}
 -keep class wendu.spidersdk.DSpider$Result{*;}
 -keep class wendu.spidersdk.IPersistence{*;}
+-keep class wendu.spidersdk.OnRetryListener{*;}
 -keep class wendu.spidersdk.SpiderEventListener{*;}
 
 

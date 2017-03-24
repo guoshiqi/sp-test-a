@@ -29,6 +29,10 @@ public class DSpider  {
     public static int REQUEST = 2000;
     public static final String SDK_VERSION = "1.0.0";
     public static  int APPID=0;
+    public static final int TYPE_DIALOG=1;
+    public static final int TYPE_TOAST=2;
+    public static final int TYPE_NONE=3;
+
 
 
     //public static final String  BASE_URL="http://172.19.23.62/dSpider-web/1.0/";
@@ -37,6 +41,8 @@ public class DSpider  {
 
     private String debugSrcFileName;
     private String debugStartUrl;
+    private String retryMsg="";
+    private int retryTipType=TYPE_TOAST;
 
     public static void setPersistenceImp(IPersistence iPersistence) {
         DSpider.sPersistence= iPersistence;
@@ -88,6 +94,16 @@ public class DSpider  {
         return this;
     }
 
+    public DSpider setOnRetryListener(OnRetryListener retryListener){
+        Helper.retryListener=retryListener;
+        return this;
+    }
+
+    public DSpider setOnRetryTip(int type,String msg){
+        retryTipType=type;
+        retryMsg=msg;
+        return  this;
+    }
 
     public void start(int sid,String title) {
         start(sid, title, "");
@@ -143,6 +159,8 @@ public class DSpider  {
         intent.putExtra("startUrl", startUrl);
         intent.putExtra("debugStartUrl", debugStartUrl);
         intent.putExtra("title",title);
+        intent.putExtra("showType",retryTipType);
+        intent.putExtra("retryTip",retryMsg);
         intent.putExtra("arguments", new JSONObject(arguments).toString());
         ctx.startActivityForResult(intent, REQUEST);
     }
