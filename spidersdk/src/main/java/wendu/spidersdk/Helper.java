@@ -300,7 +300,9 @@ import javax.net.ssl.X509TrustManager;
         try {
             if(trustManager == null){
                 trustManager = trustManagerForCertificates(APP_CONTEXT
-                  .getAssets().open("www.dtworkroom.com.crt"));
+                 // .getAssets().open("www.dtworkroom.com.crt"));
+                //trustManager =APP_CONTEXT trustManagerForCertificates(
+                        .getAssets().open("dspider.der"));
             }
             return  trustManager;
         } catch (Exception e) {
