@@ -55,6 +55,7 @@ import javax.net.ssl.X509TrustManager;
 public class Helper {
 
     public static final String TAG = "spider";
+    public static OnRetryListener retryListener;
 
     public static int getColor(Context ctx, int resId) {
         int color = -1;
