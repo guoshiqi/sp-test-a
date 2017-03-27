@@ -190,6 +190,7 @@ public class DSWebview extends WebView {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
+            setVisibility(VISIBLE);
         }
 
         @Override
@@ -207,6 +208,7 @@ public class DSWebview extends WebView {
         @SuppressWarnings("deprecation")
         @Override
         public void onReceivedError(WebView view, int errorCode, String description, final String failingUrl) {
+            setVisibility(INVISIBLE);
             if (webEventListener != null && failingUrl.startsWith("http")) {
                 webEventListener.onReceivedError(
                         String.format("{\"url\":\"%s\",\"msg\":\"%s\",\"code\":%d}", failingUrl, description, errorCode));
