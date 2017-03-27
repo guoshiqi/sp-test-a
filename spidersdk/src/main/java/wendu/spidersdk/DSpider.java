@@ -173,7 +173,7 @@ public class DSpider  {
         public static final int STATE_PAGE_CHANGED = 3;
         public static final int STATE_TIMEOUT=4;
         public static final int STATE_DSPIDER_SERVER_ERROR = 5;
-        public static final int STATE_ERROR_MSG = 6;
+        public static final int STATE_ERROR_MSG = 100;
         public List<String> datas;
         public String sessionKey;
         public String errorMsg;

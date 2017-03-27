@@ -73,6 +73,7 @@ public class DSpiderView extends LinearLayout {
             void onSdkServerError(Exception e) {
                 super.onSdkServerError(e);
                 if (spiderEventListener != null) {
+                    errorCanRetry=false;
                     spiderEventListener.onError(DSpider.Result.STATE_DSPIDER_SERVER_ERROR, e.getMessage());
                 }
             }
@@ -107,7 +108,7 @@ public class DSpiderView extends LinearLayout {
                     } else {
                         if(result.code==DSpider.Result.STATE_ERROR_MSG
                                 ||result.code==DSpider.Result.STATE_DSPIDER_SERVER_ERROR
-                                ||result.code==DSpider.Result.STATE_WEB_ERROR){
+                               ){
                             errorCanRetry=false;
                         }else {
                             errorCanRetry=true;
