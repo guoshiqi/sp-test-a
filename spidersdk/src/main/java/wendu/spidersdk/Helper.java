@@ -343,10 +343,15 @@ public class Helper {
                         }
                     });
 
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     e.printStackTrace();
-                    initStateListener.onFail(e.getMessage(),
-                            DSpider.Result.STATE_DSPIDER_SERVER_ERROR);
+                    ctx.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            initStateListener.onFail(e.getMessage(),
+                                    DSpider.Result.STATE_DSPIDER_SERVER_ERROR);
+                        }
+                    });
                 }
             }
 
