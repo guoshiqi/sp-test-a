@@ -26,6 +26,7 @@ public class DSpiderView extends LinearLayout {
     private int mScriptCount=1;
     private String startUrl="";
     private boolean customProgressShow=false;
+    private boolean errorCanRetry=true;
     private String arguments;
     public DSpiderView(Context context) {
         super(context);
@@ -104,6 +105,13 @@ public class DSpiderView extends LinearLayout {
                     if (result.code == DSpider.Result.STATE_SUCCEED) {
                         spiderEventListener.onResult(result.sessionKey, result.datas);
                     } else {
+                        if(result.code==DSpider.Result.STATE_ERROR_MSG
+                                ||result.code==DSpider.Result.STATE_DSPIDER_SERVER_ERROR
+                                ||result.code==DSpider.Result.STATE_WEB_ERROR){
+                            errorCanRetry=false;
+                        }else {
+                            errorCanRetry=true;
+                        }
                         spiderEventListener.onError(result.code, result.errorMsg);
                     }
                 }
@@ -153,7 +161,7 @@ public class DSpiderView extends LinearLayout {
     }
 
     public boolean canRetry(){
-        return retry<mScriptCount;
+        return retry<mScriptCount && errorCanRetry;
     }
 
     public void retry(){
