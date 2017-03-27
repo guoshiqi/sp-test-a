@@ -31,6 +31,9 @@ public class DSpider implements Serializable {
     public static final String SDK_VERSION = "1.0.0";
     public static Context APP_CONTEXT;
     public static IPersistentData sPersistentData;
+    String retryMsg="";
+    int  retryTipType=TYPE_TOAST;
+
     //public static final String  BASE_URL="http://172.19.23.62/dSpider-web/1.0/";
     //public static final String  BASE_URL="http://192.168.1.24/dSpider-web/1.0/";
     //public static final String REPORT_URL = "report";
@@ -41,6 +44,12 @@ public class DSpider implements Serializable {
     public static final String REPORT_URL = "scriptReport";
 
     private static SSLSocketFactory sslSocketFactory;
+
+    public static OnRetryListener retryListener;
+
+    public static final int TYPE_DIALOG=1;
+    public static final int TYPE_TOAST=2;
+    public static final int TYPE_NONE=3;
 
 
     private DSpider(Activity ctx) {
@@ -95,13 +104,16 @@ public class DSpider implements Serializable {
         return this;
     }
 
-    String mUid="1";
-    public DSpider setUID(String uid) {
-         mUid=uid;
+
+    public DSpider setOnRetryListener(OnRetryListener retryListener){
+        Helper.retryListener=retryListener;
         return this;
     }
-
-
+    public DSpider setOnRetryTip(int type,String msg){
+        retryTipType=type;
+        retryMsg=msg;
+        return  this;
+    }
 
     public DSpider setDebug(boolean debug) {
         isDebug = debug;
@@ -151,6 +163,8 @@ public class DSpider implements Serializable {
         intent.putExtra("debugSrc", debugSrcFileName);
         intent.putExtra("startUrl", debugStartUrl);
         intent.putExtra("title",title);
+        intent.putExtra("showType",retryTipType);
+        intent.putExtra("retryTip",retryMsg);
         intent.putExtra("arguments", new JSONObject(arguments).toString());
         ctx.startActivityForResult(intent, REQUEST);
     }
