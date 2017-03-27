@@ -174,6 +174,8 @@ public class DSpiderView extends LinearLayout {
         this.spiderEventListener=spiderEventListener;
         addJavaScriptApi();
         CookieManager.getInstance().removeAllCookie();
+        webview.setExceptUrl("");
+        customProgressShow=false;
         webview.setDebug(true);
         webview.setDebugSrc(debugSrc);
         this.startUrl=startUrl;
