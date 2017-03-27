@@ -390,8 +390,8 @@ import javax.net.ssl.X509TrustManager;
             public void run() {
                 HashMap<String, String> param = new HashMap<>();
                 param.put("sid", sid + "");
-                param.put("retry",retryCount+"");
-                Helper.APP_CONTEXT=ctx.getApplicationContext();
+                param.put("retry", retryCount + "");
+                Helper.APP_CONTEXT = ctx.getApplicationContext();
                 try {
                     final String response = Helper.post(DSpider.BASE_URL + "script", param);
                     ctx.runOnUiThread(new Runnable() {
@@ -407,7 +407,7 @@ import javax.net.ssl.X509TrustManager;
                                 } else {
                                     ret = ret.getJSONObject("data");
                                     initStateListener.onSucceed(ret.getInt("script_id"), ret.getString("login_url"),
-                                            ret.getString("script"),ret.getInt("script_count"),ret.has("id")?ret.getInt("id"):0);
+                                            ret.getString("script"), ret.getInt("script_count"), ret.has("id") ? ret.getInt("id") : 0);
                                 }
 
                             } catch (Exception e) {
@@ -418,15 +418,20 @@ import javax.net.ssl.X509TrustManager;
                         }
                     });
 
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     e.printStackTrace();
-                    if(e instanceof SSLHandshakeException){
-                        initStateListener.onFail("您当前网络环境不安全",
-                                DSpider.Result.STATE_ERROR_MSG);
-                    }else {
-                        initStateListener.onFail(e.getMessage(),
-                                DSpider.Result.STATE_DSPIDER_SERVER_ERROR);
-                    }
+                    ctx.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (e instanceof SSLHandshakeException) {
+                                initStateListener.onFail("您当前网络环境不安全",
+                                        DSpider.Result.STATE_ERROR_MSG);
+                            } else {
+                                initStateListener.onFail(e.getMessage(),
+                                        DSpider.Result.STATE_DSPIDER_SERVER_ERROR);
+                            }
+                        }
+                    });
                 }
             }
 
