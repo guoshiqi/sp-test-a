@@ -1,12 +1,8 @@
 package wendu.spider;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -25,7 +21,6 @@ import wendu.common.base.BaseActivity;
 import wendu.common.utils.DpiHelper;
 import wendu.common.utils.KvStorage;
 import wendu.spidersdk.DSpider;
-import wendu.spidersdk.IPersistentData;
 import wendu.spidersdk.third.ZmxyActivity;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
@@ -93,7 +88,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         category = new SpiderCategory();
         category.name = "身份信息认证";
         category.spiders = new ArrayList<SpiderItem>() {{
-            add(new SpiderItem(4, R.drawable.unicom, "联通", "http://wap.10010.com/t/query/getPhoneByDetailTip.htm", "unicom.js"));
+            add(new SpiderItem(4, R.drawable.unicom, "联通", "http://wap.10010.com/mobileService/operationservice/getUserinfo.htm", "unicom.js"));
             add(new SpiderItem(5, R.drawable.mobile, "移动", "https://login.10086.cn/login.html?channelID=12003&backUrl=http://shop.10086.cn/i/?f=billdetailqry", "mobile.js"));
             add(new SpiderItem(10, R.drawable.telecom, "广东电信", "https://gd.189.cn/TS/login.htm", "telecom_gd.js"));
             add(new SpiderItem(11, R.drawable.shebao, "社保"));
