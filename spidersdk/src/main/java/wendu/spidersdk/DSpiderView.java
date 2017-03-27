@@ -219,6 +219,8 @@ public class DSpiderView extends LinearLayout {
                 addJavaScriptApi();
                 webview.setDebug(false);
                 webview.setScriptId(scriptId+"");
+                webview.setExceptUrl("");
+                customProgressShow=false;
                 webview.setTaskId(taskId + "");
                 webview.setInjectScript(script);
                 startUrl=url;

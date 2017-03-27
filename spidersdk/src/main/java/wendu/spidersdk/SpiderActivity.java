@@ -146,8 +146,7 @@ public class SpiderActivity extends AppCompatActivity {
             if(spiderView.canRetry()){
                 if(Helper.retryListener!=null){
                     if(Helper.retryListener.onRetry(code,msg)){
-                        spiderView.retry();
-                        showProgress(false);
+                       retry();
                     }else {
                         backResult(new DSpider.Result(code,msg));
                     }
@@ -160,8 +159,7 @@ public class SpiderActivity extends AppCompatActivity {
                                 setPositiveButton("重试", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        spiderView.retry();
-                                        showProgress(false);
+                                        retry();
                                     }
                                 })
                                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -176,14 +174,21 @@ public class SpiderActivity extends AppCompatActivity {
                     }else if(type==DSpider.TYPE_TOAST) {
                         Toast.makeText(SpiderActivity.this,tipMsg,Toast.LENGTH_SHORT).show();
                     }
-                    spiderView.retry();
-                    showProgress(false);
+                    retry();
                 }
             } else{
                 backResult(new DSpider.Result(code, msg));
             }
         }
     };
+
+    private void retry(){
+        showProgress(false);
+        workProgress.setMax(100);
+        workProgress.setProgress(0);
+        percentage.setText("0%");
+        spiderView.retry();
+    }
 
     private void backResult(DSpider.Result result) {
         Intent intent = new Intent();
