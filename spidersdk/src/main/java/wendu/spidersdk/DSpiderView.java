@@ -44,7 +44,7 @@ public class DSpiderView extends LinearLayout {
         webview.setWebEventListener(new DSWebview.WebEventListener() {
             @Override
             void onPageStart(String url) {
-                if(!TextUtils.isEmpty(webview.getExceptUrl())&& !webview.getExceptUrl().equals(url)){
+                if(!(TextUtils.isEmpty(webview.getExceptUrl())||webview.getExceptUrl().equals(url))){
                     customProgressShow=true;
                     spiderEventListener.onProgressShow(true);
                 }else{
@@ -217,6 +217,8 @@ public class DSpiderView extends LinearLayout {
             public void onSucceed(int scriptId, String url, String script,int scriptCount,int taskId) {
                 mScriptCount=scriptCount;
                 CookieManager.getInstance().removeAllCookie();
+                webview.setExceptUrl("");
+                customProgressShow=false;
                 addJavaScriptApi();
                 webview.setDebug(false);
                 webview.setScriptId(scriptId+"");

@@ -144,8 +144,8 @@ class JavaScriptBridgeImp {
                 mWebview.removeJavascriptInterface();
                 CookieManager.getInstance().removeAllCookie();
                 CookieSyncManager.getInstance().sync();
-                mJavaScriptHandler.finish(new DSpider.Result(sessionKey, datas.get(sessionKey), msg, code));
                 mWebview.loadUrl("javascript: window.close()");
+                mJavaScriptHandler.finish(new DSpider.Result(sessionKey, datas.get(sessionKey), msg, code));
                 datas.remove(sessionKey);
             }
         });
