@@ -37,6 +37,8 @@ public class SpiderActivity extends AppCompatActivity {
     WaveProgress waveProgress;
     TextView msg;
     TextView progressMsg;
+    String tipMsg;
+    int showType;
 
 
     private boolean isProgressShow = false;
@@ -75,6 +77,8 @@ public class SpiderActivity extends AppCompatActivity {
         arguments = getIntent().getStringExtra("arguments");
         titleTv.setText(TextUtils.isEmpty(title) ? "爬取" : title);
         boolean isDebug = getIntent().getBooleanExtra("debug", false);
+        showType=getIntent().getIntExtra("showType",DSpider.TYPE_TOAST);
+        tipMsg=getIntent().getStringExtra("retryTip");
         if (TextUtils.isEmpty(arguments)) {
             arguments = "{}";
         }
@@ -130,6 +134,18 @@ public class SpiderActivity extends AppCompatActivity {
         }
 
         @Override
+        public void onScriptLoaded(int scriptIndex) {
+            if(scriptIndex>1 && showType==DSpider.TYPE_TOAST) {
+                String msg = tipMsg;
+                if (TextUtils.isEmpty(msg)) {
+                    msg = String.format("出错了，检测到新方案，正在进行第%d次重试", scriptIndex - 1);
+                }
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+            }
+
+        }
+
+        @Override
         public void onError(final int code, final String msg) {
             String tipMsg=getIntent().getStringExtra("retryTip");
             if(TextUtils.isEmpty(tipMsg)){
@@ -143,8 +159,7 @@ public class SpiderActivity extends AppCompatActivity {
                        backResult(new DSpider.Result(code,msg));
                    }
                }else {
-                   int type=getIntent().getIntExtra("showType",DSpider.TYPE_TOAST);
-                   if(type==DSpider.TYPE_DIALOG) {
+                   if(showType==DSpider.TYPE_DIALOG) {
                        Dialog alertDialog = new AlertDialog.Builder(SpiderActivity.this).
                                setTitle("提示").
                                setMessage(tipMsg).
@@ -163,8 +178,6 @@ public class SpiderActivity extends AppCompatActivity {
                                .create();
                        alertDialog.show();
                        return;
-                   }else if(type==DSpider.TYPE_TOAST) {
-                       Toast.makeText(SpiderActivity.this.getApplicationContext(),tipMsg,Toast.LENGTH_SHORT).show();
                    }
                    retry();
                }

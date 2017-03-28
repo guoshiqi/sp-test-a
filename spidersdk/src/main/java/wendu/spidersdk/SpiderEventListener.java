@@ -23,6 +23,10 @@ public abstract class SpiderEventListener {
 
     }
 
+    public void onScriptLoaded(int scriptIndex){
+
+    }
+
     public void onError(int code, String msg) {
 
     }
