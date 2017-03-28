@@ -231,7 +231,9 @@ public class DSpiderView extends LinearLayout {
                     spiderEventListener.onProgressShow(false);
                     spiderEventListener.onProgress(0,100);
                     spiderEventListener.onProgressMsg("任务初始化中...");
+                    spiderEventListener.onScriptLoaded(retry);
                 }
+
                 webview.loadUrl(url);
             }
 

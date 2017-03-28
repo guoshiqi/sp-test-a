@@ -38,6 +38,8 @@ public class SpiderActivity extends AppCompatActivity {
     TextView msg;
     TextView progressMsg;
     ViewGroup toobar;
+    String tipMsg;
+    int showType;
 
     private boolean isProgressShow = false;
     private DSpiderView spiderView;
@@ -74,7 +76,9 @@ public class SpiderActivity extends AppCompatActivity {
         title=TextUtils.isEmpty(title) ? "爬取中" : title;
         ((TextView)findViewById(R.id.title_progress)).setText(title);
         titleTv.setText(title);
+        tipMsg=getIntent().getStringExtra("retryTip");
         boolean isDebug = getIntent().getBooleanExtra("debug", false);
+        showType=getIntent().getIntExtra("showType",DSpider.TYPE_TOAST);
         String startUrl = getIntent().getStringExtra("startUrl");
         if (TextUtils.isEmpty(arguments)) {
             arguments = "{}";
@@ -138,11 +142,19 @@ public class SpiderActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onError(final int code, final String msg) {
-            String tipMsg=getIntent().getStringExtra("retryTip");
-            if(TextUtils.isEmpty(tipMsg)){
-                tipMsg= "遇到点问题，正在尝试新的方案" ;
+        public void onScriptLoaded(int scriptIndex) {
+            if(scriptIndex>1 && showType==DSpider.TYPE_TOAST) {
+                String msg = tipMsg;
+                if (TextUtils.isEmpty(msg)) {
+                    msg = String.format("出错了，检测到新方案，正在进行第%d次重试", scriptIndex - 1);
+                }
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
             }
+        }
+
+        @Override
+        public void onError(final int code, final String msg) {
+
             if(spiderView.canRetry()){
                 if(Helper.retryListener!=null){
                     if(Helper.retryListener.onRetry(code,msg)){
@@ -151,8 +163,7 @@ public class SpiderActivity extends AppCompatActivity {
                         backResult(new DSpider.Result(code,msg));
                     }
                 }else {
-                    int type=getIntent().getIntExtra("showType",DSpider.TYPE_TOAST);
-                    if(type==DSpider.TYPE_DIALOG) {
+                    if(showType==DSpider.TYPE_DIALOG) {
                         Dialog alertDialog = new AlertDialog.Builder(SpiderActivity.this).
                                 setTitle("提示").
                                 setMessage(tipMsg).
@@ -171,8 +182,6 @@ public class SpiderActivity extends AppCompatActivity {
                                 .create();
                         alertDialog.show();
                         return;
-                    }else if(type==DSpider.TYPE_TOAST) {
-                        Toast.makeText(SpiderActivity.this,tipMsg,Toast.LENGTH_SHORT).show();
                     }
                     retry();
                 }
