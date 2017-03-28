@@ -230,7 +230,7 @@ public class DSpiderView extends LinearLayout {
                 if(spiderEventListener!=null){
                     spiderEventListener.onProgressShow(false);
                     spiderEventListener.onProgress(0,100);
-                    spiderEventListener.onProgressMsg("任务初始化中...");
+                    //spiderEventListener.onProgressMsg("任务初始化中...");
                     spiderEventListener.onScriptLoaded(retry);
                 }
 

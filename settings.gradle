@@ -1,1 +1,1 @@
-include ':app', ':spidersdk', ':zmxySDKALCmini_V1.01450366738902_release'
+include ':app', ':spidersdk'
