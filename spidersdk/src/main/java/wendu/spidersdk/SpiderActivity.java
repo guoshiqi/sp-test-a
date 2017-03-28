@@ -183,10 +183,6 @@ public class SpiderActivity extends AppCompatActivity {
     };
 
     private void retry(){
-        showProgress(false);
-        workProgress.setMax(100);
-        workProgress.setProgress(0);
-        percentage.setText("0%");
         spiderView.retry();
     }
 

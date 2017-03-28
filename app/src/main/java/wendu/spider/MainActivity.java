@@ -21,7 +21,6 @@ import wendu.common.base.BaseActivity;
 import wendu.common.utils.DpiHelper;
 import wendu.common.utils.KvStorage;
 import wendu.spidersdk.DSpider;
-import wendu.spidersdk.third.ZmxyActivity;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
@@ -98,7 +97,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         category = new SpiderCategory();
         category.name = "征信信息认证";
         category.spiders = new ArrayList<SpiderItem>() {{
-            add(new SpiderItem(Util.ZHIMA, R.drawable.zmf, "芝麻分"));
             add(new SpiderItem(0, R.drawable.zx, "简版征信"));
             add(new SpiderItem(1, R.mipmap.ic_launcher, "测试", "https://www.baidu.com", "test.js"));
 
@@ -121,9 +119,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     SpiderItem item = category.spiders.get(position);
                     switch (item.sid) {
-                        case Util.ZHIMA:
-                            startActivity(ZmxyActivity.class);
-                            break;
                         case Util.EMAIL:
                             startActivity(EmailActivity.class);
                             break;
