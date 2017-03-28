@@ -236,6 +236,11 @@ public class DSpiderView extends LinearLayout {
                 webview.setTaskId(taskId + "");
                 webview.setInjectScript(script);
                 startUrl=url;
+                if(spiderEventListener!=null){
+                    spiderEventListener.onProgressShow(false);
+                    spiderEventListener.onProgress(0,100);
+                    spiderEventListener.onProgressMsg("任务初始化中...");
+                }
                 webview.loadUrl(url);
             }
 
