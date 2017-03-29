@@ -73,6 +73,7 @@ public class DSpiderView extends LinearLayout {
                 super.onReceivedError(msg);
                 if (spiderEventListener != null) {
                     spiderEventListener.onError(DSpider.Result.STATE_WEB_ERROR, msg);
+                    errorCanRetry=false;
                 }
             }
 
