@@ -138,10 +138,11 @@ public class SpiderActivity extends AppCompatActivity {
             if(scriptIndex>1 && showType==DSpider.TYPE_TOAST) {
                 String msg = tipMsg;
                 if (TextUtils.isEmpty(msg)) {
-                    msg = String.format("出错了，检测到新方案，正在进行第%d次重试", scriptIndex - 1);
+                    msg = String.format("出错了，正在进行第%d次重试", scriptIndex - 1);
                 }
                 Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
             }
+
 
         }
 

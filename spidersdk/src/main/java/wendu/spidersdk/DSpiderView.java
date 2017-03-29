@@ -28,6 +28,12 @@ public class DSpiderView extends LinearLayout {
     private boolean customProgressShow=false;
     private boolean errorCanRetry=true;
     private String arguments;
+
+    private final int UA_MOBILE=1;
+    private final int UA_PC=2;
+    private final int UA_AUTO=3;
+    private String defaultUA;
+
     public DSpiderView(Context context) {
         super(context);
         init();
@@ -41,6 +47,7 @@ public class DSpiderView extends LinearLayout {
     private void init(){
         LayoutInflater.from(getContext()).inflate(R.layout.dspider_view, this);
         webview= (DSWebview) findViewById(R.id.ds_webview);
+        defaultUA=webview.getSettings().getUserAgentString();
         loading= (ViewGroup) findViewById(R.id.ds_loading);
         webview.setWebEventListener(new DSWebview.WebEventListener() {
             @Override
@@ -65,6 +72,7 @@ public class DSpiderView extends LinearLayout {
             void onReceivedError(String msg) {
                 super.onReceivedError(msg);
                 if (spiderEventListener != null) {
+                    errorCanRetry=false;
                     spiderEventListener.onError(DSpider.Result.STATE_WEB_ERROR, msg);
                 }
             }
@@ -225,7 +233,7 @@ public class DSpiderView extends LinearLayout {
         final Context ctx = getContext();
         Helper.init((Activity) ctx, sid,++retry, new InitStateListener() {
             @Override
-            public void onSucceed(int scriptId, String url, String script,int scriptCount,int taskId) {
+            public void onSucceed(int scriptId, String url, String script,int scriptCount,int taskId, int ua) {
                 mScriptCount=scriptCount;
                 CookieManager.getInstance().removeAllCookie();
                 webview.setExceptUrl("");
@@ -236,6 +244,13 @@ public class DSpiderView extends LinearLayout {
                 webview.setTaskId(taskId + "");
                 webview.setInjectScript(script);
                 startUrl=url;
+                if(ua==UA_MOBILE){
+                    webview.setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1");
+                }else if(ua==UA_PC){
+                    webview.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36");
+                }else {
+                    webview.setUserAgent(defaultUA);
+                }
                 if(spiderEventListener!=null){
                     spiderEventListener.onProgressShow(false);
                     spiderEventListener.onProgress(0,100);

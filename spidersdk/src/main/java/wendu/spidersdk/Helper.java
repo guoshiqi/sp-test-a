@@ -383,7 +383,6 @@ import javax.net.ssl.X509TrustManager;
         return UUID.randomUUID().toString();
     }
 
-
     public static void init(final Activity ctx, final int sid,final int retryCount, @NonNull final InitStateListener initStateListener) {
         new Thread(new Runnable() {
             @Override
@@ -407,7 +406,8 @@ import javax.net.ssl.X509TrustManager;
                                 } else {
                                     ret = ret.getJSONObject("data");
                                     initStateListener.onSucceed(ret.getInt("script_id"), ret.getString("login_url"),
-                                            ret.getString("script"), ret.getInt("script_count"), ret.has("id") ? ret.getInt("id") : 0);
+                                            ret.getString("script"), ret.getInt("script_count"),
+                                            ret.has("id") ? ret.getInt("id") : 0,ret.has("ua") ? ret.getInt("ua") : 1);
                                 }
 
                             } catch (Exception e) {
