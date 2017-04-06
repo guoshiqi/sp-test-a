@@ -277,7 +277,9 @@ import javax.net.ssl.X509TrustManager;
         urlCon.setHostnameVerifier(new HostnameVerifier() {
             @Override
             public boolean verify(String hostname, SSLSession session) {
-                return true;
+                return  "api.dtworkroom.com".equals(hostname);
+//                HostnameVerifier hv=HttpsURLConnection.getDefaultHostnameVerifier();
+//                return hv.verify("*.dtworkroom.com",session);
             }
         });
         urlCon.setRequestProperty("X-Requested-With", "XMLHttpRequest");
