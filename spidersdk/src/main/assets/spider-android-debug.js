@@ -17,7 +17,15 @@ String.prototype.trim = function () {
 String.prototype.empty = function () {
     return this.trim() === "";
 };
-
+$.onload=function(cb){
+    if(document.readyState=="complete"){
+        cb();
+    }else {
+        window.addEventListener("load",function(){
+            cb();
+        })
+    }
+}
 function _logstr(str){
     str=str||" "
     return typeof str=="object"?JSON.stringify(str):(new String(str)).toString()
@@ -189,7 +197,6 @@ function dSpider(sessionKey,timeOut, callback) {
         }
         var session = new DataSession(sessionKey);
         var onclose=function(){
-            log("onNavigate:"+location.href)
             session._save()
             if(session.onNavigate){
                 session.onNavigate(location.href);
@@ -225,7 +232,7 @@ function dSpider(sessionKey,timeOut, callback) {
                                 if(v=="_blank") return "_self"
                             })
                         })
-                        log("dSpider start!")
+                        session.log("dSpider start!",-1)
                         extras.config=typeof _config==="object"?_config:"{}";
                         callback(session, extras, $);
                     }))
@@ -235,9 +242,10 @@ function dSpider(sessionKey,timeOut, callback) {
     }, 20);
 }
 //网页回调
-$(function () {
-    var f = window.onSpiderInited;
-    f && f(dSpider.bind(5))
+$(function(){
+    if(window.onSpiderInited){
+        window.onSpiderInited(dSpider.bind(5));
+    }
 })
 
 function DataSession(key) {
@@ -283,12 +291,15 @@ DataSession.prototype = {
         _xy.setProgress(progress);
     },
     finish: function (errmsg, content, code, stack) {
+        var _log=this.get("__log");
+        _log=_log?("\nLOG: \n"+_log):"";
         this.finished = true;
         if (errmsg) {
             var ob = {
                 url: location.href,
-                msg: errmsg,
+                msg: "Error msg:\n"+errmsg+_log,
                 content: content || document.documentElement.outerHTML,
+                netState:navigator.connection,
                 args: this.getArguments&&this.getArguments()
             }
             stack && (ob.stack = stack);
@@ -331,6 +342,9 @@ DataSession.prototype = {
     },
     log: function(str,type) {
         str=_logstr(str);
+        if(type!==-1) {
+            this.set("__log", (this.get("__log")||"") + "> " + str+"\n");
+        }
         console.log("dSpider: "+str)
         _xy.log(str,type||1)
     },

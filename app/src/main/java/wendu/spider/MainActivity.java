@@ -41,7 +41,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         root = getView(R.id.root);
         hideBackImg();
         initFromLocal();
-        DSpider.BASE_URL="http://119.29.112.230:8589/partner/crawl/";
+       // DSpider.BASE_URL="http://119.29.112.230:8589/partner/crawl/";
 
 //        DSpiderView dSpiderView= getView(R.id.dspier_view);
 //        dSpiderView.start(1, null, new SpiderEventListener() {

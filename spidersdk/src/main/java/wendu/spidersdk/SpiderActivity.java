@@ -105,6 +105,18 @@ public class SpiderActivity extends AppCompatActivity {
 
             }
         });
+
+        if(isDebug){
+            View hidden=getView(R.id.hidden);
+            hidden.setVisibility(View.VISIBLE);
+            hidden.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showProgress(false);
+                }
+            });
+        }
+
         errorLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
