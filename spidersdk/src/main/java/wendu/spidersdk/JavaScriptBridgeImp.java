@@ -2,12 +2,15 @@ package wendu.spidersdk;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -78,9 +81,28 @@ class JavaScriptBridgeImp {
 
     public String getExtraData() {
         Map<String, Object> info = new HashMap<>();
-        info.put("os_version", Build.VERSION.RELEASE);
+        info.put("osVersion", Build.VERSION.RELEASE);
         info.put("os", "android");
-        info.put("sdk_version", DSpider.SDK_VERSION);
+        info.put("sdkVersion", DSpider.SDK_VERSION);
+        ConnectivityManager connMgr = (ConnectivityManager) mWebview.getContext()
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo =connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        boolean isWifiConn = networkInfo.isConnected();
+        boolean isWifi=true;
+        if(!isWifiConn) {
+            isWifi=false;
+            networkInfo = connMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        }
+        JSONObject jso=new JSONObject();
+        try {
+            jso.put("isWifi",isWifi);
+            jso.put("subType",networkInfo.getSubtype());
+            jso.put("subTypeName",networkInfo.getSubtypeName());
+            info.put("network",jso);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         JSONObject jsonObject = new JSONObject(info);
         return jsonObject.toString();
 

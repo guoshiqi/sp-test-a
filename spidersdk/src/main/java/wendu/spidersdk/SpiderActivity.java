@@ -84,6 +84,14 @@ public class SpiderActivity extends AppCompatActivity {
         }
         spiderView.setArguments(arguments);
         if (isDebug) {
+            View hidden=getView(R.id.hidden);
+            hidden.setVisibility(View.VISIBLE);
+            hidden.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showProgress(false);
+                }
+            });
             spiderView.startDebug(getIntent().getStringExtra("debugStartUrl"),
                     getIntent().getStringExtra("debugSrc"), spiderEventListener);
         } else {

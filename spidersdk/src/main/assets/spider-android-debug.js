@@ -1,5 +1,18 @@
+/**
+ * Created by du on 16/9/1.
+ */
 
 var $ = dQuery;
+$.onload=function(cb){
+    if(document.readyState=="complete"){
+        cb();
+    }else {
+        window.addEventListener("load",function(){
+            cb();
+        })
+    }
+}
+
 String.prototype.format = function () {
     var args = Array.prototype.slice.call(arguments);
     var count = 0;
@@ -26,7 +39,7 @@ function log(str) {
 function errorReport(e) {
     var msg = "语法错误: " + e.message + "\nscript_url:" + _su + "\n" + e.stack
     if (window.curSession) {
-        curSession.log(msg);
+        curSession.log(msg,-1);
         curSession.finish(e.message, "", 2, msg);
     }
 }
@@ -63,7 +76,7 @@ $.errorReport = errorReport;
 function hook(fun) {
     return function () {
         if (!(arguments[0] instanceof Function)) {
-            t = arguments[0];
+            var t = arguments[0];
             log("warning: " + fun.name + " first argument should be function not string ")
             arguments[0] = function () {
                 eval(t)
@@ -171,8 +184,7 @@ function dSpider(sessionKey, timeOut, callback) {
             _startTimer(session)
         }
     }
-    var extras = DataSession.getExtraData()
-    extras = JSON.parse(extras || "{}")
+    var extras = session.getEnv()
     $(safeCallback(function () {
         $("body").on("click", "a", function () {
             $(this).attr("target", function (_, v) {
@@ -204,10 +216,6 @@ function DataSession(key) {
     this.key = key;
     this.finished = false;
     callHandler("start", {sessionKey: key})
-}
-
-DataSession.getExtraData = function (f) {
-    return callHandler("getExtraData")
 }
 
 var getArguments =function () {
@@ -261,12 +269,16 @@ DataSession.prototype = {
     },
     finish: function (errmsg, content, code, stack) {
         var ret = {sessionKey: this.key, result: 0, msg: ""}
+        var _log=this.get("__log");
+        _log=_log&&("\nLOG: \n"+_log);
         if (errmsg) {
             var ob = {
                 url: location.href,
                 msg: errmsg,
                 args: this.getArguments(),
-                content: content ,
+                log:_log,
+                network:this.getEnv().network,
+                content: content||undefined,
             }
             stack && (ob.stack = stack);
             ret.result = code || 2;
@@ -275,6 +287,9 @@ DataSession.prototype = {
         this.finished = true;
         callHandler("finish", ret);
 
+    },
+    getEnv: function(){
+        return JSON.parse(callHandler("getExtraData")||"{}");
     },
     upload: function (value) {
         if (value instanceof Object) {
@@ -307,6 +322,9 @@ DataSession.prototype = {
     log: function (str, type) {
         str = _logstr(str);
         console.log("dSpider: " + str)
+        if(type!==-1) {
+            this.set("__log", (this.get("__log")||"") + "> " + str+"\n");
+        }
         callHandler("log", {type: type || 1, msg: str})
     },
     setLocal: function (k, v) {

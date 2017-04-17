@@ -27,7 +27,8 @@
             android:padding="10dp"
             android:layout_marginLeft="10dp"
             android:src="@drawable/back_dark" />
-          <TextView
+
+        <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -36,6 +37,18 @@
             android:textSize="18dp"
             android:textColor="@color/black"
            />
+
+         <TextView
+            android:id="@+id/hidden"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="隐藏"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:gravity="center_vertical"
+            android:layout_marginRight="16dp"
+            android:visibility="gone"
+            />
     </RelativeLayout>
     </LinearLayout>
     <RelativeLayout

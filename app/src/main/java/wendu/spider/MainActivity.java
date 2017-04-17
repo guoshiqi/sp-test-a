@@ -109,7 +109,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         category = new SpiderCategory();
         category.name = "小说";
         category.spiders = new ArrayList<SpiderItem>() {{
-            add(new SpiderItem(1, R.mipmap.ic_launcher, "测试", "", ""));
+            add(new SpiderItem(1, R.mipmap.ic_launcher, "测试", "https://www.baidu.com", "test.js"));
             add(new SpiderItem(12, R.mipmap.ic_launcher, "顶点小说", "http://m.23us.com/", "dingdian.js"));
         }};
         items.add(category);

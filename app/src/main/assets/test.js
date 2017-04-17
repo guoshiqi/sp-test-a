@@ -3,6 +3,7 @@
  */
 dSpider("test", function(session,env,$){
     var count=100;
+    log(env)
     session.showProgress();
     session.setProgressMsg("正在初始化");
     var timer=setInterval(function(){
