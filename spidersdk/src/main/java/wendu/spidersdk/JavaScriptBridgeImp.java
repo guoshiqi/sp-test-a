@@ -207,6 +207,7 @@ class JavaScriptBridgeImp {
     public void log(final String msg, final int type) {
         String str = read("_log");
         save("_log", str + "dSpider: " + msg + "\n\n");
+        Log.d("dSpider",msg);
         mWebview.post(new Runnable() {
             @Override
             public void run() {

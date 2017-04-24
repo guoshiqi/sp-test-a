@@ -321,6 +321,10 @@ public class DSWebview extends WebView {
             return true;
         }
 
+        @Override
+        public boolean onJsConfirm(WebView view, String url, String message, JsResult result) {
+            return super.onJsConfirm(view, url, message, result);
+        }
     };
 
 
