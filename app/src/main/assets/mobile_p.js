@@ -346,7 +346,7 @@ dSpider("mobile", 60 * 5, function (session, env, $) {
         });
 
         $('#p_phone_account,#p_phone').val(PHONE)
-         .attr({"disabled": true});
+        // .attr({"disabled": true});
         $('#account_nav').click(function () {
             if (!$('#p_pwd').val()) {
                 window.jQuery("#p_phone_account").blur();
