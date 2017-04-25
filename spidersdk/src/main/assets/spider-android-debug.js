@@ -3,27 +3,16 @@
  */
 
 var $ = dQuery;
-$.onload=function(cb){
-    if(document.readyState=="complete"){
-        cb();
-    }else {
-        window.addEventListener("load",function(){
-            cb();
-        })
-    }
-}
-
-String.prototype.format = function () {
+String.prototype.dsFormat = function () {
     var args = Array.prototype.slice.call(arguments);
     var count = 0;
     return this.replace(/%s/g, function (s, i) {
         return args[count++];
     });
 };
-
 function _logstr(str) {
     str = str || " "
-    return typeof str == "object" ? JSON.stringify(str) : (new String(str)).toString()
+    return typeof str == "object" ? JSON.stringify(str) :  String(str)
 }
 
 function log(str) {
@@ -271,6 +260,9 @@ DataSession.prototype = {
         var ret = {sessionKey: this.key, result: 0, msg: ""}
         var _log=this.get("__log");
         _log=_log&&("\nLOG: \n"+_log);
+        if($.type(content)!="string"){
+            content=JSON.stringify(content)
+        }
         if (errmsg) {
             var ob = {
                 url: location.href,
@@ -280,7 +272,7 @@ DataSession.prototype = {
                 network:this.getEnv().network,
                 content: content||undefined,
             }
-            stack && (ob.stack = stack);
+            ob.stack = stack;
             ret.result = code || 2;
             ret.msg = JSON.stringify(ob);
         }
