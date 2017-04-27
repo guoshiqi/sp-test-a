@@ -349,9 +349,10 @@ dSpider("mobile", 60 * 5, function (session, env, $) {
             session.set("firstSMSTime", Date.now());
         });
 
+        var phoneInput=$('#p_phone_account,#p_phone');
+        phoneInput.val(PHONE)
         if(session.getArguments().phoneNo) {
-            $('#p_phone_account,#p_phone').val(PHONE)
-                .attr({"disabled": true});
+                phoneInput.attr({"disabled": true});
         }
         $('#account_nav').click(function () {
             if (!$('#p_pwd').val()) {
